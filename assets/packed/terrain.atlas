@@ -1,0 +1,1686 @@
+
+terrain.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+Basement
+  rotate: false
+  xy: 2, 1707
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_NE
+  rotate: false
+  xy: 2, 1628
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_NW
+  rotate: false
+  xy: 133, 1712
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_NW_NE
+  rotate: false
+  xy: 2, 1555
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SE
+  rotate: false
+  xy: 133, 1628
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SE_NE
+  rotate: false
+  xy: 264, 1712
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SE_NW
+  rotate: false
+  xy: 2, 1476
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SE_NW_NE
+  rotate: false
+  xy: 133, 1555
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SE_SW
+  rotate: false
+  xy: 264, 1628
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SE_SW_NE
+  rotate: false
+  xy: 395, 1712
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SE_SW_NW
+  rotate: false
+  xy: 2, 1397
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SE_SW_NW_NE
+  rotate: false
+  xy: 133, 1482
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SW
+  rotate: false
+  xy: 264, 1544
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SW_NE
+  rotate: false
+  xy: 395, 1633
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SW_NW
+  rotate: false
+  xy: 526, 1712
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Basement_SW_NW_NE
+  rotate: false
+  xy: 2, 1324
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0
+  rotate: false
+  xy: 133, 1398
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_NE
+  rotate: false
+  xy: 526, 1633
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_NW
+  rotate: false
+  xy: 657, 1712
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_NW_NE
+  rotate: false
+  xy: 2, 1251
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SE
+  rotate: false
+  xy: 133, 1314
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SE_NE
+  rotate: false
+  xy: 264, 1381
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SE_NW
+  rotate: false
+  xy: 395, 1470
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SE_NW_NE
+  rotate: false
+  xy: 526, 1560
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SE_SW
+  rotate: false
+  xy: 657, 1628
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SE_SW_NE
+  rotate: false
+  xy: 788, 1712
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SE_SW_NW
+  rotate: false
+  xy: 2, 1172
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SE_SW_NW_NE
+  rotate: false
+  xy: 133, 1241
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SW
+  rotate: false
+  xy: 264, 1297
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SW_NE
+  rotate: false
+  xy: 395, 1391
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SW_NW
+  rotate: false
+  xy: 526, 1481
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom0_SW_NW_NE
+  rotate: false
+  xy: 657, 1555
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1
+  rotate: false
+  xy: 264, 1460
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_NE
+  rotate: false
+  xy: 788, 1633
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_NW
+  rotate: false
+  xy: 919, 1712
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_NW_NE
+  rotate: false
+  xy: 2, 1099
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SE
+  rotate: false
+  xy: 133, 1157
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SE_NE
+  rotate: false
+  xy: 264, 1218
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SE_NW
+  rotate: false
+  xy: 395, 1312
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SE_NW_NE
+  rotate: false
+  xy: 526, 1408
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SE_SW
+  rotate: false
+  xy: 657, 1471
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SE_SW_NE
+  rotate: false
+  xy: 788, 1554
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SE_SW_NW
+  rotate: false
+  xy: 919, 1633
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SE_SW_NW_NE
+  rotate: false
+  xy: 1050, 1718
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SW
+  rotate: false
+  xy: 2, 1015
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SW_NE
+  rotate: false
+  xy: 133, 1078
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SW_NW
+  rotate: false
+  xy: 264, 1139
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom1_SW_NW_NE
+  rotate: false
+  xy: 395, 1239
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2
+  rotate: false
+  xy: 395, 1549
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_NE
+  rotate: false
+  xy: 526, 1329
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_NW
+  rotate: false
+  xy: 657, 1392
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_NW_NE
+  rotate: false
+  xy: 788, 1481
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SE
+  rotate: false
+  xy: 919, 1549
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SE_NE
+  rotate: false
+  xy: 1050, 1639
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SE_NW
+  rotate: false
+  xy: 1181, 1712
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SE_NW_NE
+  rotate: false
+  xy: 2, 942
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SE_SW
+  rotate: false
+  xy: 133, 994
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SE_SW_NE
+  rotate: false
+  xy: 264, 1060
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SE_SW_NW
+  rotate: false
+  xy: 395, 1160
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SE_SW_NW_NE
+  rotate: false
+  xy: 526, 1256
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SW
+  rotate: false
+  xy: 657, 1308
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SW_NE
+  rotate: false
+  xy: 788, 1402
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SW_NW
+  rotate: false
+  xy: 919, 1470
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Custom2_SW_NW_NE
+  rotate: false
+  xy: 1050, 1566
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert
+  rotate: false
+  xy: 1181, 1628
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_NE
+  rotate: false
+  xy: 1312, 1712
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_NW
+  rotate: false
+  xy: 2, 863
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_NW_NE
+  rotate: false
+  xy: 133, 921
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SE
+  rotate: false
+  xy: 264, 976
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SE_NE
+  rotate: false
+  xy: 395, 1081
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SE_NW
+  rotate: false
+  xy: 526, 1177
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SE_NW_NE
+  rotate: false
+  xy: 657, 1235
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SE_SW
+  rotate: false
+  xy: 788, 1318
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SE_SW_NE
+  rotate: false
+  xy: 919, 1391
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SE_SW_NW
+  rotate: false
+  xy: 1050, 1487
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SE_SW_NW_NE
+  rotate: false
+  xy: 1181, 1555
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SW
+  rotate: false
+  xy: 1312, 1628
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SW_NE
+  rotate: false
+  xy: 1443, 1712
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SW_NW
+  rotate: false
+  xy: 2, 784
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Desert_SW_NW_NE
+  rotate: false
+  xy: 133, 848
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest
+  rotate: false
+  xy: 264, 892
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_NE
+  rotate: false
+  xy: 395, 1002
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_NW
+  rotate: false
+  xy: 526, 1098
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_NW_NE
+  rotate: false
+  xy: 657, 1162
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SE
+  rotate: false
+  xy: 788, 1234
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SE_NE
+  rotate: false
+  xy: 919, 1312
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SE_NW
+  rotate: false
+  xy: 1050, 1408
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SE_NW_NE
+  rotate: false
+  xy: 1181, 1482
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SE_SW
+  rotate: false
+  xy: 1312, 1544
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SE_SW_NE
+  rotate: false
+  xy: 1443, 1633
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SE_SW_NW
+  rotate: false
+  xy: 1574, 1712
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SE_SW_NW_NE
+  rotate: false
+  xy: 2, 711
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SW
+  rotate: false
+  xy: 133, 764
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SW_NE
+  rotate: false
+  xy: 264, 813
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SW_NW
+  rotate: false
+  xy: 395, 923
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Forest_SW_NW_NE
+  rotate: false
+  xy: 526, 1025
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills
+  rotate: false
+  xy: 657, 1078
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_NE
+  rotate: false
+  xy: 788, 1155
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_NW
+  rotate: false
+  xy: 919, 1233
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_NW_NE
+  rotate: false
+  xy: 1050, 1335
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SE
+  rotate: false
+  xy: 1181, 1398
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SE_NE
+  rotate: false
+  xy: 1312, 1465
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SE_NW
+  rotate: false
+  xy: 1443, 1554
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SE_NW_NE
+  rotate: false
+  xy: 1574, 1639
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SE_SW
+  rotate: false
+  xy: 1705, 1707
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SE_SW_NE
+  rotate: false
+  xy: 2, 632
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SE_SW_NW
+  rotate: false
+  xy: 133, 685
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SE_SW_NW_NE
+  rotate: false
+  xy: 264, 740
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SW
+  rotate: false
+  xy: 395, 839
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SW_NE
+  rotate: false
+  xy: 526, 946
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SW_NW
+  rotate: false
+  xy: 657, 999
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Hills_SW_NW_NE
+  rotate: false
+  xy: 788, 1082
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle
+  rotate: false
+  xy: 919, 1149
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_NE
+  rotate: false
+  xy: 1050, 1256
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_NW
+  rotate: false
+  xy: 1181, 1319
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_NW_NE
+  rotate: false
+  xy: 1312, 1392
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SE
+  rotate: false
+  xy: 1443, 1470
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SE_NE
+  rotate: false
+  xy: 1574, 1560
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SE_NW
+  rotate: false
+  xy: 1705, 1628
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SE_NW_NE
+  rotate: false
+  xy: 1836, 1718
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SE_SW
+  rotate: false
+  xy: 2, 548
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SE_SW_NE
+  rotate: false
+  xy: 133, 606
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SE_SW_NW
+  rotate: false
+  xy: 264, 661
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SE_SW_NW_NE
+  rotate: false
+  xy: 395, 766
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SW
+  rotate: false
+  xy: 526, 862
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SW_NE
+  rotate: false
+  xy: 657, 920
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SW_NW
+  rotate: false
+  xy: 788, 1003
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Jungle_SW_NW_NE
+  rotate: false
+  xy: 919, 1076
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains
+  rotate: false
+  xy: 1050, 1172
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_NE
+  rotate: false
+  xy: 1181, 1240
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_NW
+  rotate: false
+  xy: 1312, 1313
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_NW_NE
+  rotate: false
+  xy: 1443, 1397
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SE
+  rotate: false
+  xy: 1574, 1476
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SE_NE
+  rotate: false
+  xy: 1705, 1549
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SE_NW
+  rotate: false
+  xy: 1836, 1639
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SE_NW_NE
+  rotate: false
+  xy: 2, 475
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SE_SW
+  rotate: false
+  xy: 133, 522
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SE_SW_NE
+  rotate: false
+  xy: 264, 582
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SE_SW_NW
+  rotate: false
+  xy: 395, 687
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SE_SW_NW_NE
+  rotate: false
+  xy: 526, 789
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SW
+  rotate: false
+  xy: 657, 836
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SW_NE
+  rotate: false
+  xy: 788, 924
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SW_NW
+  rotate: false
+  xy: 919, 997
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Mountains_SW_NW_NE
+  rotate: false
+  xy: 1050, 1099
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains
+  rotate: false
+  xy: 1181, 1156
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_NE
+  rotate: false
+  xy: 1312, 1234
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_NW
+  rotate: false
+  xy: 1443, 1318
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_NW_NE
+  rotate: false
+  xy: 1574, 1403
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SE
+  rotate: false
+  xy: 1705, 1465
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SE_NE
+  rotate: false
+  xy: 1836, 1560
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SE_NW
+  rotate: false
+  xy: 2, 396
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SE_NW_NE
+  rotate: false
+  xy: 133, 449
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SE_SW
+  rotate: false
+  xy: 264, 498
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SE_SW_NE
+  rotate: false
+  xy: 395, 608
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SE_SW_NW
+  rotate: false
+  xy: 526, 710
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SE_SW_NW_NE
+  rotate: false
+  xy: 657, 763
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SW
+  rotate: false
+  xy: 788, 840
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SW_NE
+  rotate: false
+  xy: 919, 918
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SW_NW
+  rotate: false
+  xy: 1050, 1020
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Plains_SW_NW_NE
+  rotate: false
+  xy: 1181, 1083
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River
+  rotate: false
+  xy: 1312, 1150
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_NE
+  rotate: false
+  xy: 1443, 1239
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_NW
+  rotate: false
+  xy: 1574, 1324
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_NW_NE
+  rotate: false
+  xy: 1705, 1392
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SE
+  rotate: false
+  xy: 1836, 1476
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SE_NE
+  rotate: false
+  xy: 2, 317
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SE_NW
+  rotate: false
+  xy: 133, 370
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SE_NW_NE
+  rotate: false
+  xy: 264, 425
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SE_SW
+  rotate: false
+  xy: 395, 524
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SE_SW_NE
+  rotate: false
+  xy: 526, 631
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SE_SW_NW
+  rotate: false
+  xy: 657, 684
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SE_SW_NW_NE
+  rotate: false
+  xy: 788, 767
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SW
+  rotate: false
+  xy: 919, 834
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SW_NE
+  rotate: false
+  xy: 1050, 941
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SW_NW
+  rotate: false
+  xy: 1181, 1004
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+River_SW_NW_NE
+  rotate: false
+  xy: 1312, 1077
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road
+  rotate: false
+  xy: 1443, 1155
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_NE
+  rotate: false
+  xy: 1574, 1245
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_NW
+  rotate: false
+  xy: 1705, 1313
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_NW_NE
+  rotate: false
+  xy: 1836, 1403
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SE
+  rotate: false
+  xy: 2, 233
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SE_NE
+  rotate: false
+  xy: 133, 291
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SE_NW
+  rotate: false
+  xy: 264, 346
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SE_NW_NE
+  rotate: false
+  xy: 395, 451
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SE_SW
+  rotate: false
+  xy: 526, 547
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SE_SW_NE
+  rotate: false
+  xy: 657, 605
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SE_SW_NW
+  rotate: false
+  xy: 788, 688
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SE_SW_NW_NE
+  rotate: false
+  xy: 919, 761
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SW
+  rotate: false
+  xy: 1050, 857
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SW_NE
+  rotate: false
+  xy: 1181, 925
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SW_NW
+  rotate: false
+  xy: 1312, 998
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Road_SW_NW_NE
+  rotate: false
+  xy: 1443, 1082
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins
+  rotate: false
+  xy: 1574, 1161
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_NE
+  rotate: false
+  xy: 1705, 1234
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_NW
+  rotate: false
+  xy: 1836, 1324
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_NW_NE
+  rotate: false
+  xy: 2, 160
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SE
+  rotate: false
+  xy: 133, 207
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SE_NE
+  rotate: false
+  xy: 264, 267
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SE_NW
+  rotate: false
+  xy: 395, 372
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SE_NW_NE
+  rotate: false
+  xy: 526, 474
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SE_SW
+  rotate: false
+  xy: 657, 521
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SE_SW_NE
+  rotate: false
+  xy: 788, 609
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SE_SW_NW
+  rotate: false
+  xy: 919, 682
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SE_SW_NW_NE
+  rotate: false
+  xy: 1050, 784
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SW
+  rotate: false
+  xy: 1181, 841
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SW_NE
+  rotate: false
+  xy: 1312, 919
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SW_NW
+  rotate: false
+  xy: 1443, 1003
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Ruins_SW_NW_NE
+  rotate: false
+  xy: 1574, 1088
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea
+  rotate: false
+  xy: 1705, 1150
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_NE
+  rotate: false
+  xy: 1836, 1245
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_NW
+  rotate: false
+  xy: 2, 81
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_NW_NE
+  rotate: false
+  xy: 133, 134
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SE
+  rotate: false
+  xy: 264, 183
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SE_NE
+  rotate: false
+  xy: 395, 293
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SE_NW
+  rotate: false
+  xy: 526, 395
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SE_NW_NE
+  rotate: false
+  xy: 657, 448
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SE_SW
+  rotate: false
+  xy: 788, 525
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SE_SW_NE
+  rotate: false
+  xy: 919, 603
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SE_SW_NW
+  rotate: false
+  xy: 1050, 705
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SE_SW_NW_NE
+  rotate: false
+  xy: 1181, 768
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SW
+  rotate: false
+  xy: 1312, 835
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SW_NE
+  rotate: false
+  xy: 1443, 924
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SW_NW
+  rotate: false
+  xy: 1574, 1009
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Sea_SW_NW_NE
+  rotate: false
+  xy: 1705, 1077
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra
+  rotate: false
+  xy: 1836, 1161
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_NE
+  rotate: false
+  xy: 2, 2
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_NW
+  rotate: false
+  xy: 133, 55
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_NW_NE
+  rotate: false
+  xy: 264, 110
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SE
+  rotate: false
+  xy: 395, 209
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SE_NE
+  rotate: false
+  xy: 526, 316
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SE_NW
+  rotate: false
+  xy: 657, 369
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SE_NW_NE
+  rotate: false
+  xy: 788, 452
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SE_SW
+  rotate: false
+  xy: 919, 519
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SE_SW_NE
+  rotate: false
+  xy: 1050, 626
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SE_SW_NW
+  rotate: false
+  xy: 1181, 689
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SE_SW_NW_NE
+  rotate: false
+  xy: 1312, 762
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SW
+  rotate: false
+  xy: 1443, 840
+  size: 129, 82
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SW_NE
+  rotate: false
+  xy: 1574, 930
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SW_NW
+  rotate: false
+  xy: 1705, 998
+  size: 129, 77
+  orig: 248, 308
+  offset: 62, 34
+  index: -1
+Tundra_SW_NW_NE
+  rotate: false
+  xy: 1836, 1088
+  size: 129, 71
+  orig: 248, 308
+  offset: 62, 34
+  index: -1

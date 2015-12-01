@@ -40,6 +40,7 @@ public class TextureAtlas {
 	 * @author Maximilian Stark | Dakror
 	 */
 	public static class TextureRegion {
+		public Texture texture;
 		/**
 		 * relative to the full size of the texture
 		 */
@@ -47,7 +48,7 @@ public class TextureAtlas {
 		/**
 		 * all absolute values
 		 */
-		public int origWidth, origHeight, index, textureId;
+		public int origWidth, origHeight, index;
 	}
 	
 	List<Texture> textures = new ArrayList<Texture>();
@@ -112,7 +113,7 @@ public class TextureAtlas {
 					br.readLine();
 				} else if (!line.startsWith("  ")) {
 					TextureRegion tr = new TextureRegion();
-					tr.textureId = currentTexture.textureId;
+					tr.texture = currentTexture;
 					
 					// rotate
 					br.readLine();

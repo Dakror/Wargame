@@ -22,35 +22,44 @@ import de.dakror.wargame.TextureAtlas.Tile;
  * @author Maximilian Stark | Dakror
  *
  */
-public class Entity extends AnimatedSprite {
+public abstract class Entity extends AnimatedSprite {
 	World world;
 	Tile[] faces;
+	boolean huge;
 	int face;
 	boolean dead;
 	
-	public Entity(int x, int y, int z, String name, int face) {
+	public Entity(int x, int y, int z, int face, boolean huge, String name) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		
+		this.huge = huge;
 		this.face = face;
 		vAnim = 0.05f;
 		loopAnim = true;
-		faces = MainActivity.standing.getFaces(name);
+		faces = MainActivity.standing.getFaces("palette99_" + name + "_" + (huge ? "Huge" : "Large"));
 		
 		updateTexture();
 	}
 	
+	public Entity(int x, int y, int z, int face, String name) {
+		this(x, y, z, face, false, name);
+	}
+	
+	public Entity(int x, int y, int z, boolean huge, String name) {
+		this(x, y, z, 0, huge, name);
+	}
+	
 	public Entity(int x, int y, int z, String name) {
-		this(x, y, z, name, 0);
+		this(x, y, z, 0, false, name);
 	}
 	
 	@Override
 	protected void updateTexture() {
 		tile = faces[face];
 		super.updateTexture();
-		width = textureWidth * 2048;//(float) Math.ceil((textureWidth * 2048) / World.WIDTH) * World.WIDTH;
-		height = textureHeight * 2048;//(width / (textureWidth * 2048)) * 2048;
+		width = textureWidth * tile.regions.get(index).texture.width;
+		height = textureHeight * tile.regions.get(index).texture.height;
 	}
 	
 	public int getFace() {
@@ -75,17 +84,17 @@ public class Entity extends AnimatedSprite {
 	
 	@Override
 	public float getX() {
-		return super.getX() * World.WIDTH / 2 + super.getZ() * World.WIDTH / 2 + world.getPos().x + (World.WIDTH - width) / 2;//- world.width * World.WIDTH / 2;
+		return super.getX() + world.getPos().x;
 	}
 	
 	@Override
 	public float getY() {
-		return super.getY() * World.HEIGHT - super.getX() * World.DEPTH / 2 + super.getZ() * World.DEPTH / 2 + world.getPos().y;
+		return super.getY() + world.getPos().y + World.HEIGHT;
 	}
 	
 	@Override
 	public float getZ() {
-		return super.getY() * World.HEIGHT + super.getX() * World.DEPTH / 2 + world.getPos().z + World.HEIGHT;
+		return super.getZ() + world.getPos().z;
 	}
 	
 	public boolean isDead() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015 Maximilian Stark | Dakror <mail@dakror.de>
+  * Copyright 2015 Maximilian Stark | Dakror <mail@dakror.de>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,6 @@ public class MainActivity extends Activity {
 		float scale = 1;
 		float ratio;
 		
-		//AnimatedSprite sprite;
 		World map;
 		
 		@SuppressLint("ClickableViewAccessibility")
@@ -149,13 +148,9 @@ public class MainActivity extends Activity {
 			//			System.out.println(animation.tiles.size());
 			//			System.out.println(animation.tr);
 			
-			/*sprite = new AnimatedSprite(0, 0, 0, 65, 87, standing.getTile("palette99_Copter_P_Large_face0"), 1);
-			sprite.vAnim = 0.04f;
-			sprite.loopAnim = true;*/
+			map = new World("maps/lake.map");
 			
-			map = new World(6, 1, 6);//"maps/lake.map");
-			
-			map.addEntity(new Entity(0, 0, 0, "palette99_Dock_Large", 0));
+			map.addEntity(new Building(0, 1, 0, true, Building.Type.Dock));
 			
 			glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
 		}
@@ -166,13 +161,13 @@ public class MainActivity extends Activity {
 			MainActivity.height = height;
 			glViewport(0, 0, width, height);
 			ratio = (float) width / height;
-			System.out.println("ratio: " + ratio);
+			//			System.out.println("ratio: " + ratio);
 			Matrix.orthoM(projMatrix, 0, -ratio, ratio, -1, 1, -10, 100);
 			//			Matrix.rotateM(projMatrix, 0, -45, 0, 1, 0);
 			//			Matrix.rotateM(projMatrix, 0, 25, 1, 0, 0);
 			Matrix.orthoM(hudMatrix, 0, 0, ratio, 0, 1, 0, 10);
 			
-			printMatrix(projMatrix);
+			//			printMatrix(projMatrix);
 			
 			//Matrix.frustumM(projMatrix, 0, -ratio, ratio, -1, 1, 1, 1000);
 		}
@@ -188,7 +183,6 @@ public class MainActivity extends Activity {
 			
 			float timeStep = Math.min(1.0f / fps, 1 / 60f);
 			
-			//sprite.update(timeStep);
 			map.update(timeStep);
 			
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -196,7 +190,7 @@ public class MainActivity extends Activity {
 			glEnable(GL_DEPTH_TEST);
 			
 			Matrix.setIdentityM(mvMatrix, 0);
-			Matrix.setIdentityM(matrix, 0);
+			//			Matrix.setIdentityM(matrix, 0);
 			
 			Matrix.scaleM(mvMatrix, 0, 1f / 1024 * scale, 1f / 1024 * scale, 1f / 1024 * scale);
 			
@@ -208,7 +202,8 @@ public class MainActivity extends Activity {
 			
 			spriteRenderer.begin(hudMatrix);
 			textRenderer.renderText(0f, 0.97f, 0, 0.00125f, "FPS: " + fps, spriteRenderer);
-			textRenderer.renderText(0f, 0.93f, 0, 0.00125f, "E: " + map.rEntities + " / " + map.entities.size(), spriteRenderer);
+			textRenderer.renderText(0f, 0.93f, 0, 0.00125f, "R: " + map.rendered + " / " + map.all, spriteRenderer);
+			textRenderer.renderText(0f, 0.89f, 0, 0.00125f, "E: " + map.rEntities + " / " + map.entities.size(), spriteRenderer);
 			spriteRenderer.end();
 			
 			frames++;

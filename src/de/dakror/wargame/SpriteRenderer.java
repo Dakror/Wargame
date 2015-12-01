@@ -45,6 +45,8 @@ public class SpriteRenderer {
 	FloatBuffer vertices;
 	ShortBuffer indices;
 	
+	float[] matrix;
+	
 	final float[] WHITE = new float[] { 1, 1, 1, 1 };
 	
 	public SpriteRenderer() {
@@ -117,6 +119,7 @@ public class SpriteRenderer {
 	}
 	
 	public void begin(float[] matrix) {
+		this.matrix = matrix;
 		glUseProgram(program);
 		aPos = glGetAttribLocation(program, "aPos");
 		aTex = glGetAttribLocation(program, "aTex");

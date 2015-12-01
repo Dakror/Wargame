@@ -44,7 +44,7 @@ public class AnimatedSprite extends Sprite {
 	}
 	
 	protected void updateTexture() {
-		textureId = tile.regions.get(index).textureId;
+		textureId = tile.regions.get(index).texture.textureId;
 		textureX = tile.regions.get(index).x;
 		textureY = tile.regions.get(index).y;
 		textureWidth = tile.regions.get(index).width;

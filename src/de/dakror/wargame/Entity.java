@@ -22,36 +22,25 @@ import de.dakror.wargame.TextureAtlas.Tile;
  * @author Maximilian Stark | Dakror
  *
  */
-public abstract class Entity extends AnimatedSprite {
+public abstract class Entity extends AnimatedSprite implements EntityLifeCycle {
 	World world;
 	Tile[] faces;
 	boolean huge;
 	int face;
 	boolean dead;
 	
-	public Entity(int x, int y, int z, int face, boolean huge, String name) {
+	public Entity(int x, int y, int z, int face, int color, boolean huge, String name) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.huge = huge;
 		this.face = face;
+		this.color = color;
 		vAnim = 0.05f;
 		loopAnim = true;
-		faces = MainActivity.standing.getFaces("palette99_" + name + "_" + (huge ? "Huge" : "Large"));
+		faces = Wargame.standing.getFaces("palette99_" + name + "_" + (huge ? "Huge" : "Large"));
 		
 		updateTexture();
-	}
-	
-	public Entity(int x, int y, int z, int face, String name) {
-		this(x, y, z, face, false, name);
-	}
-	
-	public Entity(int x, int y, int z, boolean huge, String name) {
-		this(x, y, z, 0, huge, name);
-	}
-	
-	public Entity(int x, int y, int z, String name) {
-		this(x, y, z, 0, false, name);
 	}
 	
 	@Override

@@ -30,8 +30,6 @@ public class AnimatedSprite extends Sprite {
 	protected float vAnim, lastAnim;
 	protected boolean loopAnim;
 	
-	int loops;
-	
 	public AnimatedSprite() {}
 	
 	public AnimatedSprite(float x, float y, float z, float width, float height, Tile tile, int color) {
@@ -52,13 +50,6 @@ public class AnimatedSprite extends Sprite {
 	}
 	
 	public void update(float timePassed) {
-		// entity stuff
-		/*if (frozen || dead) return;
-		
-		if (lifeTime > 0) {
-			life += timePassed;
-			if (life >= lifeTime) dead = true;
-		}*/
 		if (vAnim > 0) {
 			lastAnim -= timePassed;
 			if (lastAnim <= 0) {
@@ -66,12 +57,7 @@ public class AnimatedSprite extends Sprite {
 				lastAnim = vAnim;
 				
 				index = loopAnim ? index % tile.regions.size() : (index >= tile.regions.size() ? tile.regions.size() - 1 : index);
-				if (index == 0) loops++;
 				
-				if (loops % 20 == 0) {
-					color = (color + 1) % 8;
-					loops = 1;
-				}
 				updateTexture();
 			}
 		}

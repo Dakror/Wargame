@@ -58,7 +58,7 @@ public class TextRenderer {
 	void parse(String fontFile) {
 		try {
 			glyphs = new HashMap<Character, Glyph>();
-			BufferedReader br = new BufferedReader(new InputStreamReader(MainActivity.instance.getAssets().open(fontFile)));
+			BufferedReader br = new BufferedReader(new InputStreamReader(Wargame.instance.getAssets().open(fontFile)));
 			
 			String line = "";
 			while ((line = br.readLine()) != null) {
@@ -69,7 +69,7 @@ public class TextRenderer {
 					
 					System.out.println("(TextRenderer) Loading Texture: " + texture);
 					if (textureId != 0) System.err.println("(TextRenderer) Conflict! Multiple Pages detected");
-					textureId = MainActivity.instance.loadTexture(fontFile.substring(0, fontFile.lastIndexOf("/")) + "/" + texture);
+					textureId = Wargame.instance.loadTexture(fontFile.substring(0, fontFile.lastIndexOf("/")) + "/" + texture);
 				} else if (line.startsWith("char ")) {
 					String[] p = line.split(" +");
 					Glyph g = new Glyph();

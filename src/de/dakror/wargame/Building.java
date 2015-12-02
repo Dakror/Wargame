@@ -21,35 +21,71 @@ package de.dakror.wargame;
  *
  */
 public class Building extends Entity {
-	public static enum Type {
-		Airport,
-		Castle,
-		City,
-		Dock,
-		Estate,
-		Factory,
-		Laboratory;
+	public static final float SCALE = 0.5f;
+	
+	public static enum Type implements EntityLifeCycle {
+		//		Airport(750, 160), // for planes
+		//		Castle(2500, 325), // for defense
+		City(1000, 125) {
+			@Override
+			public void onDeath() {
+				System.out.println("YOU LOSE");
+			}
+		}, // main building
+		//		Dock(650, 90), // for ships
+		Estate(350, 35), // for troops
+		Factory(550, 75), // for resources
+		//		Laboratory(450, 1000), // for science!!!!
 		
-		private Type() {}
+		;
+		
+		public final int hp, costs;
+		
+		private Type(int hp, int costs) {
+			this.hp = hp;
+			this.costs = costs;
+		}
+		
+		@Override
+		public void onCreate() {}
+		
+		@Override
+		public void onSpawn() {}
+		
+		@Override
+		public void update(float timePassed) {}
+		
+		@Override
+		public void onDeath() {}
+		
+		@Override
+		public void onRemoval() {}
 	}
 	
 	protected Type type;
 	
-	public Building(int x, int y, int z, int face, boolean huge, Type type) {
-		super(x, y, z, face, huge, type.name());
+	public Building(int x, int y, int z, int face, int color, boolean huge, Type type) {
+		super(x, y, z, face, color, huge, type.name());
 		this.type = type;
+		type.onCreate();
 	}
 	
-	public Building(int x, int y, int z, Type type) {
-		this(x, y, z, 0, type);
+	public Building(int x, int y, int z, int color, Type type) {
+		this(x, y, z, 0, color, type);
 	}
 	
-	public Building(int x, int y, int z, int face, Type type) {
-		this(x, y, z, face, false, type);
+	public Building(int x, int y, int z, int face, int color, Type type) {
+		this(x, y, z, face, color, false, type);
 	}
 	
-	public Building(int x, int y, int z, boolean huge, Type type) {
-		this(x, y, z, 0, huge, type);
+	public Building(int x, int y, int z, int color, boolean huge, Type type) {
+		this(x, y, z, 0, color, huge, type);
+	}
+	
+	@Override
+	public void update(float timePassed) {
+		super.update(timePassed);
+		type.update(timePassed);
 	}
 	
 	@Override
@@ -59,7 +95,7 @@ public class Building extends Entity {
 		
 		float texWidth = textureWidth * tile.regions.get(index).texture.width;
 		
-		width = (float) (Math.ceil(texWidth / World.WIDTH) * World.WIDTH);
+		width = (float) (Math.ceil(texWidth / World.WIDTH) * (World.WIDTH * SCALE));
 		height = (textureHeight * tile.regions.get(index).texture.height) * (width / texWidth);
 	}
 	
@@ -69,16 +105,36 @@ public class Building extends Entity {
 	
 	@Override
 	public float getX() {
-		return (x + (huge ? 1 : 0)) * World.WIDTH / 2 + z * World.WIDTH / 2 + world.getPos().x + (World.WIDTH - width) / 2;
+		return (x + (huge ? 1 : 0)) * (World.WIDTH * SCALE) / 2 + z * (World.WIDTH * SCALE) / 2 + world.getPos().x + ((World.WIDTH * SCALE) - width) / 2;
 	}
 	
 	@Override
 	public float getY() {
-		return y * World.HEIGHT - (x + (huge ? 1 : 0)) * World.DEPTH / 2 + z * World.DEPTH / 2 + world.getPos().y + World.HEIGHT;
+		return y * World.HEIGHT - (x + (huge ? 1 : 0)) * (World.DEPTH * SCALE) / 2 + z * (World.DEPTH * SCALE) / 2 + world.getPos().y + World.HEIGHT - 1;
 	}
 	
 	@Override
 	public float getZ() {
-		return y * World.HEIGHT + (x + (huge ? 1 : 0)) * World.DEPTH / 2 + world.getPos().z + World.HEIGHT + 1337;
+		return y * World.HEIGHT + (x + (huge ? 1 : 0)) * (World.DEPTH * SCALE) / 2 + world.getPos().z + World.HEIGHT;
+	}
+	
+	@Override
+	public void onCreate() {
+		type.onCreate();
+	}
+	
+	@Override
+	public void onSpawn() {
+		type.onSpawn();
+	}
+	
+	@Override
+	public void onDeath() {
+		type.onDeath();
+	}
+	
+	@Override
+	public void onRemoval() {
+		type.onDeath();
 	}
 }

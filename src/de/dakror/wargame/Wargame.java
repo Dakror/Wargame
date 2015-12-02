@@ -37,65 +37,20 @@ import android.opengl.Matrix;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import de.dakror.wargame.Building.Type;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class MainActivity extends Activity {
-	GLSurfaceView glView;
-	WargameRenderer renderer;
-	public static MainActivity instance;
-	
-	public static int width, height;
-	public static TextureAtlas terrain, standing, animation;
-	
-	float prevX, prevY, prevNum;
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
-		instance = this;
-		renderer = new WargameRenderer();
-		glView = new GLSurfaceView(this);
-		glView.setEGLContextClientVersion(2);
-		glView.setRenderer(renderer);
-		glView.setOnTouchListener(renderer);
-		renderer.gestureDetector = new ScaleGestureDetector(this, renderer);
-		setContentView(glView);
-	}
-	
-	@TargetApi(Build.VERSION_CODES.KITKAT)
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		if (hasFocus) {
-			glView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-		}
-	}
-	
-	@Override
-	protected void onResume() {
-		// Ideally a game should implement onResume() and onPause()
-		// to take appropriate action when the activity looses focus
-		super.onResume();
-		glView.onResume();
-	}
-	
-	@Override
-	protected void onPause() {
-		// Ideally a game should implement onResume() and onPause()
-		// to take appropriate action when the activity looses focus
-		super.onPause();
-		glView.onPause();
-	}
-	
-	public class WargameRenderer implements GLSurfaceView.Renderer, OnTouchListener, ScaleGestureDetector.OnScaleGestureListener {
-		ScaleGestureDetector gestureDetector;
+public class Wargame extends Activity {
+	public class WargameRenderer implements GLSurfaceView.Renderer, OnTouchListener, GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener {
+		GestureDetector gestureDetector;
+		ScaleGestureDetector scaleGestureDetector;
 		
 		SpriteRenderer spriteRenderer;
 		TextRenderer textRenderer;
@@ -105,8 +60,12 @@ public class MainActivity extends Activity {
 		long lastTimestamp;
 		long lastFrame;
 		
-		float scale = 1;
+		float scale = 5;
 		float ratio;
+		
+		float prevX, prevY, prevNum;
+		
+		float vX, vY;
 		
 		World map;
 		
@@ -114,6 +73,7 @@ public class MainActivity extends Activity {
 		@Override
 		public boolean onTouch(View v, MotionEvent e) {
 			gestureDetector.onTouchEvent(e);
+			scaleGestureDetector.onTouchEvent(e);
 			float x = e.getX();
 			float y = e.getY();
 			
@@ -150,15 +110,20 @@ public class MainActivity extends Activity {
 			
 			map = new World("maps/lake.map");
 			
-			map.addEntity(new Building(0, 1, 0, true, Building.Type.Dock));
-			
+			Building b = new Building(5, 2, 7, 0, Type.City);
+			map.addEntity(b);
+			map.center(b);
+			//			for (int i = 0; i < 8; i++)
+			//				for (Type t : Type.values())
+			//					map.addEntity(new Building(t.ordinal(), 2, i * 2, i, t));
+			//					
 			glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
 		}
 		
 		@Override
 		public void onSurfaceChanged(GL10 gl10, int width, int height) {
-			MainActivity.width = width;
-			MainActivity.height = height;
+			Wargame.width = width;
+			Wargame.height = height;
 			glViewport(0, 0, width, height);
 			ratio = (float) width / height;
 			//			System.out.println("ratio: " + ratio);
@@ -212,6 +177,7 @@ public class MainActivity extends Activity {
 		@Override
 		public boolean onScale(ScaleGestureDetector detector) {
 			scale *= detector.getScaleFactor();
+			scale = Math.min(15, Math.max(0.3f, scale));
 			return true;
 		}
 		
@@ -222,6 +188,80 @@ public class MainActivity extends Activity {
 		
 		@Override
 		public void onScaleEnd(ScaleGestureDetector detector) {}
+		
+		@Override
+		public boolean onDown(MotionEvent e) {
+			return false;
+		}
+		
+		@Override
+		public void onShowPress(MotionEvent e) {}
+		
+		@Override
+		public boolean onSingleTapUp(MotionEvent e) {
+			System.out.println(e);
+			return false;
+		}
+		
+		@Override
+		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+			return false;
+		}
+		
+		@Override
+		public void onLongPress(MotionEvent e) {}
+		
+		@Override
+		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+			return false;
+		}
+	}
+	
+	GLSurfaceView glView;
+	WargameRenderer renderer;
+	public static Wargame instance;
+	
+	public static int width, height;
+	public static TextureAtlas terrain, standing, animation;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		instance = this;
+		renderer = new WargameRenderer();
+		glView = new GLSurfaceView(this);
+		glView.setEGLContextClientVersion(2);
+		glView.setRenderer(renderer);
+		glView.setOnTouchListener(renderer);
+		renderer.gestureDetector = new GestureDetector(this, renderer);
+		renderer.scaleGestureDetector = new ScaleGestureDetector(this, renderer);
+		setContentView(glView);
+	}
+	
+	@TargetApi(Build.VERSION_CODES.KITKAT)
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus) {
+			glView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+		}
+	}
+	
+	@Override
+	protected void onResume() {
+		// Ideally a game should implement onResume() and onPause()
+		// to take appropriate action when the activity looses focus
+		super.onResume();
+		glView.onResume();
+	}
+	
+	@Override
+	protected void onPause() {
+		// Ideally a game should implement onResume() and onPause()
+		// to take appropriate action when the activity looses focus
+		super.onPause();
+		glView.onPause();
 	}
 	
 	public int createProgram(String vertexShaderFile, String fragmentShaderFile) {
@@ -281,6 +321,18 @@ public class MainActivity extends Activity {
 		return id[0];
 	}
 	
+	public static String read(InputStream is) throws IOException {
+		StringBuilder content = new StringBuilder();
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		String line = "";
+		while ((line = br.readLine()) != null) {
+			content.append(line);
+			content.append("\r\n");
+		}
+		br.close();
+		return content.toString();
+	}
+	
 	public static void printMatrix(float[] m) {
 		int len = 8;
 		for (int i = 0; i < 4; i++) {
@@ -293,17 +345,5 @@ public class MainActivity extends Activity {
 		while (s.length() < len)
 			s = f % 1 == 0 ? " " + s : s + "0";
 		return s;
-	}
-	
-	public static String read(InputStream is) throws IOException {
-		StringBuilder content = new StringBuilder();
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		String line = "";
-		while ((line = br.readLine()) != null) {
-			content.append(line);
-			content.append("\r\n");
-		}
-		br.close();
-		return content.toString();
 	}
 }

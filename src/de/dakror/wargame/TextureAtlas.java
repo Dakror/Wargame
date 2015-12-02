@@ -81,7 +81,7 @@ public class TextureAtlas {
 	
 	void parse(String atlasFile) {
 		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(MainActivity.instance.getAssets().open(atlasFile)));
+			BufferedReader br = new BufferedReader(new InputStreamReader(Wargame.instance.getAssets().open(atlasFile)));
 			
 			Texture currentTexture = null;
 			String line = "";
@@ -107,7 +107,7 @@ public class TextureAtlas {
 					currentTexture.magFilter = Texture.TextureFilter.valueOf(l[2]).glEnum;
 					
 					System.out.println("(TextureAtlas) Loading Texture: " + currentTexture.name);
-					currentTexture.textureId = MainActivity.instance.loadTexture(atlasFile.substring(0, atlasFile.lastIndexOf("/")) + "/" + currentTexture.name, currentTexture.minFilter, currentTexture.magFilter);
+					currentTexture.textureId = Wargame.instance.loadTexture(atlasFile.substring(0, atlasFile.lastIndexOf("/")) + "/" + currentTexture.name, currentTexture.minFilter, currentTexture.magFilter);
 					
 					// repeat
 					br.readLine();

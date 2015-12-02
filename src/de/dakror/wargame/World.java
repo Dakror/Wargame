@@ -29,8 +29,23 @@ import de.dakror.wargame.TextureAtlas.Tile;
  * @author Maximilian Stark | Dakror
  */
 public class World {
-	public static enum Types {
-		Air, Basement, Custom0, Custom1, Custom2, Desert, Forest, Hills, Jungle, Mountains, Plains, River, Road, Ruins, Sea, Tundra // 16
+	public static enum Type {
+		Air,
+		Basement,
+		Custom0,
+		Custom1,
+		Custom2,
+		Desert,
+		Forest,
+		Hills,
+		Jungle,
+		Mountains,
+		Plains,
+		River,
+		Road,
+		Ruins,
+		Sea,
+		Tundra // 16
 	}
 	
 	public static enum Directions {
@@ -59,7 +74,7 @@ public class World {
 	protected Vector pos, newPos;
 	
 	public static final float WIDTH = 129f;
-	public static final float HEIGHT = 19f;
+	public static final float HEIGHT = 18f;
 	public static final float DEPTH = 64f;
 	
 	public boolean dirty = true;
@@ -88,7 +103,7 @@ public class World {
 	
 	void parse(String worldFile) {
 		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(MainActivity.instance.getAssets().open(worldFile)));
+			BufferedReader br = new BufferedReader(new InputStreamReader(Wargame.instance.getAssets().open(worldFile)));
 			
 			String line = "";
 			int y = 0;
@@ -109,7 +124,7 @@ public class World {
 						for (int i = 0; i < width; i++) {
 							String s = line.substring(i, i + 1);
 							if (s.equals(" ")) s = "0";
-							set(i, y, z, Types.values()[Integer.valueOf(s, 16)]);
+							set(i, y, z, Type.values()[Integer.valueOf(s, 16)]);
 						}
 						z--;
 					}
@@ -123,7 +138,7 @@ public class World {
 	}
 	
 	void generate() {
-		Types[] t = { Types.Desert, Types.Forest, Types.Mountains, Types.River, Types.Tundra };
+		Type[] t = { Type.Desert, Type.Forest, Type.Mountains, Type.River, Type.Tundra };
 		for (int i = 0; i < width; i++)
 			for (int j = 0; j < depth; j++)
 				set(i, 0, j, t[(int) (Math.random() * t.length)]);//, i == width - 1, j == 0, i == 0, j == depth - 1);
@@ -169,11 +184,20 @@ public class World {
 		//		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 	
+	public void center(Entity e) {
+		center(e.getRealX() + (e.getWidth() / WIDTH) * 2, e.getRealY(), e.getRealZ());
+	}
+	
+	public void center(float x, float y, float z) {
+		newPos.x = -(x * WIDTH / 2 + z * WIDTH / 2) / 2;
+		newPos.y = -(y * HEIGHT - x * DEPTH / 2 + z * DEPTH / 2);
+	}
+	
 	public boolean isInBounds(int x, int y, int z) {
 		return x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < depth;
 	}
 	
-	public boolean set(int x, int y, int z, Types type) {
+	public boolean set(int x, int y, int z, Type type) {
 		if (!isInBounds(x, y, z)) return false;
 		byte oldVal = map[y][x][z];
 		map[y][x][z] = (byte) (map[y][x][z] >> 4 << 4 | type.ordinal());
@@ -188,7 +212,7 @@ public class World {
 		return oldVal != map[y][x][z];
 	}
 	
-	public boolean set(int x, int y, int z, Types type, boolean se, boolean sw, boolean nw, boolean ne) {
+	public boolean set(int x, int y, int z, Type type, boolean se, boolean sw, boolean nw, boolean ne) {
 		if (!isInBounds(x, y, z)) return false;
 		byte oldVal = map[y][x][z];
 		map[y][x][z] = (byte) (type.ordinal() | (se ? 1 : 0) << 7 | (sw ? 1 : 0) << 6 | (nw ? 1 : 0) << 5 | (ne ? 1 : 0) << 4);
@@ -199,22 +223,22 @@ public class World {
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				for (int k = 0; k < depth; k++) {
-					Types t = get(j, i, k);
-					boolean solid = t != Types.River || t != Types.Sea || t != Types.Air;
-					boolean sky = get(j, i + 1, k) == Types.Air;
+					Type t = get(j, i, k);
+					boolean solid = t != Type.River || t != Type.Sea || t != Type.Air;
+					boolean sky = get(j, i + 1, k) == Type.Air;
 					
-					set(j, i, k, Directions.SE, (j == width - 1 || get(j + 1, i, k) == Types.Air) && solid && sky);
-					set(j, i, k, Directions.SW, (k == 0 || get(j, i, k - 1) == Types.Air) && solid && sky);
-					set(j, i, k, Directions.NW, (j == 0 || get(j - 1, i, k) == Types.Air) && solid && sky);
-					set(j, i, k, Directions.NE, (k == depth - 1 || get(j, i, k + 1) == Types.Air) && solid && sky);
+					set(j, i, k, Directions.SE, (j == width - 1 || get(j + 1, i, k) == Type.Air) && solid && sky);
+					set(j, i, k, Directions.SW, (k == 0 || get(j, i, k - 1) == Type.Air) && solid && sky);
+					set(j, i, k, Directions.NW, (j == 0 || get(j - 1, i, k) == Type.Air) && solid && sky);
+					set(j, i, k, Directions.NE, (k == depth - 1 || get(j, i, k + 1) == Type.Air) && solid && sky);
 				}
 			}
 		}
 	}
 	
-	public Types get(int x, int y, int z) {
-		if (!isInBounds(x, y, z)) return Types.Air;
-		return Types.values()[map[y][x][z] & 0xf];
+	public Type get(int x, int y, int z) {
+		if (!isInBounds(x, y, z)) return Type.Air;
+		return Type.values()[map[y][x][z] & 0xf];
 	}
 	
 	public boolean is(int x, int y, int z, Directions d) {
@@ -236,14 +260,16 @@ public class World {
 	public void update(float timePassed) {
 		for (Iterator<Entity> iter = entities.iterator(); iter.hasNext();) {
 			Entity e = iter.next();
-			if (e.isDead()) iter.remove();
-			else e.update(timePassed);
+			if (e.isDead()) {
+				e.onRemoval();
+				iter.remove();
+			} else e.update(timePassed);
 		}
 	}
 	
 	public void render(SpriteRenderer r) {
-		float ratio = MainActivity.instance.renderer.ratio;
-		float scale = 1 / 1024f * MainActivity.instance.renderer.scale;
+		float ratio = Wargame.instance.renderer.ratio;
+		float scale = 1 / 1024f * Wargame.instance.renderer.scale;
 		int rendered = 0, all = 0, rEntities = 0;
 		
 		//		if (dirty) {
@@ -266,13 +292,13 @@ public class World {
 		for (int x = 0; x < width; x++) {
 			for (int z = 0; z < depth; z++) {
 				for (int y = 0; y < height; y++) {
-					Tile t = MainActivity.terrain.getTile(getFile(x, y, z));
+					Tile t = Wargame.terrain.getTile(getFile(x, y, z));
 					if (t == null) continue;
 					TextureRegion tr = t.regions.get(0);
 					float x1 = pos.x + x * WIDTH / 2 + z * WIDTH / 2;
 					float y1 = pos.y + y * HEIGHT - x * DEPTH / 2 + z * DEPTH / 2;
 					
-					if (get(x, y + 1, z) == Types.Air || get(x + 1, y, z) == Types.Air || get(x, y, z - 1) == Types.Air) {
+					if (get(x, y + 1, z) == Type.Air || get(x + 1, y, z) == Type.Air || get(x, y, z - 1) == Type.Air) {
 						if ((x1 + tr.width * 2048) * scale >= -ratio && x1 * scale <= ratio && y1 * scale <= 1 && (y1 + tr.width * 2048) * scale >= -1) {
 							r.render(x1, y1, pos.z + y * HEIGHT + x * DEPTH / 2, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
 							rendered++;
@@ -352,6 +378,7 @@ public class World {
 	public void addEntity(Entity e) {
 		e.setWorld(this);
 		entities.add(e);
+		e.onSpawn();
 	}
 	
 	public void move(float x, float y) {

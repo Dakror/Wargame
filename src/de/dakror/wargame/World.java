@@ -19,8 +19,10 @@ package de.dakror.wargame;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Iterator;
+
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 
 import de.dakror.wargame.TextureAtlas.TextureRegion;
 import de.dakror.wargame.TextureAtlas.Tile;
@@ -28,7 +30,7 @@ import de.dakror.wargame.TextureAtlas.Tile;
 /**
  * @author Maximilian Stark | Dakror
  */
-public class World {
+public class World /*extends PooledEngine*/ {
 	public static enum Type {
 		Air,
 		Basement,
@@ -71,7 +73,7 @@ public class World {
 	// (Y|X|Z)
 	protected byte[][][] map;
 	
-	protected Vector pos, newPos;
+	protected Vector3 pos, newPos;
 	
 	public static final float WIDTH = 129f;
 	public static final float HEIGHT = 18f;
@@ -80,18 +82,23 @@ public class World {
 	public boolean dirty = true;
 	protected int width, height, depth;
 	public int rendered, all, rEntities;
-	protected ArrayList<Entity> entities;
+	protected Array<Entity> entities;
+
+	public static final float SCALE = 0.5f;
 	
 	//	public int[] fbo = new int[1];
 	//	int[] tex = new int[1];
 	//	public int texWidth, texHeight;
+	//	ImmutableArray<Entity> renderables;
 	
 	public World(String worldFile) {
+		super();
 		parse(worldFile);
 		init();
 	}
 	
 	public World(int width, int height, int depth) {
+		super();
 		this.width = width;
 		this.height = height;
 		this.depth = depth;
@@ -148,11 +155,12 @@ public class World {
 		//		set(2, 0, 2, Types.Tundra); // white
 	}
 	
+	@SuppressWarnings("unchecked")
 	void init() {
-		entities = new ArrayList<Entity>();
-		
-		pos = new Vector(-width / 2 * WIDTH, 0, 0);
-		newPos = new Vector().set(pos);
+		entities = new Array<Entity>();
+		//		renderables = getEntitiesFor(Family.all(CAnimatedSprite.class, CPosition.class, CFace.class).get());
+		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
+		newPos = new Vector3(pos);
 		//		updateDirections();
 		
 		//		glGenFramebuffers(1, fbo, 0);
@@ -236,6 +244,22 @@ public class World {
 		}
 	}
 	
+	public Entity getEntityAt(float x, float y, boolean global) {
+		if (!global) {
+			x += pos.x;
+			y += pos.y;
+		}
+		float scale = Wargame.instance.scale;
+		
+		for (Entity e : entities) {
+			if (e.getX() * scale <= x && x <= (e.getX() + e.getWidth()) * scale && e.getY() * scale <= y && y <= (e.getY() + e.getHeight()) * scale) {
+				return e;
+			}
+		}
+		
+		return null;
+	}
+	
 	public Type get(int x, int y, int z) {
 		if (!isInBounds(x, y, z)) return Type.Air;
 		return Type.values()[map[y][x][z] & 0xf];
@@ -268,9 +292,9 @@ public class World {
 	}
 	
 	public void render(SpriteRenderer r) {
-		float ratio = Wargame.instance.renderer.ratio;
-		float scale = 1 / 1024f * Wargame.instance.renderer.scale;
 		int rendered = 0, all = 0, rEntities = 0;
+		
+		float scale = Wargame.instance.scale;
 		
 		//		if (dirty) {
 		//			float[] m = r.matrix;
@@ -288,7 +312,6 @@ public class World {
 		//			
 		//			float hX = 0, hY = 0;
 		
-		
 		for (int x = 0; x < width; x++) {
 			for (int z = 0; z < depth; z++) {
 				for (int y = 0; y < height; y++) {
@@ -299,8 +322,8 @@ public class World {
 					float y1 = pos.y + y * HEIGHT - x * DEPTH / 2 + z * DEPTH / 2;
 					
 					if (get(x, y + 1, z) == Type.Air || get(x + 1, y, z) == Type.Air || get(x, y, z - 1) == Type.Air) {
-						if ((x1 + tr.width * 2048) * scale >= -ratio && x1 * scale <= ratio && y1 * scale <= 1 && (y1 + tr.width * 2048) * scale >= -1) {
-							r.render(x1, y1, pos.z + y * HEIGHT + x * DEPTH / 2, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
+						if ((x1 + tr.width * 2048) * scale >= -Wargame.width / 2 && x1 * scale <= Wargame.width / 2 && y1 * scale <= Wargame.height / 2 && (y1 + tr.height * 2048) * scale >= -Wargame.height / 2) {
+							r.render(x1, y1, (pos.z + y * HEIGHT + x * DEPTH / 2) / 1024f, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
 							rendered++;
 						}
 					}
@@ -363,11 +386,12 @@ public class World {
 		//		}
 		
 		for (Entity e : entities) {
-			if ((e.getX() + e.getWidth()) * scale >= -ratio && e.getX() * scale <= ratio && e.getY() * scale <= 1 && (e.getY() + e.getHeight()) * scale >= -1) {
+			if ((e.getX() + e.getWidth()) * scale >= -Wargame.width / 2 && e.getX() * scale <= Wargame.width / 2 && e.getY() * scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * scale >= -Wargame.height / 2) {
 				r.render(e);
 				rEntities++;
 			}
 		}
+		
 		this.rEntities = rEntities;
 		this.rendered = rendered;
 		this.all = all;
@@ -385,11 +409,11 @@ public class World {
 		newPos.set(pos).add(x, -y, 0);
 	}
 	
-	public Vector getPos() {
+	public Vector3 getPos() {
 		return pos;
 	}
 	
-	public Vector getNewPos() {
+	public Vector3 getNewPos() {
 		return newPos;
 	}
 }

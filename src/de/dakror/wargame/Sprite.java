@@ -18,19 +18,14 @@ package de.dakror.wargame;
 
 /**
  * @author Maximilian Stark | Dakror
- *
  */
 public class Sprite {
 	protected float x, y, z;
 	protected float width, height;
 	protected float textureX, textureY, textureWidth, textureHeight;
+	protected float xOffset, yOffset, innerWidth, innerHeight;
 	protected float[] color;
 	protected int textureId;
-	
-	// entity stuff
-	/*protected float vx, vy, vz;
-	protected boolean frozen, dead;
-	protected long life, lifeTime;*/
 	
 	public Sprite() {
 		color = new float[] { 1, 1, 1, 1 };
@@ -41,6 +36,10 @@ public class Sprite {
 	}
 	
 	public Sprite(float x, float y, float z, float width, float height, float textureX, float textureY, float textureWidth, float textureHeight) {
+		this(x, y, z, width, height, textureX, textureY, textureWidth, textureHeight, 0, 0, width, height);
+	}
+	
+	public Sprite(float x, float y, float z, float width, float height, float textureX, float textureY, float textureWidth, float textureHeight, float xOffset, float yOffset, float innerWidth, float innerHeight) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -50,6 +49,10 @@ public class Sprite {
 		this.textureY = textureY;
 		this.textureWidth = textureWidth;
 		this.textureHeight = textureHeight;
+		this.xOffset = xOffset;
+		this.yOffset = yOffset;
+		this.innerWidth = innerWidth;
+		this.innerHeight = innerHeight;
 		color = new float[] { 1, 1, 1, 1 };
 	}
 	
@@ -143,66 +146,39 @@ public class Sprite {
 		return textureHeight;
 	}
 	
+	public float getXOffset() {
+		return xOffset;
+	}
+	
+	public void setXOffset(float xOffset) {
+		this.xOffset = xOffset;
+	}
+	
+	public float getYOffset() {
+		return yOffset;
+	}
+	
+	public void setYOffset(float yOffset) {
+		this.yOffset = yOffset;
+	}
+	
+	public float getInnerWidth() {
+		return innerWidth;
+	}
+	
+	public void setInnerWidth(float innerWidth) {
+		this.innerWidth = innerWidth;
+	}
+	
+	public float getInnerHeight() {
+		return innerHeight;
+	}
+	
+	public void setInnerHeight(float innerHeight) {
+		this.innerHeight = innerHeight;
+	}
+	
 	public void setTextureHeight(float textureHeight) {
 		this.textureHeight = textureHeight;
 	}
-	
-	// entity stuff
-	/*
-		public float getSpeedX() {
-		return vx;
-	}
-	
-	public void setSpeedX(float vx) {
-		this.vx = vx;
-	}
-	
-	public float getSpeedY() {
-		return vy;
-	}
-	
-	public void setSpeedY(float vy) {
-		this.vy = vy;
-	}
-	
-	public float getSpeedZ() {
-		return vz;
-	}
-	
-	public void setSpeedZ(float vz) {
-		this.vz = vz;
-	}
-	
-	public boolean isFrozen() {
-		return frozen;
-	}
-	
-	public void setFrozen(boolean frozen) {
-		this.frozen = frozen;
-	}
-	
-	public boolean isDead() {
-		return dead;
-	}
-	
-	public void setDead(boolean dead) {
-		this.dead = dead;
-	}
-	
-	public long getLife() {
-		return life;
-	}
-	
-	public void setLife(long life) {
-		this.life = life;
-	}
-	
-	public long getLifeTime() {
-		return lifeTime;
-	}
-	
-	public void setLifeTime(long lifeTime) {
-		this.lifeTime = lifeTime;
-	}
-	*/
 }

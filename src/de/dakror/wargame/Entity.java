@@ -20,16 +20,21 @@ import de.dakror.wargame.TextureAtlas.Tile;
 
 /**
  * @author Maximilian Stark | Dakror
- *
  */
 public abstract class Entity extends AnimatedSprite implements EntityLifeCycle {
-	World world;
+	boolean dead;
+	/**
+	 * 0 = X+<br>
+	 * 1 = Z-<br>
+	 * 2 = X-<br>
+	 * 3 = Z+<br>
+	 */
+	int face;
 	Tile[] faces;
 	boolean huge;
-	int face;
-	boolean dead;
+	World world;
 	
-	public Entity(int x, int y, int z, int face, int color, boolean huge, String name) {
+	public Entity(float x, float y, float z, int face, int color, boolean huge, String name) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -43,20 +48,8 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle {
 		updateTexture();
 	}
 	
-	@Override
-	protected void updateTexture() {
-		tile = faces[face];
-		super.updateTexture();
-		width = textureWidth * tile.regions.get(index).texture.width;
-		height = textureHeight * tile.regions.get(index).texture.height;
-	}
-	
 	public int getFace() {
 		return face;
-	}
-	
-	public void setFace(int face) {
-		this.face = face;
 	}
 	
 	public float getRealX() {
@@ -71,19 +64,23 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle {
 		return z;
 	}
 	
+	public World getWorld() {
+		return world;
+	}
+	
 	@Override
 	public float getX() {
-		return super.getX() + world.getPos().x;
+		return (x + (huge ? 1 : 0)) * (World.WIDTH) / 2 + z * (World.WIDTH) / 2 + world.getPos().x + ((World.WIDTH) - width) / 4;
 	}
 	
 	@Override
 	public float getY() {
-		return super.getY() + world.getPos().y + World.HEIGHT;
+		return y * World.HEIGHT - (x + (huge ? 1 : 0)) * (World.DEPTH) / 2 + z * (World.DEPTH) / 2 + world.getPos().y + World.HEIGHT - 1;
 	}
 	
 	@Override
 	public float getZ() {
-		return super.getZ() + world.getPos().z;
+		return (y * World.HEIGHT + (x + (huge ? 1 : 0)) * (World.DEPTH) / 2 + world.getPos().z + World.HEIGHT) / 1024f;
 	}
 	
 	public boolean isDead() {
@@ -94,11 +91,19 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle {
 		this.dead = dead;
 	}
 	
+	public void setFace(int face) {
+		this.face = face;
+	}
+	
 	public void setWorld(World world) {
 		this.world = world;
 	}
 	
-	public World getWorld() {
-		return world;
+	@Override
+	protected void updateTexture() {
+		tile = faces[face];
+		super.updateTexture();
+		width = textureWidth * tile.regions.get(index).texture.width;
+		height = textureHeight * tile.regions.get(index).texture.height;
 	}
 }

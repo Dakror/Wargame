@@ -21,8 +21,6 @@ package de.dakror.wargame;
  *
  */
 public class Building extends Entity {
-	public static final float SCALE = 0.5f;
-	
 	public static enum Type implements EntityLifeCycle {
 		//		Airport(750, 160), // for planes
 		//		Castle(2500, 325), // for defense
@@ -36,7 +34,6 @@ public class Building extends Entity {
 		Estate(350, 35), // for troops
 		Factory(550, 75), // for resources
 		//		Laboratory(450, 1000), // for science!!!!
-		
 		;
 		
 		public final int hp, costs;
@@ -60,6 +57,12 @@ public class Building extends Entity {
 		
 		@Override
 		public void onRemoval() {}
+		
+		@Override
+		public void onSelect() {}
+		
+		@Override
+		public void onDeselect() {}
 	}
 	
 	protected Type type;
@@ -67,7 +70,7 @@ public class Building extends Entity {
 	public Building(int x, int y, int z, int face, int color, boolean huge, Type type) {
 		super(x, y, z, face, color, huge, type.name());
 		this.type = type;
-		type.onCreate();
+		onCreate();
 	}
 	
 	public Building(int x, int y, int z, int color, Type type) {
@@ -95,7 +98,7 @@ public class Building extends Entity {
 		
 		float texWidth = textureWidth * tile.regions.get(index).texture.width;
 		
-		width = (float) (Math.ceil(texWidth / World.WIDTH) * (World.WIDTH * SCALE));
+		width = (float) (Math.ceil(texWidth / World.WIDTH) * (World.WIDTH * World.SCALE));
 		height = (textureHeight * tile.regions.get(index).texture.height) * (width / texWidth);
 	}
 	
@@ -105,17 +108,17 @@ public class Building extends Entity {
 	
 	@Override
 	public float getX() {
-		return (x + (huge ? 1 : 0)) * (World.WIDTH * SCALE) / 2 + z * (World.WIDTH * SCALE) / 2 + world.getPos().x + ((World.WIDTH * SCALE) - width) / 2;
+		return (x + (huge ? 1 : 0)) * (World.WIDTH * World.SCALE) / 2 + z * (World.WIDTH * World.SCALE) / 2 + world.getPos().x + ((World.WIDTH * World.SCALE) - width) / 2;
 	}
 	
 	@Override
 	public float getY() {
-		return y * World.HEIGHT - (x + (huge ? 1 : 0)) * (World.DEPTH * SCALE) / 2 + z * (World.DEPTH * SCALE) / 2 + world.getPos().y + World.HEIGHT - 1;
+		return y * World.HEIGHT - (x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + z * (World.DEPTH * World.SCALE) / 2 + world.getPos().y + World.HEIGHT - 1;
 	}
 	
 	@Override
 	public float getZ() {
-		return y * World.HEIGHT + (x + (huge ? 1 : 0)) * (World.DEPTH * SCALE) / 2 + world.getPos().z + World.HEIGHT;
+		return (y * World.HEIGHT + (x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + world.getPos().z + World.HEIGHT) / 1024f;
 	}
 	
 	@Override
@@ -137,4 +140,10 @@ public class Building extends Entity {
 	public void onRemoval() {
 		type.onDeath();
 	}
+	
+	@Override
+	public void onSelect() {}
+	
+	@Override
+	public void onDeselect() {}
 }

@@ -48,6 +48,7 @@ public class SpriteRenderer {
 	float[] matrix;
 	
 	final float[] WHITE = new float[] { 1, 1, 1, 1 };
+	final float[] BLACK = new float[] { 0, 0, 0, 1 };
 	
 	public SpriteRenderer() {
 		ByteBuffer bb = ByteBuffer.allocateDirect(VERTEX_SIZE * kAboSize);
@@ -58,17 +59,11 @@ public class SpriteRenderer {
 		indices = blb.asShortBuffer();
 		for (int i = 0; i < kAboSize; i += 4) {
 			indices.put((short) i);
-			//			elementIndex++;
 			indices.put((short) (i + 1));
-			//			elementIndex++;
 			indices.put((short) (i + 2));
-			//			elementIndex++;
 			indices.put((short) i);
-			//			elementIndex++;
 			indices.put((short) (i + 2));
-			//			elementIndex++;
 			indices.put((short) (i + 3));
-			//			elementIndex++;
 		}
 		
 		indices.position(0);
@@ -87,18 +82,19 @@ public class SpriteRenderer {
 	}
 	
 	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, int texture) {
-		render(x, y, z, w, h, tx, ty, tw, th, WHITE, -1, texture);
+		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, WHITE, -1, texture);
 	}
 	
 	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, float p, int texture) {
-		render(x, y, z, w, h, tx, ty, tw, th, WHITE, p, texture);
+		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, WHITE, p, texture);
 	}
 	
 	public void render(Sprite sprite) {
-		render(sprite.getX(), sprite.getY(), sprite.getZ(), sprite.getWidth(), sprite.getHeight(), sprite.getTextureX(), sprite.getTextureY(), sprite.getTextureWidth(), sprite.getTextureHeight(), sprite.getColor(), sprite.getPaletteIndex(), sprite.getTextureId());
+		if (sprite.getXOffset() != 0 && sprite.getYOffset() != 0 && sprite.getInnerWidth() != 0 && sprite.getInnerHeight() != 0) render(sprite.getX(), sprite.getY(), sprite.getZ() - 0.001f, sprite.getWidth(), sprite.getHeight(), 0, 0, 1, 1, 0, 0, sprite.getWidth(), sprite.getHeight(), BLACK, 255, sprite.getTextureId());
+		render(sprite.getX(), sprite.getY(), sprite.getZ(), sprite.getWidth(), sprite.getHeight(), sprite.getTextureX(), sprite.getTextureY(), sprite.getTextureWidth(), sprite.getTextureHeight(), sprite.getXOffset(), sprite.getYOffset(), sprite.getInnerWidth(), sprite.getInnerHeight(), sprite.getColor(), sprite.getPaletteIndex(), sprite.getTextureId());
 	}
 	
-	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, float[] c, float p, int texture) {
+	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, float xOff, float yOff, float innerW, float innerH, float[] c, float p, int texture) {
 		if (texture != lastTexture) {
 			if (lastTexture != 0) flush();
 			lastTexture = texture;
@@ -106,14 +102,27 @@ public class SpriteRenderer {
 		
 		elementIndex += 6;
 		
-		vertices.put(new float[] { x, y + h, z, tx, ty, c[0], c[1], c[2], c[3], p });
-		vertexIndex++;
-		vertices.put(new float[] { x, y, z, tx, ty + th, c[0], c[1], c[2], c[3], p });
-		vertexIndex++;
-		vertices.put(new float[] { x + w, y, z, tx + tw, ty + th, c[0], c[1], c[2], c[3], p });
-		vertexIndex++;
-		vertices.put(new float[] { x + w, y + h, z, tx + tw, ty, c[0], c[1], c[2], c[3], p });
-		vertexIndex++;
+		boolean useOffset = xOff != 0 && yOff != 0 && innerW != 0 && innerH != 0;
+		
+		if (useOffset) {
+			vertices.put(new float[] { x + xOff, y + yOff + innerH, z, tx, ty, c[0], c[1], c[2], c[3], p });
+			vertexIndex++;
+			vertices.put(new float[] { x + xOff, y + yOff, z, tx, ty + th, c[0], c[1], c[2], c[3], p });
+			vertexIndex++;
+			vertices.put(new float[] { x + xOff + innerW, y + yOff, z, tx + tw, ty + th, c[0], c[1], c[2], c[3], p });
+			vertexIndex++;
+			vertices.put(new float[] { x + xOff + innerW, y + yOff + innerH, z, tx + tw, ty, c[0], c[1], c[2], c[3], p });
+			vertexIndex++;
+		} else {
+			vertices.put(new float[] { x, y + h, z, tx, ty, c[0], c[1], c[2], c[3], p });
+			vertexIndex++;
+			vertices.put(new float[] { x, y, z, tx, ty + th, c[0], c[1], c[2], c[3], p });
+			vertexIndex++;
+			vertices.put(new float[] { x + w, y, z, tx + tw, ty + th, c[0], c[1], c[2], c[3], p });
+			vertexIndex++;
+			vertices.put(new float[] { x + w, y + h, z, tx + tw, ty, c[0], c[1], c[2], c[3], p });
+			vertexIndex++;
+		}
 		
 		if (vertexIndex >= kAboSize) flush();
 	}

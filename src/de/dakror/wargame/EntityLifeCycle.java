@@ -18,7 +18,6 @@ package de.dakror.wargame;
 
 /**
  * @author Maximilian Stark | Dakror
- *
  */
 public interface EntityLifeCycle {
 	public void onCreate();
@@ -30,4 +29,8 @@ public interface EntityLifeCycle {
 	public void onDeath();
 	
 	public void onRemoval();
+	
+	public void onSelect();
+	
+	public void onDeselect();
 }

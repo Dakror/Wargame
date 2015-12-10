@@ -68,11 +68,6 @@ public class AnimatedSprite extends Sprite {
 		return color;
 	}
 	
-	@Override
-	public void setPaletteIndex(int i) {
-		color = i;
-	}
-	
 	public TextureRegion getTextureRegion() {
 		return tile.regions.get(index);
 	}

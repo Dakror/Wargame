@@ -2,6 +2,7 @@ attribute vec3 aPos;
 attribute vec2 aTex;
 attribute vec4 aCol;
 attribute float aPal;
+attribute vec4 aOff;
 
 uniform mat4 uMat;
 

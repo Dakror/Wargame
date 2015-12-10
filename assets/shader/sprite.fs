@@ -31,7 +31,10 @@ void main() {
 	else if(vPal == 6.0) col = texture2D(color6, c99);
 	else if(vPal == 7.0) col = texture2D(color7, c99);
 	else if(vPal == 8.0) col = texture2D(terrain, c99);
-
+	else if(vPal == 255.0) { // for debugging 
+		if(vTex.x < 0.01 || vTex.x > 0.99 || vTex.y <0.01 || vTex.y > 0.99) col = vCol;
+		else col = vec4(0.0); 
+	}
 	if(col.a < 1.0) discard;
 
 	gl_FragColor = vec4(col.rgb, 1);

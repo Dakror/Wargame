@@ -27,7 +27,6 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.badlogic.gdx.ai.GdxAI;
-import com.badlogic.gdx.ai.Logger;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.math.Vector3;
@@ -54,38 +53,6 @@ import de.dakror.wargame.Building.Type;
  * @author Maximilian Stark | Dakror
  */
 public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouchListener, GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener {
-	public static class AndroidLogger implements Logger {
-		@Override
-		public void debug(String tag, String message, Throwable exception) {
-			Log.d(tag, message, exception);
-		}
-		
-		@Override
-		public void debug(String tag, String message) {
-			Log.d(tag, message);
-		}
-		
-		@Override
-		public void info(String tag, String message) {
-			Log.i(tag, message);
-		}
-		
-		@Override
-		public void info(String tag, String message, Throwable exception) {
-			Log.i(tag, message, exception);
-		}
-		
-		@Override
-		public void error(String tag, String message) {
-			Log.e(tag, message);
-		}
-		
-		@Override
-		public void error(String tag, String message, Throwable exception) {
-			Log.e(tag, message, exception);
-		}
-	}
-	
 	public static TextureAtlas animation, standing, terrain;
 	public static int height, width;
 	public static Wargame instance;

@@ -143,6 +143,10 @@ public class Unit extends Entity implements Steerable<Vector3> {
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
+		if (pos.x >= 3) linearVelocity.x = -1f;
+		if (pos.x <= 0) linearVelocity.x = 1f;
+		pos.x += linearVelocity.x * deltaTime;
+		
 		if (steeringBehavior != null) {
 			steeringBehavior.calculateSteering(steeringOutput);
 			applySteering(steeringOutput, deltaTime);
@@ -168,12 +172,12 @@ public class Unit extends Entity implements Steerable<Vector3> {
 	
 	@Override
 	public float getX() {
-		return (pos.x + (huge ? 1 : 0)) * (World.WIDTH * World.SCALE) / 2 + pos.z * (World.WIDTH * World.SCALE) / 2 + world.getPos().x;// + ((World.WIDTH) - width) / 4;
+		return (pos.x + (huge ? 1 : 0)) * (World.WIDTH * World.SCALE) / 2 + pos.z * (World.WIDTH * World.SCALE) / 2 + world.getPos().x - xOffset;// + ((World.WIDTH) - width) / 4;
 	}
 	
 	@Override
 	public float getY() {
-		return pos.y * World.HEIGHT - (pos.x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + pos.z * (World.DEPTH * World.SCALE) / 2 + world.getPos().y + World.HEIGHT;
+		return pos.y * World.HEIGHT - (pos.x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + pos.z * (World.DEPTH * World.SCALE) / 2 + world.getPos().y + yOffset * 2;
 	}
 	
 	@Override

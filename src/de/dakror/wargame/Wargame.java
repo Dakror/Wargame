@@ -139,7 +139,7 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		Unit u = new Unit(0, 2, 0, 0, Unit.Type.Infantry);
 		
 		SteeringBehavior<Vector3> sb = new Arrive<Vector3>(u).setTarget(new WorldLocation(new Vector3(2, 2, 0), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f);
-		//u.setSteeringBehavior(sb);
+		u.setSteeringBehavior(sb);
 		map.addEntity(u);
 		//			for (int i = 0; i < 8; i++)
 		//				for (Type t : Type.values())

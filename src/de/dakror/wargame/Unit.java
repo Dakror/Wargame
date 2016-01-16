@@ -87,7 +87,7 @@ public class Unit extends Entity implements Steerable<Vector3> {
 	private static final SteeringAcceleration<Vector3> steeringOutput = new SteeringAcceleration<Vector3>(new Vector3());
 	
 	boolean tagged;
-	boolean independentFacing = true;
+	boolean independentFacing = false;
 	float maxLinearSpeed = 2;
 	float maxLinearAcceleration = 10;
 	float maxAngularSpeed = 5;
@@ -143,9 +143,6 @@ public class Unit extends Entity implements Steerable<Vector3> {
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-		if (pos.x >= 3) linearVelocity.x = -1f;
-		if (pos.x <= 0) linearVelocity.x = 1f;
-		pos.x += linearVelocity.x * deltaTime;
 		
 		if (steeringBehavior != null) {
 			steeringBehavior.calculateSteering(steeringOutput);
@@ -172,7 +169,7 @@ public class Unit extends Entity implements Steerable<Vector3> {
 	
 	@Override
 	public float getX() {
-		return (pos.x + (huge ? 1 : 0)) * (World.WIDTH * World.SCALE) / 2 + pos.z * (World.WIDTH * World.SCALE) / 2 + world.getPos().x - xOffset;// + ((World.WIDTH) - width) / 4;
+		return (pos.x + (huge ? 1 : 0)) * (World.WIDTH * World.SCALE) / 2 + pos.z * (World.WIDTH * World.SCALE) / 2 + world.getPos().x - xOffset + ((World.WIDTH) - width) / 4;
 	}
 	
 	@Override

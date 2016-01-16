@@ -4,7 +4,6 @@ import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector3;
 
 public class WorldLocation implements Location<Vector3> {
-	
 	Vector3 position;
 	float orientation;
 	

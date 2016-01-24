@@ -29,7 +29,8 @@ import javax.microedition.khronos.opengles.GL10;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.ai.steer.behaviors.Arrive;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.ai.steer.behaviors.Pursue;
+import com.badlogic.gdx.math.Vector2;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -132,14 +133,17 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		
 		map = new World("maps/lake.map");
 		
-		Building b = new Building(5, 2, 7, 0, Type.City);
+		Building b = new Building(5, 7, 0, Type.City);
 		map.addEntity(b);
 		map.center(b);
 		
-		Unit u = new Unit(0, 2, 0, 0, Unit.Type.Infantry);
+		Unit u = new Unit(0, 0, 0, Unit.Type.Infantry);
+		Unit v = new Unit(0, 2, 0, Unit.Type.Infantry);
 		
-		SteeringBehavior<Vector3> sb = new Arrive<Vector3>(u).setTarget(new WorldLocation(new Vector3(2, 2, 0), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f);
+		SteeringBehavior<Vector2> sb = new Pursue<Vector2>(u, v, 0.3f)/*.setTarget(new WorldLocation(new Vector3(2, 2, 0), 0))/*.setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f)*/;
 		u.setSteeringBehavior(sb);
+		v.setSteeringBehavior(new Arrive<Vector2>(v).setTarget(new WorldLocation(new Vector2(6, 6), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f));
+		map.addEntity(v);
 		map.addEntity(u);
 		//			for (int i = 0; i < 8; i++)
 		//				for (Type t : Type.values())

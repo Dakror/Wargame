@@ -34,9 +34,9 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle {
 	boolean huge;
 	World world;
 	
-	public Entity(float x, float y, float z, int face, int color, boolean huge, String name) {
+	public Entity(float x, float z, int face, int color, boolean huge, String name) {
 		this.x = x;
-		this.y = y;
+		y = 1;
 		this.z = z;
 		this.huge = huge;
 		this.face = face;

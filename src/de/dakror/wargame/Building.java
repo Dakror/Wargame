@@ -67,22 +67,22 @@ public class Building extends Entity {
 	
 	protected Type type;
 	
-	public Building(int x, int y, int z, int face, int color, boolean huge, Type type) {
-		super(x, y, z, face, color, huge, type.name());
+	public Building(int x, int z, int face, int color, boolean huge, Type type) {
+		super(x, z, face, color, huge, type.name());
 		this.type = type;
 		onCreate();
 	}
 	
-	public Building(int x, int y, int z, int color, Type type) {
-		this(x, y, z, 0, color, type);
+	public Building(int x, int z, int color, Type type) {
+		this(x, z, 0, color, type);
 	}
 	
-	public Building(int x, int y, int z, int face, int color, Type type) {
-		this(x, y, z, face, color, false, type);
+	public Building(int x, int z, int face, int color, Type type) {
+		this(x, z, face, color, false, type);
 	}
 	
-	public Building(int x, int y, int z, int color, boolean huge, Type type) {
-		this(x, y, z, 0, color, huge, type);
+	public Building(int x, int z, int color, boolean huge, Type type) {
+		this(x, z, 0, color, huge, type);
 	}
 	
 	@Override

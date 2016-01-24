@@ -50,28 +50,9 @@ public class World /*extends PooledEngine*/ {
 		Tundra // 16
 	}
 	
-	public static enum Directions {
-		/**
-		 * X+
-		 */
-		SE,
-		/**
-		 * Z-
-		 */
-		SW,
-		/**
-		 * X-
-		 */
-		NW,
-		/**
-		 * Z+
-		 */
-		NE
-	}
-	
 	// lol super dumb method, but idc 
-	// (Y|X|Z)
-	protected byte[][][] map;
+	// (X|Z)
+	protected byte[][] map;
 	
 	protected Vector3 pos, newPos;
 	
@@ -80,10 +61,10 @@ public class World /*extends PooledEngine*/ {
 	public static final float DEPTH = 64f;
 	
 	public boolean dirty = true;
-	protected int width, height, depth;
+	protected int width, depth;
 	public int rendered, all, rEntities;
 	protected Array<Entity> entities;
-
+	
 	public static final float SCALE = 0.5f;
 	
 	//	public int[] fbo = new int[1];
@@ -97,12 +78,11 @@ public class World /*extends PooledEngine*/ {
 		init();
 	}
 	
-	public World(int width, int height, int depth) {
+	public World(int width, int depth) {
 		super();
 		this.width = width;
-		this.height = height;
 		this.depth = depth;
-		map = new byte[height][width][depth];
+		map = new byte[width][depth];
 		
 		generate();
 		init();
@@ -113,25 +93,22 @@ public class World /*extends PooledEngine*/ {
 			BufferedReader br = new BufferedReader(new InputStreamReader(Wargame.instance.getAssets().open(worldFile)));
 			
 			String line = "";
-			int y = 0;
 			int z = 0;
 			while ((line = br.readLine()) != null) {
 				if (line.startsWith("+")) {
 					String[] s = line.substring(1).split(",");
 					width = Integer.valueOf(s[0]);
 					depth = Integer.valueOf(s[1]);
-					height = Integer.valueOf(s[2]);
 					z = depth - 1;
-					map = new byte[height][width][depth];
+					map = new byte[width][depth];
 				} else if (map != null) {
 					if (line.startsWith("-")) {
-						y++;
 						z = depth - 1;
 					} else if (line.length() == width) {
 						for (int i = 0; i < width; i++) {
 							String s = line.substring(i, i + 1);
 							if (s.equals(" ")) s = "0";
-							set(i, y, z, Type.values()[Integer.valueOf(s, 16)]);
+							set(i, z, Type.values()[Integer.valueOf(s, 16)]);
 						}
 						z--;
 					}
@@ -148,14 +125,13 @@ public class World /*extends PooledEngine*/ {
 		Type[] t = { Type.Desert, Type.Forest, Type.Mountains, Type.River, Type.Tundra };
 		for (int i = 0; i < width; i++)
 			for (int j = 0; j < depth; j++)
-				set(i, 0, j, t[(int) (Math.random() * t.length)]);//, i == width - 1, j == 0, i == 0, j == depth - 1);
+				set(i, j, t[(int) (Math.random() * t.length)]);//, i == width - 1, j == 0, i == 0, j == depth - 1);
 		//		set(0, 0, 0, Types.Custom0); // red
 		//		set(2, 0, 0, Types.Custom1); // pink 
 		//		set(0, 0, 2, Types.Forest); // green
 		//		set(2, 0, 2, Types.Tundra); // white
 	}
 	
-	@SuppressWarnings("unchecked")
 	void init() {
 		entities = new Array<Entity>();
 		//		renderables = getEntitiesFor(Family.all(CAnimatedSprite.class, CPosition.class, CFace.class).get());
@@ -193,55 +169,23 @@ public class World /*extends PooledEngine*/ {
 	}
 	
 	public void center(Entity e) {
-		center(e.getRealX() + (e.getWidth() / WIDTH) * 2, e.getRealY(), e.getRealZ());
+		center(e.getRealX() + (e.getWidth() / WIDTH) * 2, e.getRealZ());
 	}
 	
-	public void center(float x, float y, float z) {
+	public void center(float x, float z) {
 		newPos.x = -(x * WIDTH / 2 + z * WIDTH / 2) / 2;
-		newPos.y = -(y * HEIGHT - x * DEPTH / 2 + z * DEPTH / 2);
+		newPos.y = -(-x * DEPTH / 2 + z * DEPTH / 2);
 	}
 	
-	public boolean isInBounds(int x, int y, int z) {
-		return x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < depth;
+	public boolean isInBounds(int x, int z) {
+		return x >= 0 && x < width && z >= 0 && z < depth;
 	}
 	
-	public boolean set(int x, int y, int z, Type type) {
-		if (!isInBounds(x, y, z)) return false;
-		byte oldVal = map[y][x][z];
-		map[y][x][z] = (byte) (map[y][x][z] >> 4 << 4 | type.ordinal());
-		return oldVal != map[y][x][z];
-	}
-	
-	public boolean set(int x, int y, int z, Directions d, boolean set) {
-		if (!isInBounds(x, y, z)) return false;
-		byte oldVal = map[y][x][z];
-		if (set) map[y][x][z] |= 1 << (7 - d.ordinal());
-		else map[y][x][z] &= ~(1 << (7 - d.ordinal()));
-		return oldVal != map[y][x][z];
-	}
-	
-	public boolean set(int x, int y, int z, Type type, boolean se, boolean sw, boolean nw, boolean ne) {
-		if (!isInBounds(x, y, z)) return false;
-		byte oldVal = map[y][x][z];
-		map[y][x][z] = (byte) (type.ordinal() | (se ? 1 : 0) << 7 | (sw ? 1 : 0) << 6 | (nw ? 1 : 0) << 5 | (ne ? 1 : 0) << 4);
-		return oldVal != map[y][x][z];
-	}
-	
-	public void updateDirections() {
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				for (int k = 0; k < depth; k++) {
-					Type t = get(j, i, k);
-					boolean solid = t != Type.River || t != Type.Sea || t != Type.Air;
-					boolean sky = get(j, i + 1, k) == Type.Air;
-					
-					set(j, i, k, Directions.SE, (j == width - 1 || get(j + 1, i, k) == Type.Air) && solid && sky);
-					set(j, i, k, Directions.SW, (k == 0 || get(j, i, k - 1) == Type.Air) && solid && sky);
-					set(j, i, k, Directions.NW, (j == 0 || get(j - 1, i, k) == Type.Air) && solid && sky);
-					set(j, i, k, Directions.NE, (k == depth - 1 || get(j, i, k + 1) == Type.Air) && solid && sky);
-				}
-			}
-		}
+	public boolean set(int x, int z, Type type) {
+		if (!isInBounds(x, z)) return false;
+		byte oldVal = map[x][z];
+		map[x][z] = (byte) type.ordinal();
+		return oldVal != map[x][z];
 	}
 	
 	public Entity getEntityAt(float x, float y, boolean global) {
@@ -260,23 +204,14 @@ public class World /*extends PooledEngine*/ {
 		return null;
 	}
 	
-	public Type get(int x, int y, int z) {
-		if (!isInBounds(x, y, z)) return Type.Air;
-		return Type.values()[map[y][x][z] & 0xf];
+	public Type get(int x, int z) {
+		if (!isInBounds(x, z)) return Type.Air;
+		return Type.values()[map[x][z]];
 	}
 	
-	public boolean is(int x, int y, int z, Directions d) {
-		if (!isInBounds(x, y, z)) return false;
-		return (map[y][x][z] >> (7 - d.ordinal()) & 0x1) == 1;
-	}
-	
-	public String getFile(int x, int y, int z) {
-		if (!isInBounds(x, y, z)) return null;
-		String t = get(x, y, z).name();
-		if (is(x, y, z, Directions.SE)) t += "_SE";
-		if (is(x, y, z, Directions.SW)) t += "_SW";
-		if (is(x, y, z, Directions.NW)) t += "_NW";
-		if (is(x, y, z, Directions.NE)) t += "_NE";
+	public String getFile(int x, int z) {
+		if (!isInBounds(x, z)) return null;
+		String t = get(x, z).name();
 		
 		return t;
 	}
@@ -314,21 +249,17 @@ public class World /*extends PooledEngine*/ {
 		
 		for (int x = 0; x < width; x++) {
 			for (int z = 0; z < depth; z++) {
-				for (int y = 0; y < height; y++) {
-					Tile t = Wargame.terrain.getTile(getFile(x, y, z));
-					if (t == null) continue;
-					TextureRegion tr = t.regions.get(0);
-					float x1 = pos.x + x * WIDTH / 2 + z * WIDTH / 2;
-					float y1 = pos.y + y * HEIGHT - x * DEPTH / 2 + z * DEPTH / 2;
-					
-					if (get(x, y + 1, z) == Type.Air || get(x + 1, y, z) == Type.Air || get(x, y, z - 1) == Type.Air) {
-						if ((x1 + tr.width * 2048) * scale >= -Wargame.width / 2 && x1 * scale <= Wargame.width / 2 && y1 * scale <= Wargame.height / 2 && (y1 + tr.height * 2048) * scale >= -Wargame.height / 2) {
-							r.render(x1, y1, (pos.z + y * HEIGHT + x * DEPTH / 2) / 1024f, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
-							rendered++;
-						}
-					}
-					all++;
+				Tile t = Wargame.terrain.getTile(getFile(x, z));
+				if (t == null) continue;
+				TextureRegion tr = t.regions.get(0);
+				float x1 = pos.x + x * WIDTH / 2 + z * WIDTH / 2;
+				float y1 = pos.y - x * DEPTH / 2 + z * DEPTH / 2;
+				
+				if ((x1 + tr.width * 2048) * scale >= -Wargame.width / 2 && x1 * scale <= Wargame.width / 2 && y1 * scale <= Wargame.height / 2 && (y1 + tr.height * 2048) * scale >= -Wargame.height / 2) {
+					r.render(x1, y1, (pos.z + x * DEPTH / 2) / 1024f, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
+					rendered++;
 				}
+				all++;
 			}
 		}
 		

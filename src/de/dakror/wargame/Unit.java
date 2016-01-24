@@ -20,7 +20,7 @@ import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.ai.utils.Location;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.Vector2;
 
 import de.dakror.wargame.TextureAtlas.TextureRegion;
 
@@ -28,7 +28,7 @@ import de.dakror.wargame.TextureAtlas.TextureRegion;
  * @author Maximilian Stark | Dakror
  *
  */
-public class Unit extends Entity implements Steerable<Vector3> {
+public class Unit extends Entity implements Steerable<Vector2> {
 	public static enum AttackKind {
 		Arc_Missile,
 		Bomb,
@@ -84,7 +84,7 @@ public class Unit extends Entity implements Steerable<Vector3> {
 		public void update(float timePassed) {}
 	}
 	
-	private static final SteeringAcceleration<Vector3> steeringOutput = new SteeringAcceleration<Vector3>(new Vector3());
+	private static final SteeringAcceleration<Vector2> steeringOutput = new SteeringAcceleration<Vector2>(new Vector2());
 	
 	boolean tagged;
 	boolean independentFacing = false;
@@ -95,29 +95,29 @@ public class Unit extends Entity implements Steerable<Vector3> {
 	float angularVelocity;
 	float boundingRadius;
 	float orientation;
-	Vector3 linearVelocity = new Vector3();
-	Vector3 pos = new Vector3();
+	Vector2 linearVelocity = new Vector2();
+	Vector2 pos = new Vector2();
 	Type type;
-	SteeringBehavior<Vector3> steeringBehavior;
+	SteeringBehavior<Vector2> steeringBehavior;
 	float scale = 0.5f;
 	
-	public Unit(float x, float y, float z, int face, int color, boolean huge, Type type) {
-		super(x, y, z, face, color, huge, type.name());
+	public Unit(float x, float z, int face, int color, boolean huge, Type type) {
+		super(x, z, face, color, huge, type.name());
 		this.type = type;
-		pos.set(x, y, z);
+		pos.set(x, z);
 		onCreate();
 	}
 	
-	public Unit(float x, float y, float z, int color, Type type) {
-		this(x, y, z, 0, color, type);
+	public Unit(float x, float z, int color, Type type) {
+		this(x, z, 0, color, type);
 	}
 	
-	public Unit(float x, float y, float z, int face, int color, Type type) {
-		this(x, y, z, face, color, false, type);
+	public Unit(float x, float z, int face, int color, Type type) {
+		this(x, z, face, color, false, type);
 	}
 	
-	public Unit(float x, float y, float z, int color, boolean huge, Type type) {
-		this(x, y, z, 0, color, huge, type);
+	public Unit(float x, float z, int color, boolean huge, Type type) {
+		this(x, z, 0, color, huge, type);
 	}
 	
 	@Override
@@ -153,7 +153,7 @@ public class Unit extends Entity implements Steerable<Vector3> {
 		}
 	}
 	
-	private void applySteering(SteeringAcceleration<Vector3> steering, float deltaTime) {
+	private void applySteering(SteeringAcceleration<Vector2> steering, float deltaTime) {
 		pos.mulAdd(linearVelocity, deltaTime);
 		linearVelocity.mulAdd(steering.linear, deltaTime).limit(getMaxLinearSpeed());
 		
@@ -169,26 +169,26 @@ public class Unit extends Entity implements Steerable<Vector3> {
 	
 	@Override
 	public float getX() {
-		return (pos.x + (huge ? 1 : 0)) * (World.WIDTH * World.SCALE) / 2 + pos.z * (World.WIDTH * World.SCALE) / 2 + world.getPos().x - xOffset + ((World.WIDTH) - width) / 4;
+		return (pos.x + (huge ? 1 : 0)) * (World.WIDTH * World.SCALE) / 2 + pos.y * (World.WIDTH * World.SCALE) / 2 + world.getPos().x - xOffset + ((World.WIDTH) - width) / 4;
 	}
 	
 	@Override
 	public float getY() {
-		return pos.y * World.HEIGHT - (pos.x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + pos.z * (World.DEPTH * World.SCALE) / 2 + world.getPos().y + yOffset * 2;
+		return 2 * World.HEIGHT - (pos.x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + pos.y * (World.DEPTH * World.SCALE) / 2 + world.getPos().y + yOffset * 2;
 	}
 	
 	@Override
 	public float getZ() {
-		return (pos.y * World.HEIGHT + (pos.x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + world.getPos().z + World.HEIGHT) / 1024f;
+		return (2 * World.HEIGHT + (pos.x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + world.getPos().z + World.HEIGHT) / 1024f;
 	}
 	
 	@Override
-	public Vector3 angleToVector(Vector3 outVector, float angle) {
+	public Vector2 angleToVector(Vector2 outVector, float angle) {
 		return WorldLocation.AngleToVector(outVector, angle);
 	}
 	
 	@Override
-	public float vectorToAngle(Vector3 vector) {
+	public float vectorToAngle(Vector2 vector) {
 		return WorldLocation.VectorToAngle(vector);
 	}
 	
@@ -211,7 +211,7 @@ public class Unit extends Entity implements Steerable<Vector3> {
 	}
 	
 	@Override
-	public Vector3 getLinearVelocity() {
+	public Vector2 getLinearVelocity() {
 		return linearVelocity;
 	}
 	
@@ -266,7 +266,7 @@ public class Unit extends Entity implements Steerable<Vector3> {
 	}
 	
 	@Override
-	public Vector3 getPosition() {
+	public Vector2 getPosition() {
 		return pos;
 	}
 	
@@ -280,11 +280,11 @@ public class Unit extends Entity implements Steerable<Vector3> {
 		throw new UnsupportedOperationException();
 	}
 	
-	public SteeringBehavior<Vector3> getSteeringBehavior() {
+	public SteeringBehavior<Vector2> getSteeringBehavior() {
 		return steeringBehavior;
 	}
 	
-	public void setSteeringBehavior(SteeringBehavior<Vector3> steeringBehavior) {
+	public void setSteeringBehavior(SteeringBehavior<Vector2> steeringBehavior) {
 		this.steeringBehavior = steeringBehavior;
 	}
 	
@@ -299,7 +299,7 @@ public class Unit extends Entity implements Steerable<Vector3> {
 	}
 	
 	@Override
-	public Location<Vector3> newLocation() {
+	public Location<Vector2> newLocation() {
 		return new WorldLocation();
 	}
 	

@@ -1,24 +1,24 @@
 package de.dakror.wargame;
 
 import com.badlogic.gdx.ai.utils.Location;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.Vector2;
 
-public class WorldLocation implements Location<Vector3> {
-	Vector3 position;
+public class WorldLocation implements Location<Vector2> {
+	Vector2 position;
 	float orientation;
 	
 	public WorldLocation() {
-		position = new Vector3();
+		position = new Vector2();
 		orientation = 0;
 	}
 	
-	public WorldLocation(Vector3 position, float orientation) {
+	public WorldLocation(Vector2 position, float orientation) {
 		this.position = position;
 		this.orientation = orientation;
 	}
 	
 	@Override
-	public Vector3 getPosition() {
+	public Vector2 getPosition() {
 		return position;
 	}
 	
@@ -33,28 +33,27 @@ public class WorldLocation implements Location<Vector3> {
 	}
 	
 	@Override
-	public Location<Vector3> newLocation() {
+	public Location<Vector2> newLocation() {
 		return new WorldLocation();
 	}
 	
 	@Override
-	public float vectorToAngle(Vector3 vector) {
+	public float vectorToAngle(Vector2 vector) {
 		return VectorToAngle(vector);
 	}
 	
 	@Override
-	public Vector3 angleToVector(Vector3 outVector, float angle) {
+	public Vector2 angleToVector(Vector2 outVector, float angle) {
 		return AngleToVector(outVector, angle);
 	}
 	
-	public static Vector3 AngleToVector(Vector3 outVector, float angle) {
-		outVector.x = (float) Math.sin(angle);
-		outVector.y = 0;
-		outVector.z = (float) Math.cos(angle);
+	public static Vector2 AngleToVector(Vector2 outVector, float angle) {
+		outVector.x = -(float) Math.sin(angle);
+		outVector.y = (float) Math.cos(angle);
 		return outVector;
 	}
 	
-	public static float VectorToAngle(Vector3 vector) {
-		return (float) Math.atan2(vector.x, vector.z);
+	public static float VectorToAngle(Vector2 vector) {
+		return (float) Math.atan2(vector.x, vector.y);
 	}
 }

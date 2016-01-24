@@ -76,6 +76,8 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	float vX, vY;
 	int frames, fps = 60;
 	
+	public float money = 2000;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -119,7 +121,7 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	@Override
 	public void onSurfaceCreated(GL10 gl10, EGLConfig config) {
 		spriteRenderer = new SpriteRenderer();
-		textRenderer = new TextRenderer("packed/font/copperplate.fnt");
+		textRenderer = new TextRenderer("packed/font/copperplate.fnt", "packed/font/bling.fnt");
 		viewMatrix = new float[16];
 		projMatrix = new float[16];
 		hudMatrix = new float[16];
@@ -173,6 +175,7 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		
 		float timeStep = Math.min(1.0f / fps, 1 / 60f);
 		GdxAI.getTimepiece().update(timeStep);
+		money += timeStep;
 		map.update(timeStep);
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -191,9 +194,14 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		glDisable(GL_DEPTH_TEST);
 		
 		spriteRenderer.begin(hudMatrix);
-		textRenderer.renderText(-width / 2, height / 2 - 30, 0, 1, "FPS: " + fps, spriteRenderer);
-		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 1, "R: " + map.rendered + " / " + map.all, spriteRenderer);
-		textRenderer.renderText(-width / 2, height / 2 - 90, 0, 1, "E: " + map.rEntities + " / " + map.entities.size, spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 30, 0, 0.5f, "FPS: " + fps, spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "R: " + map.rendered + " / " + map.all, spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 90, 0, 0.5f, "E: " + map.rEntities + " / " + map.entities.size, spriteRenderer);
+		
+		textRenderer.setFont(1);
+		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(money), spriteRenderer);
+		textRenderer.setFont(0);
+		
 		spriteRenderer.end();
 		
 		frames++;

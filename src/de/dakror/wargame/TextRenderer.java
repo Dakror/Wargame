@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * Only supports one page long fonts for simplicity and lazyness :P
@@ -35,65 +36,90 @@ public class TextRenderer {
 		char c;
 	}
 	
-	HashMap<Character, Glyph> glyphs;
-	int textureId;
-	float textureWidth, textureHeight;
-	int lineHeight;
+	/**
+	 * @author Maximilian Stark | Dakror
+	 */
+	public static class Font {
+		HashMap<Character, Glyph> glyphs;
+		int textureId;
+		float textureWidth, textureHeight;
+		int lineHeight;
+		
+		Font(String fontFile) {
+			try {
+				glyphs = new HashMap<Character, Glyph>();
+				BufferedReader br = new BufferedReader(new InputStreamReader(Wargame.instance.getAssets().open(fontFile)));
+				
+				String line = "";
+				while ((line = br.readLine()) != null) {
+					if (line.startsWith("page ")) {
+						String[] p = line.split(" +");
+						String texture = p[2].substring(6);
+						texture = texture.substring(0, texture.indexOf("\""));
+						
+						System.out.println("(TextRenderer) Loading Texture: " + texture);
+						if (textureId != 0) System.err.println("(TextRenderer) Conflict! Multiple Pages detected");
+						textureId = Wargame.instance.loadTexture(fontFile.substring(0, fontFile.lastIndexOf("/")) + "/" + texture);
+					} else if (line.startsWith("char ")) {
+						String[] p = line.split(" +");
+						Glyph g = new Glyph();
+						g.c = (char) Integer.parseInt(p[1].substring(3));
+						g.x = Integer.parseInt(p[2].substring(2));
+						g.y = Integer.parseInt(p[3].substring(2));
+						g.width = Integer.parseInt(p[4].substring(6));
+						g.height = Integer.parseInt(p[5].substring(7));
+						g.offsetX = Integer.parseInt(p[6].substring(8));
+						g.offsetY = Integer.parseInt(p[7].substring(8));
+						g.advanceX = Integer.parseInt(p[8].substring(9));
+						
+						glyphs.put(g.c, g);
+					} else if (line.startsWith("common ")) {
+						String[] p = line.split(" +");
+						lineHeight = Integer.parseInt(p[1].substring(11));
+						textureWidth = Integer.parseInt(p[3].substring(7));
+						textureHeight = Integer.parseInt(p[4].substring(7));
+					}
+				}
+				
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
-	final float SCALE = 1.0f;
+	LinkedList<Font> fonts = new LinkedList<Font>();
+	int font = 0;
+	final float SCALE = 1f;
 	
-	public TextRenderer(String fontFile) {
-		parse(fontFile);
+	public TextRenderer(String... fonts) {
+		for (String f : fonts)
+			this.fonts.add(new Font(f));
+	}
+	
+	public void setFont(int font) {
+		this.font = font;
 	}
 	
 	public void renderText(float x, float y, float z, float size, String text, SpriteRenderer r) {
 		float w = 0;
+		Font font = fonts.get(this.font);
 		for (int i = 0; i < text.length(); i++) {
-			Glyph g = glyphs.get(text.charAt(i));
-			r.render(x + w + g.offsetX / SCALE * size, y, z, g.width / SCALE * size, g.height / SCALE * size, g.x / textureWidth, g.y / textureHeight, g.width / textureWidth, g.height / textureHeight, textureId);
+			Glyph g = font.glyphs.get(text.charAt(i));
+			r.render(x + w + g.offsetX / SCALE * size, y, z, g.width / SCALE * size, g.height / SCALE * size, g.x / font.textureWidth, g.y / font.textureHeight, g.width / font.textureWidth, g.height / font.textureHeight, font.textureId);
 			w += g.advanceX / SCALE * size;
 		}
 	}
 	
-	void parse(String fontFile) {
-		try {
-			glyphs = new HashMap<Character, Glyph>();
-			BufferedReader br = new BufferedReader(new InputStreamReader(Wargame.instance.getAssets().open(fontFile)));
-			
-			String line = "";
-			while ((line = br.readLine()) != null) {
-				if (line.startsWith("page ")) {
-					String[] p = line.split(" +");
-					String texture = p[2].substring(6);
-					texture = texture.substring(0, texture.indexOf("\""));
-					
-					System.out.println("(TextRenderer) Loading Texture: " + texture);
-					if (textureId != 0) System.err.println("(TextRenderer) Conflict! Multiple Pages detected");
-					textureId = Wargame.instance.loadTexture(fontFile.substring(0, fontFile.lastIndexOf("/")) + "/" + texture);
-				} else if (line.startsWith("char ")) {
-					String[] p = line.split(" +");
-					Glyph g = new Glyph();
-					g.c = (char) Integer.parseInt(p[1].substring(3));
-					g.x = Integer.parseInt(p[2].substring(2));
-					g.y = Integer.parseInt(p[3].substring(2));
-					g.width = Integer.parseInt(p[4].substring(6));
-					g.height = Integer.parseInt(p[5].substring(7));
-					g.offsetX = Integer.parseInt(p[6].substring(8));
-					g.offsetY = Integer.parseInt(p[7].substring(8));
-					g.advanceX = Integer.parseInt(p[8].substring(9));
-					
-					glyphs.put(g.c, g);
-				} else if (line.startsWith("common ")) {
-					String[] p = line.split(" +");
-					lineHeight = Integer.parseInt(p[1].substring(11));
-					textureWidth = Integer.parseInt(p[3].substring(7));
-					textureHeight = Integer.parseInt(p[4].substring(7));
-				}
-			}
-			
-			br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+	public void renderTextCentered(float x, float y, float z, float size, String text, SpriteRenderer r) {
+		float w = 0;
+		//float h = 0;
+		Font font = fonts.get(this.font);
+		for (int i = 0; i < text.length(); i++) {
+			Glyph g = font.glyphs.get(text.charAt(i));
+			//h = g.height > h ? g.height : h;
+			w += g.advanceX / SCALE * size;
 		}
+		renderText(x - w / 2, y/* - h * size*/, z, size, text, r);
 	}
 }

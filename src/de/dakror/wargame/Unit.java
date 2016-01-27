@@ -179,7 +179,7 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	
 	@Override
 	public float getZ() {
-		return (2 * World.HEIGHT + (pos.x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + world.getPos().z + World.HEIGHT) / 1024f;
+		return world.depth - z + x * 1f / world.depth + y * 2;//(2 * World.HEIGHT + (pos.x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + world.getPos().z + World.HEIGHT) / 1024f;
 	}
 	
 	@Override

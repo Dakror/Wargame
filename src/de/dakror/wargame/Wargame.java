@@ -86,6 +86,7 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		instance = this;
 		glView = new GLSurfaceView(this);
 		glView.setEGLContextClientVersion(2);
+		//glView.setEGLConfigChooser(new MultisampleConfigChooser());
 		glView.setRenderer(this);
 		glView.setOnTouchListener(this);
 		gestureDetector = new GestureDetector(this, this);
@@ -165,6 +166,8 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		System.arraycopy(viewProjMatrix, 0, hudMatrix, 0, 16);
 	}
 	
+	int i = 0, j = 0, k = 2, l = 4;
+	
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		if (System.currentTimeMillis() - lastTimestamp >= 1000) {
@@ -181,7 +184,12 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glEnable(GL_DEPTH_TEST);
-		
+		final int[] d = { GL_LESS, GL_LEQUAL, GL_EQUAL, GL_GEQUAL, GL_GREATER };
+		final int[] A = { GL_ZERO, GL_ONE, GL_SRC_ALPHA, GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA };
+		glDepthFunc(d[i]);
+		glEnable(GL_BLEND);
+		glBlendFunc(A[k], A[l]);
+		//		final String[] B = { "GL_ZERO", "GL_ONE", "GL_SRC_ALPHA", "GL_DST_ALPHA", "GL_ONE_MINUS_SRC_ALPHA", "GL_ONE_MINUS_DST_ALPHA" };
 		Matrix.setLookAtM(viewMatrix, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0);
 		Matrix.scaleM(viewMatrix, 0, scale, scale, scale);
 		
@@ -196,7 +204,7 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		spriteRenderer.begin(hudMatrix);
 		textRenderer.renderText(-width / 2, height / 2 - 30, 0, 0.5f, "FPS: " + fps, spriteRenderer);
 		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "R: " + map.rendered + " / " + map.all, spriteRenderer);
-		textRenderer.renderText(-width / 2, height / 2 - 90, 0, 0.5f, "E: " + map.rEntities + " / " + map.entities.size, spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 90, 0, 0.5f, "E: " + map.rEntities + " / " + map.entities.size(), spriteRenderer);
 		
 		textRenderer.setFont(1);
 		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(money), spriteRenderer);
@@ -222,6 +230,30 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 				float dy = y - prevY;
 				
 				if (e.getPointerCount() == prevNum) map.move(dx / scale * 60f / Math.max(fps, 25), dy / scale * 60f / Math.max(fps, 25));
+				break;
+			/*case MotionEvent.ACTION_UP:
+				final String[] B = { "GL_ZERO", "GL_ONE", "GL_SRC_ALPHA", "GL_DST_ALPHA", "GL_ONE_MINUS_SRC_ALPHA", "GL_ONE_MINUS_DST_ALPHA" };
+				final String[] D = { "GL_LESS", "GL_LEQUAL", "GL_EQUAL", "GL_GEQUAL", "GL_GREATER" };
+				if (x < width / 2) {
+					if (y < height / 2) {
+						i++;
+						
+						i %= D.length;
+						System.out.println("DepthFunc: " + D[i]);
+					} else j++;
+				} else {
+					if (y < height / 2) {
+						k++;
+						k %= B.length;
+						System.out.println("srcf: " + B[k]);
+					} else {
+						l++;
+						
+						l %= B.length;
+						System.out.println("dstf: " + B[l]);
+					}
+				}
+				break;*/
 		}
 		
 		prevX = x;

@@ -19,10 +19,10 @@ package de.dakror.wargame;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 
 import de.dakror.wargame.TextureAtlas.TextureRegion;
 import de.dakror.wargame.TextureAtlas.Tile;
@@ -63,7 +63,7 @@ public class World /*extends PooledEngine*/ {
 	public boolean dirty = true;
 	protected int width, depth;
 	public int rendered, all, rEntities;
-	protected Array<Entity> entities;
+	protected ArrayList<Entity> entities;
 	
 	public static final float SCALE = 0.5f;
 	
@@ -133,7 +133,7 @@ public class World /*extends PooledEngine*/ {
 	}
 	
 	void init() {
-		entities = new Array<Entity>();
+		entities = new ArrayList<Entity>();
 		//		renderables = getEntitiesFor(Family.all(CAnimatedSprite.class, CPosition.class, CFace.class).get());
 		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
 		newPos = new Vector3(pos);
@@ -248,7 +248,7 @@ public class World /*extends PooledEngine*/ {
 		//			float hX = 0, hY = 0;
 		
 		for (int x = 0; x < width; x++) {
-			for (int z = 0; z < depth; z++) {
+			for (int z = depth - 1; z >= 0; z--) {
 				Tile t = Wargame.terrain.getTile(getFile(x, z));
 				if (t == null) continue;
 				TextureRegion tr = t.regions.get(0);
@@ -256,7 +256,7 @@ public class World /*extends PooledEngine*/ {
 				float y1 = pos.y - x * DEPTH / 2 + z * DEPTH / 2;
 				
 				if ((x1 + tr.width * 2048) * scale >= -Wargame.width / 2 && x1 * scale <= Wargame.width / 2 && y1 * scale <= Wargame.height / 2 && (y1 + tr.height * 2048) * scale >= -Wargame.height / 2) {
-					r.render(x1, y1, (pos.z + x * DEPTH / 2) / 1024f, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
+					r.render(x1, y1, /*(pos.z + x * DEPTH / 2) / 1024f*/depth - z + x * 1f / depth, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
 					rendered++;
 				}
 				all++;

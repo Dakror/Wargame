@@ -118,7 +118,7 @@ public class Building extends Entity {
 	
 	@Override
 	public float getZ() {
-		return (y * World.HEIGHT + (x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + world.getPos().z + World.HEIGHT) / 1024f;
+		return world.depth - z + x * 1f / world.depth + y * 2;//(y * World.HEIGHT + (x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + world.getPos().z + World.HEIGHT) / 1024f;
 	}
 	
 	@Override

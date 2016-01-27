@@ -103,7 +103,6 @@ public class SpriteRenderer {
 		elementIndex += 6;
 		
 		boolean useOffset = xOff != 0 && yOff != 0 && innerW != 0 && innerH != 0;
-		
 		if (useOffset) {
 			vertices.put(new float[] { x + xOff, y + yOff + innerH, z, tx, ty, c[0], c[1], c[2], c[3], p });
 			vertexIndex++;

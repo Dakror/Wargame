@@ -1,5 +1,5 @@
-#define LOWP lowp
-precision mediump float;
+//#define LOWP lowp
+precision highp float;
 
 uniform sampler2D uTex;
 
@@ -36,7 +36,7 @@ void main() {
 		//else 
 		col = vec4(0.0); 
 	}
-	if(col.a < 1.0) discard;
+//if(col.a < 0.25) discard;
 
-	gl_FragColor = vec4(col.rgb, 1);
+	gl_FragColor = col;//vec4(col.rgb,1);
 }

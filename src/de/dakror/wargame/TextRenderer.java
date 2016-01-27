@@ -43,7 +43,9 @@ public class TextRenderer {
 		HashMap<Character, Glyph> glyphs;
 		int textureId;
 		float textureWidth, textureHeight;
-		int lineHeight;
+		int lineHeight, base;
+		int[] padding = new int[4];
+		int[] spacing = new int[2];
 		
 		Font(String fontFile) {
 			try {
@@ -52,7 +54,15 @@ public class TextRenderer {
 				
 				String line = "";
 				while ((line = br.readLine()) != null) {
-					if (line.startsWith("page ")) {
+					if (line.startsWith("info ")) {
+						String[] p = line.split(" +");
+						String[] padding = p[p.length - 2].substring(8).split(",");
+						for (int i = 0; i < 4; i++)
+							this.padding[i] = Integer.parseInt(padding[i]);
+						String[] spacing = p[p.length - 1].substring(8).split(",");
+						for (int i = 0; i < 2; i++)
+							this.spacing[i] = Integer.parseInt(spacing[i]);
+					} else if (line.startsWith("page ")) {
 						String[] p = line.split(" +");
 						String texture = p[2].substring(6);
 						texture = texture.substring(0, texture.indexOf("\""));
@@ -76,6 +86,7 @@ public class TextRenderer {
 					} else if (line.startsWith("common ")) {
 						String[] p = line.split(" +");
 						lineHeight = Integer.parseInt(p[1].substring(11));
+						base = Integer.parseInt(p[2].substring(5));
 						textureWidth = Integer.parseInt(p[3].substring(7));
 						textureHeight = Integer.parseInt(p[4].substring(7));
 					}
@@ -90,7 +101,6 @@ public class TextRenderer {
 	
 	LinkedList<Font> fonts = new LinkedList<Font>();
 	int font = 0;
-	final float SCALE = 1f;
 	
 	public TextRenderer(String... fonts) {
 		for (String f : fonts)
@@ -106,8 +116,8 @@ public class TextRenderer {
 		Font font = fonts.get(this.font);
 		for (int i = 0; i < text.length(); i++) {
 			Glyph g = font.glyphs.get(text.charAt(i));
-			r.render(x + w + g.offsetX / SCALE * size, y, z, g.width / SCALE * size, g.height / SCALE * size, g.x / font.textureWidth, g.y / font.textureHeight, g.width / font.textureWidth, g.height / font.textureHeight, font.textureId);
-			w += g.advanceX / SCALE * size;
+			r.render(x + w + (g.advanceX - g.width) / 2 * size, y + (font.base - g.height - g.offsetY) * size, z, g.width * size, g.height * size, g.x / font.textureWidth, g.y / font.textureHeight, g.width / font.textureWidth, g.height / font.textureHeight, font.textureId);
+			w += g.advanceX * size;
 		}
 	}
 	
@@ -118,7 +128,7 @@ public class TextRenderer {
 		for (int i = 0; i < text.length(); i++) {
 			Glyph g = font.glyphs.get(text.charAt(i));
 			//h = g.height > h ? g.height : h;
-			w += g.advanceX / SCALE * size;
+			w += g.advanceX * size;
 		}
 		renderText(x - w / 2, y/* - h * size*/, z, size, text, r);
 	}

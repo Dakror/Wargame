@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.render;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,6 +22,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import de.dakror.wargame.Wargame;
 
 /**
  * @author Maximilian Stark | Dakror

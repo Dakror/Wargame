@@ -1,4 +1,4 @@
-package de.dakror.wargame;
+package de.dakror.wargame.util;
 
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;

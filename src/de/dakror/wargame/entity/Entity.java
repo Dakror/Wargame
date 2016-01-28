@@ -14,9 +14,12 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.entity;
 
-import de.dakror.wargame.TextureAtlas.Tile;
+import de.dakror.wargame.Wargame;
+import de.dakror.wargame.World;
+import de.dakror.wargame.render.AnimatedSprite;
+import de.dakror.wargame.render.TextureAtlas.Tile;
 
 /**
  * @author Maximilian Stark | Dakror

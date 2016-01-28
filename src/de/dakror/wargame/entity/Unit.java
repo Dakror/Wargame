@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.entity;
 
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
@@ -22,7 +22,9 @@ import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 
-import de.dakror.wargame.TextureAtlas.TextureRegion;
+import de.dakror.wargame.World;
+import de.dakror.wargame.render.TextureAtlas.TextureRegion;
+import de.dakror.wargame.util.WorldLocation;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -169,17 +171,17 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	
 	@Override
 	public float getX() {
-		return (pos.x + (huge ? 1 : 0)) * (World.WIDTH * World.SCALE) / 2 + pos.y * (World.WIDTH * World.SCALE) / 2 + world.getPos().x - xOffset + ((World.WIDTH) - width) / 4;
+		return (pos.x + (huge ? 1 : 0)) * (World.WIDTH / 2) / 2 + pos.y * (World.WIDTH / 2) / 2 + world.getPos().x - xOffset + ((World.WIDTH) - width) / 4;
 	}
 	
 	@Override
 	public float getY() {
-		return 2 * World.HEIGHT - (pos.x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + pos.y * (World.DEPTH * World.SCALE) / 2 + world.getPos().y + yOffset * 2;
+		return 2 * World.HEIGHT - (pos.x + (huge ? 1 : 0)) * (World.DEPTH / 2) / 2 + pos.y * (World.DEPTH / 2) / 2 + world.getPos().y + yOffset * 2;
 	}
 	
 	@Override
 	public float getZ() {
-		return world.depth - z + x * 1f / world.depth + y * 2;//(2 * World.HEIGHT + (pos.x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + world.getPos().z + World.HEIGHT) / 1024f;
+		return (world.getDepth() - z + x * 1f / world.getDepth() + y * 2) / 1024f;
 	}
 	
 	@Override

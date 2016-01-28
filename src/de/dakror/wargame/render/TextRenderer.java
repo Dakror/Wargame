@@ -14,13 +14,15 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.render;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.LinkedList;
+
+import de.dakror.wargame.Wargame;
 
 /**
  * Only supports one page long fonts for simplicity and lazyness :P
@@ -123,13 +125,11 @@ public class TextRenderer {
 	
 	public void renderTextCentered(float x, float y, float z, float size, String text, SpriteRenderer r) {
 		float w = 0;
-		//float h = 0;
 		Font font = fonts.get(this.font);
 		for (int i = 0; i < text.length(); i++) {
 			Glyph g = font.glyphs.get(text.charAt(i));
-			//h = g.height > h ? g.height : h;
 			w += g.advanceX * size;
 		}
-		renderText(x - w / 2, y/* - h * size*/, z, size, text, r);
+		renderText(x - w / 2, y, z, size, text, r);
 	}
 }

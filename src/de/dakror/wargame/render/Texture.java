@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.render;
 
 import android.opengl.GLES20;
 

@@ -1,3 +1,4 @@
+package de.dakror.wargame.entity;
 ///*******************************************************************************
 // * Copyright 2015 Maximilian Stark | Dakror <mail@dakror.de>
 // * 

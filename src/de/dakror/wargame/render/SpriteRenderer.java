@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.render;
 
 import static android.opengl.GLES20.*;
 
@@ -22,6 +22,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+
+import de.dakror.wargame.Wargame;
 
 /**
  * @author Maximilian Stark | Dakror

@@ -14,23 +14,43 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.util;
+
+import com.badlogic.gdx.ai.Logger;
+
+import android.util.Log;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public interface EntityLifeCycle {
-	public void onCreate();
+public class AndroidLogger implements Logger {
+	@Override
+	public void debug(String tag, String message, Throwable exception) {
+		Log.d(tag, message, exception);
+	}
 	
-	public void onSpawn();
+	@Override
+	public void debug(String tag, String message) {
+		Log.d(tag, message);
+	}
 	
-	public void update(float timePassed);
+	@Override
+	public void info(String tag, String message) {
+		Log.i(tag, message);
+	}
 	
-	public void onDeath();
+	@Override
+	public void info(String tag, String message, Throwable exception) {
+		Log.i(tag, message, exception);
+	}
 	
-	public void onRemoval();
+	@Override
+	public void error(String tag, String message) {
+		Log.e(tag, message);
+	}
 	
-	public void onSelect();
-	
-	public void onDeselect();
+	@Override
+	public void error(String tag, String message, Throwable exception) {
+		Log.e(tag, message, exception);
+	}
 }

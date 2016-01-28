@@ -14,7 +14,9 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.entity;
+
+import de.dakror.wargame.World;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -98,7 +100,7 @@ public class Building extends Entity {
 		
 		float texWidth = textureWidth * tile.regions.get(index).texture.width;
 		
-		width = (float) (Math.ceil(texWidth / World.WIDTH) * (World.WIDTH * World.SCALE));
+		width = (float) (Math.ceil(texWidth / World.WIDTH) * (World.WIDTH / 2));
 		height = (textureHeight * tile.regions.get(index).texture.height) * (width / texWidth);
 	}
 	
@@ -108,17 +110,17 @@ public class Building extends Entity {
 	
 	@Override
 	public float getX() {
-		return (x + (huge ? 1 : 0)) * (World.WIDTH * World.SCALE) / 2 + z * (World.WIDTH * World.SCALE) / 2 + world.getPos().x + ((World.WIDTH * World.SCALE) - width) / 2;
+		return (x + (huge ? 1 : 0)) * (World.WIDTH / 2) / 2 + z * (World.WIDTH / 2) / 2 + world.getPos().x + ((World.WIDTH / 2) - width) / 2;
 	}
 	
 	@Override
 	public float getY() {
-		return y * World.HEIGHT - (x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + z * (World.DEPTH * World.SCALE) / 2 + world.getPos().y + World.HEIGHT - 1;
+		return y * World.HEIGHT - (x + (huge ? 1 : 0)) * (World.DEPTH / 2) / 2 + z * (World.DEPTH / 2) / 2 + world.getPos().y + World.HEIGHT - 1;
 	}
 	
 	@Override
 	public float getZ() {
-		return world.depth - z + x * 1f / world.depth + y * 2;//(y * World.HEIGHT + (x + (huge ? 1 : 0)) * (World.DEPTH * World.SCALE) / 2 + world.getPos().z + World.HEIGHT) / 1024f;
+		return (world.getDepth() - z / 2 + x / 2 * 1f / world.getDepth() + y * 2) / 1024f;
 	}
 	
 	@Override

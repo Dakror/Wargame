@@ -48,7 +48,15 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import de.dakror.wargame.Building.Type;
+import de.dakror.wargame.entity.Building;
+import de.dakror.wargame.entity.Entity;
+import de.dakror.wargame.entity.Unit;
+import de.dakror.wargame.entity.Building.Type;
+import de.dakror.wargame.render.SpriteRenderer;
+import de.dakror.wargame.render.TextRenderer;
+import de.dakror.wargame.render.TextureAtlas;
+import de.dakror.wargame.util.AndroidLogger;
+import de.dakror.wargame.util.WorldLocation;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -148,10 +156,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		v.setSteeringBehavior(new Arrive<Vector2>(v).setTarget(new WorldLocation(new Vector2(6, 6), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f));
 		map.addEntity(v);
 		map.addEntity(u);
-		//			for (int i = 0; i < 8; i++)
-		//				for (Type t : Type.values())
-		//					map.addEntity(new Building(t.ordinal(), 2, i * 2, i, t));
-		//					
 		glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
 	}
 	
@@ -165,8 +169,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		Matrix.multiplyMM(viewProjMatrix, 0, projMatrix, 0, viewMatrix, 0);
 		System.arraycopy(viewProjMatrix, 0, hudMatrix, 0, 16);
 	}
-	
-	int i = 0, j = 0, k = 2, l = 4;
 	
 	@Override
 	public void onDrawFrame(GL10 gl) {
@@ -184,12 +186,8 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glEnable(GL_DEPTH_TEST);
-		final int[] d = { GL_LESS, GL_LEQUAL, GL_EQUAL, GL_GEQUAL, GL_GREATER };
-		final int[] A = { GL_ZERO, GL_ONE, GL_SRC_ALPHA, GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA };
-		glDepthFunc(d[i]);
 		glEnable(GL_BLEND);
-		glBlendFunc(A[k], A[l]);
-		//		final String[] B = { "GL_ZERO", "GL_ONE", "GL_SRC_ALPHA", "GL_DST_ALPHA", "GL_ONE_MINUS_SRC_ALPHA", "GL_ONE_MINUS_DST_ALPHA" };
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		Matrix.setLookAtM(viewMatrix, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0);
 		Matrix.scaleM(viewMatrix, 0, scale, scale, scale);
 		
@@ -231,29 +229,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 				
 				if (e.getPointerCount() == prevNum) map.move(dx / scale * 60f / Math.max(fps, 25), dy / scale * 60f / Math.max(fps, 25));
 				break;
-			/*case MotionEvent.ACTION_UP:
-				final String[] B = { "GL_ZERO", "GL_ONE", "GL_SRC_ALPHA", "GL_DST_ALPHA", "GL_ONE_MINUS_SRC_ALPHA", "GL_ONE_MINUS_DST_ALPHA" };
-				final String[] D = { "GL_LESS", "GL_LEQUAL", "GL_EQUAL", "GL_GEQUAL", "GL_GREATER" };
-				if (x < width / 2) {
-					if (y < height / 2) {
-						i++;
-						
-						i %= D.length;
-						System.out.println("DepthFunc: " + D[i]);
-					} else j++;
-				} else {
-					if (y < height / 2) {
-						k++;
-						k %= B.length;
-						System.out.println("srcf: " + B[k]);
-					} else {
-						l++;
-						
-						l %= B.length;
-						System.out.println("dstf: " + B[l]);
-					}
-				}
-				break;*/
 		}
 		
 		prevX = x;
@@ -272,7 +247,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		if (entity != null) entity.onSelect();
 		
 		return entity != null;
-		//		return false;
 	}
 	
 	@Override

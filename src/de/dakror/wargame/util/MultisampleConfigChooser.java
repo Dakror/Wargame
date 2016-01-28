@@ -1,4 +1,4 @@
-package de.dakror.wargame;
+package de.dakror.wargame.util;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;

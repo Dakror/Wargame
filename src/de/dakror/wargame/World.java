@@ -24,13 +24,15 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.math.Vector3;
 
-import de.dakror.wargame.TextureAtlas.TextureRegion;
-import de.dakror.wargame.TextureAtlas.Tile;
+import de.dakror.wargame.entity.Entity;
+import de.dakror.wargame.render.SpriteRenderer;
+import de.dakror.wargame.render.TextureAtlas.TextureRegion;
+import de.dakror.wargame.render.TextureAtlas.Tile;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class World /*extends PooledEngine*/ {
+public class World {
 	public static enum Type {
 		Air,
 		Basement,
@@ -64,13 +66,6 @@ public class World /*extends PooledEngine*/ {
 	protected int width, depth;
 	public int rendered, all, rEntities;
 	protected ArrayList<Entity> entities;
-	
-	public static final float SCALE = 0.5f;
-	
-	//	public int[] fbo = new int[1];
-	//	int[] tex = new int[1];
-	//	public int texWidth, texHeight;
-	//	ImmutableArray<Entity> renderables;
 	
 	public World(String worldFile) {
 		super();
@@ -125,47 +120,14 @@ public class World /*extends PooledEngine*/ {
 		Type[] t = { Type.Desert, Type.Forest, Type.Mountains, Type.River, Type.Tundra };
 		for (int i = 0; i < width; i++)
 			for (int j = 0; j < depth; j++)
-				set(i, j, t[(int) (Math.random() * t.length)]);//, i == width - 1, j == 0, i == 0, j == depth - 1);
-		//		set(0, 0, 0, Types.Custom0); // red
-		//		set(2, 0, 0, Types.Custom1); // pink 
-		//		set(0, 0, 2, Types.Forest); // green
-		//		set(2, 0, 2, Types.Tundra); // white
+				set(i, j, t[(int) (Math.random() * t.length)]);
 	}
 	
 	void init() {
 		entities = new ArrayList<Entity>();
-		//		renderables = getEntitiesFor(Family.all(CAnimatedSprite.class, CPosition.class, CFace.class).get());
+		
 		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
 		newPos = new Vector3(pos);
-		//		updateDirections();
-		
-		//		glGenFramebuffers(1, fbo, 0);
-		//		glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
-		//		glGenTextures(1, tex, 0);
-		//		glBindTexture(GL_TEXTURE_2D, tex[0]);
-		//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		//		
-		//		texWidth = (int) (Math.sqrt(width * depth) * (WIDTH + 10 /*idk why */)) / 2;//(int) ((width + depth) * WIDTH);
-		//		texHeight = (int) (height * HEIGHT + depth * DEPTH / 2 + width * DEPTH / 2) / 2;//(int) ((width + depth) * DEPTH + height * HEIGHT);
-		//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
-		//		fboBitmap = Bitmap.createBitmap((int) (width * WIDTH / 2 + depth * WIDTH / 2), (int) (height * HEIGHT - width * DEPTH / 2 + depth * DEPTH / 2), Config.ARGB_8888);
-		//		GLUtils.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fboBitmap, 0);
-		//		int[] rbo = new int[1];
-		//		glGenRenderbuffers(1, rbo, 0);
-		//		glBindRenderbuffer(GL_RENDERBUFFER, rbo[0]);
-		//		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, texWidth, texHeight);
-		//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex[0], 0);
-		//		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo[0]);
-		//		
-		//		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		//			System.err.println("Framebuffer not complete");
-		//			MainActivity.instance.finish();
-		//		}
-		//		
-		//		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 	
 	public void center(Entity e) {
@@ -231,22 +193,6 @@ public class World /*extends PooledEngine*/ {
 		
 		float scale = Wargame.instance.scale;
 		
-		//		if (dirty) {
-		//			float[] m = r.matrix;
-		//			r.end();
-		//			Matrix.setIdentityM(MainActivity.instance.renderer.mvMatrix, 0);
-		//			Matrix.scaleM(MainActivity.instance.renderer.mvMatrix, 0, 1f / 1024 / (texWidth / 1920f), 1f / 1024 / (texWidth / 1920f), 1f / 1024);
-		//			Matrix.multiplyMM(MainActivity.instance.renderer.matrix, 0, MainActivity.instance.renderer.projMatrix, 0, MainActivity.instance.renderer.mvMatrix, 0);
-		//			
-		//			r.begin(MainActivity.instance.renderer.matrix);
-		//			glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
-		//			glClearColor(1, 0, 0, 1);
-		//			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//			glEnable(GL_DEPTH_TEST);
-		//			glViewport(0, 0, texWidth, texHeight);
-		//			
-		//			float hX = 0, hY = 0;
-		
 		for (int x = 0; x < width; x++) {
 			for (int z = depth - 1; z >= 0; z--) {
 				Tile t = Wargame.terrain.getTile(getFile(x, z));
@@ -256,65 +202,12 @@ public class World /*extends PooledEngine*/ {
 				float y1 = pos.y - x * DEPTH / 2 + z * DEPTH / 2;
 				
 				if ((x1 + tr.width * 2048) * scale >= -Wargame.width / 2 && x1 * scale <= Wargame.width / 2 && y1 * scale <= Wargame.height / 2 && (y1 + tr.height * 2048) * scale >= -Wargame.height / 2) {
-					r.render(x1, y1, /*(pos.z + x * DEPTH / 2) / 1024f*/depth - z + x * 1f / depth, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
+					r.render(x1, y1, (depth - z + x * 1f / depth) / 1024f, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
 					rendered++;
 				}
 				all++;
 			}
 		}
-		
-		//			r.end();
-		//			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		//			r.begin(m);
-		//			glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
-		//			glViewport(0, 0, MainActivity.width, MainActivity.height);
-		//			dirty = false;
-		
-		//		if (dirty) {
-		//			float[] m = r.matrix;
-		//			r.end();
-		//			Matrix.setIdentityM(MainActivity.instance.renderer.mvMatrix, 0);
-		//			Matrix.scaleM(MainActivity.instance.renderer.mvMatrix, 0, 1f / 1024 / (texWidth / 1920f), 1f / 1024 / (texWidth / 1920f), 1f / 1024);
-		//			Matrix.multiplyMM(MainActivity.instance.renderer.matrix, 0, MainActivity.instance.renderer.projMatrix, 0, MainActivity.instance.renderer.mvMatrix, 0);
-		//			
-		//			r.begin(MainActivity.instance.renderer.matrix);
-		//			glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
-		//			glClearColor(1, 0, 0, 1);
-		//			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//			glEnable(GL_DEPTH_TEST);
-		//			glViewport(0, 0, texWidth, texHeight);
-		//			
-		//			float hX = 0, hY = 0;
-		//			
-		//			for (int x = 0; x < width; x++) {
-		//				for (int z = 0; z < depth; z++) {
-		//					for (int y = 0; y < height; y++) {
-		//						Tile t = MainActivity.terrain.getTile(getFile(x, y, z));
-		//						if (t == null) continue;
-		//						TextureRegion tr = t.regions.get(0);
-		//						float x1 = x * WIDTH / 2 + z * WIDTH / 2 - texWidth + 10;
-		//						float y1 = y * HEIGHT - x * DEPTH / 2 + z * DEPTH / 2 - (texHeight - width * DEPTH / 2);
-		//						
-		//						if (x1 > hX) hX = x1;
-		//						if (y1 > hY) hY = y1;
-		//						
-		//						r.render(x1, y1, y * HEIGHT + x * DEPTH / 2, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.textureId);
-		//					}
-		//				}
-		//			}
-		//			
-		//			r.end();
-		//			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		//			r.begin(m);
-		//			glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
-		//			glViewport(0, 0, MainActivity.width, MainActivity.height);
-		//			dirty = false;
-		//		} else {
-		//			float fac = (float) 1.25;
-		//			int texWidth = (int) (this.texWidth * fac);
-		//			int texHeight = (int) (this.texHeight * fac);
-		//			r.render(pos.x - texWidth / 2, pos.y - texHeight / 2, 0, texWidth, texHeight, 0, 1, 1, -1, tex[0]);
-		//		}
 		
 		for (Entity e : entities) {
 			if ((e.getX() + e.getWidth()) * scale >= -Wargame.width / 2 && e.getX() * scale <= Wargame.width / 2 && e.getY() * scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * scale >= -Wargame.height / 2) {
@@ -346,5 +239,13 @@ public class World /*extends PooledEngine*/ {
 	
 	public Vector3 getNewPos() {
 		return newPos;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getDepth() {
+		return depth;
 	}
 }

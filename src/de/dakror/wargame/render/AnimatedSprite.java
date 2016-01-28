@@ -14,10 +14,10 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.render;
 
-import de.dakror.wargame.TextureAtlas.TextureRegion;
-import de.dakror.wargame.TextureAtlas.Tile;
+import de.dakror.wargame.render.TextureAtlas.TextureRegion;
+import de.dakror.wargame.render.TextureAtlas.Tile;
 
 /**
  * @author Maximilian Stark | Dakror

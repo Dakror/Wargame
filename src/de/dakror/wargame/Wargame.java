@@ -27,10 +27,6 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.badlogic.gdx.ai.GdxAI;
-import com.badlogic.gdx.ai.steer.SteeringBehavior;
-import com.badlogic.gdx.ai.steer.behaviors.Arrive;
-import com.badlogic.gdx.ai.steer.behaviors.Pursue;
-import com.badlogic.gdx.math.Vector2;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -56,7 +52,6 @@ import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas;
 import de.dakror.wargame.util.AndroidLogger;
-import de.dakror.wargame.util.WorldLocation;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -151,14 +146,18 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		Building theirCity = new Building(46, 23, 1, Type.City);
 		map.addEntity(theirCity);
 		
-		Unit u = new Unit(0, 0, 0, Unit.Type.Infantry);
-		Unit v = new Unit(0, 2, 0, Unit.Type.Infantry);
+		for (int i = 0; i < 15; i++) {
+			Unit u = new Unit(2 + (float) Math.random() * 2, 3 + (float) Math.random() * 2, 0, Unit.Type.Infantry);
+			map.addEntity(u);
+		}
 		
-		SteeringBehavior<Vector2> sb = new Pursue<Vector2>(u, v, 0.3f)/*.setTarget(new WorldLocation(new Vector3(2, 2, 0), 0))/*.setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f)*/;
-		u.setSteeringBehavior(sb);
-		v.setSteeringBehavior(new Arrive<Vector2>(v).setTarget(new WorldLocation(new Vector2(6, 6), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f));
-		map.addEntity(v);
-		map.addEntity(u);
+		//		Unit v = new Unit(0, 2, 0, Unit.Type.Infantry);
+		//		
+		//		SteeringBehavior<Vector2> sb = new Pursue<Vector2>(u, v, 0.3f)/*.setTarget(new WorldLocation(new Vector3(2, 2, 0), 0))/*.setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f)*/;
+		//		u.setSteeringBehavior(sb);
+		//		v.setSteeringBehavior(new Arrive<Vector2>(v).setTarget(new WorldLocation(new Vector2(6, 6), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f));
+		//		map.addEntity(v);
+		//		map.addEntity(u);
 		glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
 		//		glClearColor(114 / 255f, 163 / 255f, 107 / 255f, 1);
 	}
@@ -207,7 +206,7 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		spriteRenderer.begin(hudMatrix);
 		textRenderer.renderText(-width / 2, height / 2 - 30, 0, 0.5f, "FPS: " + fps, spriteRenderer);
 		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "R: " + map.rendered + " / " + map.all, spriteRenderer);
-		textRenderer.renderText(-width / 2, height / 2 - 90, 0, 0.5f, "E: " + map.rEntities + " / " + map.entities.size(), spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 90, 0, 0.5f, "E: " + map.rEntities + " / " + map.entities.size, spriteRenderer);
 		
 		textRenderer.setFont(1);
 		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(money), spriteRenderer);

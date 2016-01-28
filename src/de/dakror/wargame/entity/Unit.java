@@ -19,8 +19,10 @@ package de.dakror.wargame.entity;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
+import com.badlogic.gdx.ai.steer.proximities.InfiniteProximity;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import de.dakror.wargame.World;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
@@ -31,6 +33,14 @@ import de.dakror.wargame.util.WorldLocation;
  *
  */
 public class Unit extends Entity implements Steerable<Vector2> {
+	public static class UnitTypeProximity extends InfiniteProximity<Vector2> {
+		public UnitTypeProximity(Unit owner, Array<Unit> agents) {
+			super(owner, agents);
+		}
+		
+		
+	}
+	
 	public static enum AttackKind {
 		Arc_Missile,
 		Bomb,
@@ -42,7 +52,7 @@ public class Unit extends Entity implements Steerable<Vector2> {
 		Torpedo
 	}
 	
-	public static enum Type implements EntityLifeCycle {
+	public static enum Type {
 		Infantry(20, 35, false, AttackKind.Machine_Gun, null, 1, 0, null),
 		
 		;
@@ -64,26 +74,19 @@ public class Unit extends Entity implements Steerable<Vector2> {
 			this.alias = alias;
 		}
 		
-		@Override
-		public void onCreate() {}
+		public void onCreate(Unit u) {}
 		
-		@Override
-		public void onDeath() {}
+		public void onDeath(Unit u) {}
 		
-		@Override
-		public void onDeselect() {}
+		public void onDeselect(Unit u) {}
 		
-		@Override
-		public void onRemoval() {}
+		public void onRemoval(Unit u) {}
 		
-		@Override
-		public void onSelect() {}
+		public void onSelect(Unit u) {}
 		
-		@Override
-		public void onSpawn() {}
+		public void onSpawn(Unit u) {}
 		
-		@Override
-		public void update(float timePassed) {}
+		public void update(Unit u, float timePassed) {}
 	}
 	
 	private static final SteeringAcceleration<Vector2> steeringOutput = new SteeringAcceleration<Vector2>(new Vector2());
@@ -134,12 +137,6 @@ public class Unit extends Entity implements Steerable<Vector2> {
 		height = scale * tr.origHeight;
 		xOffset = scale * tr.offsetX * tr.texture.width;
 		yOffset = scale * tr.offsetY * tr.texture.height;
-		//		innerWidth = width;
-		//		innerHeight = height;
-		//		width = tr.origWidth;
-		//		height = tr.origHeight;
-		//		xOffset = tr.offsetX * tr.texture.width;
-		//		yOffset = tr.offsetY * tr.texture.height;
 	}
 	
 	@Override
@@ -153,6 +150,8 @@ public class Unit extends Entity implements Steerable<Vector2> {
 			face = ((((int) Math.round(Math.toDegrees(orientation) + 360)) % 360) / 90 + 3) % 4;
 			updateTexture();
 		}
+		
+		type.update(this, deltaTime);
 	}
 	
 	private void applySteering(SteeringAcceleration<Vector2> steering, float deltaTime) {
@@ -181,7 +180,7 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	
 	@Override
 	public float getZ() {
-		return (world.getDepth() - z + x * 1f / world.getDepth() + y * 2) / 1024f;
+		return (world.getDepth() - pos.y / 2 + pos.x / 2 * 1f / world.getDepth() + y * 2) / 1024f;
 	}
 	
 	@Override
@@ -307,31 +306,31 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	
 	@Override
 	public void onCreate() {
-		type.onCreate();
+		type.onCreate(this);
 	}
 	
 	@Override
 	public void onDeath() {
-		type.onDeath();
+		type.onDeath(this);
 	}
 	
 	@Override
 	public void onDeselect() {
-		type.onDeselect();
+		type.onDeselect(this);
 	}
 	
 	@Override
 	public void onRemoval() {
-		type.onRemoval();
+		type.onRemoval(this);
 	}
 	
 	@Override
 	public void onSelect() {
-		type.onSelect();
+		type.onSelect(this);
 	}
 	
 	@Override
 	public void onSpawn() {
-		type.onSpawn();
+		type.onSpawn(this);
 	}
 }

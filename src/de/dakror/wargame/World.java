@@ -19,10 +19,10 @@ package de.dakror.wargame;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.render.SpriteRenderer;
@@ -65,7 +65,7 @@ public class World {
 	public boolean dirty = true;
 	protected int width, depth;
 	public int rendered, all, rEntities;
-	protected ArrayList<Entity> entities;
+	protected Array<Entity> entities;
 	
 	public World(String worldFile) {
 		super();
@@ -124,7 +124,7 @@ public class World {
 	}
 	
 	void init() {
-		entities = new ArrayList<Entity>();
+		entities = new Array<Entity>();
 		
 		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
 		newPos = new Vector3(pos);
@@ -197,8 +197,6 @@ public class World {
 	public void render(SpriteRenderer r) {
 		int rendered = 0, all = 0, rEntities = 0;
 		
-		float scale = Wargame.instance.scale;
-		
 		for (int x = 0; x < width; x++) {
 			for (int z = depth - 1; z >= 0; z--) {
 				Tile t = Wargame.terrain.getTile(getFile(x, z));
@@ -207,8 +205,8 @@ public class World {
 				float x1 = pos.x + x * WIDTH / 2 + z * WIDTH / 2;
 				float y1 = pos.y - x * DEPTH / 2 + z * DEPTH / 2;
 				
-				if ((x1 + tr.width * 2048) * scale >= -Wargame.width / 2 && x1 * scale <= Wargame.width / 2 && y1 * scale <= Wargame.height / 2 && (y1 + tr.height * 2048) * scale >= -Wargame.height / 2) {
-					r.render(x1, y1, (depth - z + x * 1f / depth) - width - depth, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
+				if ((x1 + tr.width * 2048) * Wargame.scale >= -Wargame.width / 2 && x1 * Wargame.scale <= Wargame.width / 2 && y1 * Wargame.scale <= Wargame.height / 2 && (y1 + tr.height * 2048) * Wargame.scale >= -Wargame.height / 2) {
+					r.render(x1, y1, (depth - z + x * 1f / depth) - (2 * (width + depth)), tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
 					rendered++;
 				}
 				all++;
@@ -216,7 +214,7 @@ public class World {
 		}
 		
 		for (Entity e : entities) {
-			if ((e.getX() + e.getWidth()) * scale >= -Wargame.width / 2 && e.getX() * scale <= Wargame.width / 2 && e.getY() * scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * scale >= -Wargame.height / 2) {
+			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
 				r.render(e);
 				rEntities++;
 			}

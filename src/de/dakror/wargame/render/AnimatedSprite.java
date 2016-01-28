@@ -64,7 +64,7 @@ public class AnimatedSprite extends Sprite {
 	}
 	
 	@Override
-	public float getPaletteIndex() {
+	public int getPaletteIndex() {
 		return color;
 	}
 	

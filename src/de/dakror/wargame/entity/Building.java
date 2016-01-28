@@ -23,13 +23,13 @@ import de.dakror.wargame.World;
  *
  */
 public class Building extends Entity {
-	public static enum Type implements EntityLifeCycle {
+	public static enum Type {
 		//		Airport(750, 160), // for planes
 		//		Castle(2500, 325), // for defense
 		City(1000, 125) {
 			@Override
-			public void onDeath() {
-				System.out.println("YOU LOSE");
+			public void onDeath(Building b) {
+				System.out.println("Team " + b.getPaletteIndex() + " lost.");
 			}
 		}, // main building
 		//		Dock(650, 90), // for ships
@@ -45,26 +45,19 @@ public class Building extends Entity {
 			this.costs = costs;
 		}
 		
-		@Override
-		public void onCreate() {}
+		public void onCreate(Building b) {}
 		
-		@Override
-		public void onSpawn() {}
+		public void onSpawn(Building b) {}
 		
-		@Override
-		public void update(float timePassed) {}
+		public void update(Building b, float timePassed) {}
 		
-		@Override
-		public void onDeath() {}
+		public void onDeath(Building b) {}
 		
-		@Override
-		public void onRemoval() {}
+		public void onRemoval(Building b) {}
 		
-		@Override
-		public void onSelect() {}
+		public void onSelect(Building b) {}
 		
-		@Override
-		public void onDeselect() {}
+		public void onDeselect(Building b) {}
 	}
 	
 	protected Type type;
@@ -90,7 +83,7 @@ public class Building extends Entity {
 	@Override
 	public void update(float timePassed) {
 		super.update(timePassed);
-		type.update(timePassed);
+		type.update(this, timePassed);
 	}
 	
 	@Override
@@ -125,27 +118,31 @@ public class Building extends Entity {
 	
 	@Override
 	public void onCreate() {
-		type.onCreate();
+		type.onCreate(this);
 	}
 	
 	@Override
 	public void onSpawn() {
-		type.onSpawn();
+		type.onSpawn(this);
 	}
 	
 	@Override
 	public void onDeath() {
-		type.onDeath();
+		type.onDeath(this);
 	}
 	
 	@Override
 	public void onRemoval() {
-		type.onDeath();
+		type.onDeath(this);
 	}
 	
 	@Override
-	public void onSelect() {}
+	public void onSelect() {
+		type.onSelect(this);
+	}
 	
 	@Override
-	public void onDeselect() {}
+	public void onDeselect() {
+		type.onDeselect(this);
+	}
 }

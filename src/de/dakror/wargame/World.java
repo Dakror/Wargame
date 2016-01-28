@@ -137,6 +137,13 @@ public class World {
 	public void center(float x, float z) {
 		newPos.x = -(x * WIDTH / 2 + z * WIDTH / 2) / 2;
 		newPos.y = -(-x * DEPTH / 2 + z * DEPTH / 2);
+		
+		clampNewPosition();
+	}
+	
+	public void clampNewPosition() {
+		newPos.x = Math.min(-Wargame.width / 2 / Wargame.scale, Math.max(-(width * WIDTH / 2 + depth * WIDTH / 2) + Wargame.width / 2 / Wargame.scale, newPos.x));
+		newPos.y = Math.min((width - 1) * DEPTH / 2 - Wargame.height / 2 / Wargame.scale, Math.max(-(depth + 1) * DEPTH / 2 - HEIGHT + Wargame.height / 2 / Wargame.scale, newPos.y));
 	}
 	
 	public boolean isInBounds(int x, int z) {
@@ -155,10 +162,9 @@ public class World {
 			x += pos.x;
 			y += pos.y;
 		}
-		float scale = Wargame.instance.scale;
 		
 		for (Entity e : entities) {
-			if (e.getX() * scale <= x && x <= (e.getX() + e.getWidth()) * scale && e.getY() * scale <= y && y <= (e.getY() + e.getHeight()) * scale) {
+			if (e.getX() * Wargame.scale <= x && x <= (e.getX() + e.getWidth()) * Wargame.scale && e.getY() * Wargame.scale <= y && y <= (e.getY() + e.getHeight()) * Wargame.scale) {
 				return e;
 			}
 		}
@@ -202,7 +208,7 @@ public class World {
 				float y1 = pos.y - x * DEPTH / 2 + z * DEPTH / 2;
 				
 				if ((x1 + tr.width * 2048) * scale >= -Wargame.width / 2 && x1 * scale <= Wargame.width / 2 && y1 * scale <= Wargame.height / 2 && (y1 + tr.height * 2048) * scale >= -Wargame.height / 2) {
-					r.render(x1, y1, (depth - z + x * 1f / depth) / 1024f, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
+					r.render(x1, y1, (depth - z + x * 1f / depth) - width - depth, tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
 					rendered++;
 				}
 				all++;
@@ -231,6 +237,7 @@ public class World {
 	
 	public void move(float x, float y) {
 		newPos.set(pos).add(x, -y, 0);
+		clampNewPosition();
 	}
 	
 	public Vector3 getPos() {

@@ -56,7 +56,7 @@ public class Sprite {
 		color = new float[] { 1, 1, 1, 1 };
 	}
 	
-	public float getPaletteIndex() {
+	public int getPaletteIndex() {
 		return -1;
 	}
 	

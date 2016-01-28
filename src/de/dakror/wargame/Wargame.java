@@ -49,9 +49,9 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import de.dakror.wargame.entity.Building;
+import de.dakror.wargame.entity.Building.Type;
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.Unit;
-import de.dakror.wargame.entity.Building.Type;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas;
@@ -64,6 +64,7 @@ import de.dakror.wargame.util.WorldLocation;
 public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouchListener, GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener {
 	public static TextureAtlas animation, standing, terrain;
 	public static int height, width;
+	public static float scale = 2f;
 	public static Wargame instance;
 	public float[] viewMatrix, projMatrix, hudMatrix, viewProjMatrix;
 	
@@ -80,7 +81,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	long lastFrame;
 	long lastTimestamp;
 	float prevX, prevY, prevNum;
-	float scale = 2f;
 	float vX, vY;
 	int frames, fps = 60;
 	
@@ -144,9 +144,12 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		
 		map = new World("maps/lake.map");
 		
-		Building b = new Building(5, 7, 0, Type.City);
-		map.addEntity(b);
-		map.center(b);
+		Building myCity = new Building(5, 7, 0, Type.City);
+		map.addEntity(myCity);
+		map.center(myCity);
+		
+		Building theirCity = new Building(46, 23, 1, Type.City);
+		map.addEntity(theirCity);
 		
 		Unit u = new Unit(0, 0, 0, Unit.Type.Infantry);
 		Unit v = new Unit(0, 2, 0, Unit.Type.Infantry);
@@ -157,12 +160,14 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		map.addEntity(v);
 		map.addEntity(u);
 		glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
+		//		glClearColor(114 / 255f, 163 / 255f, 107 / 255f, 1);
 	}
 	
 	@Override
 	public void onSurfaceChanged(GL10 gl10, int width, int height) {
 		Wargame.width = width;
 		Wargame.height = height;
+		map.clampNewPosition();
 		glViewport(0, 0, width, height);
 		Matrix.orthoM(projMatrix, 0, -width / 2, width / 2, -height / 2, height / 2, -100, 1000);
 		Matrix.setLookAtM(viewMatrix, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0);
@@ -252,7 +257,11 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	@Override
 	public boolean onScale(ScaleGestureDetector detector) {
 		scale *= detector.getScaleFactor();
-		scale = Math.min(15, Math.max(0.3f, scale));
+		float width = map.getWidth() * World.WIDTH / 2 + map.getDepth() * World.WIDTH / 2;
+		float height = map.getWidth() * World.DEPTH / 2 + map.getDepth() * World.DEPTH / 2 + World.HEIGHT;
+		scale = Math.max(Math.max(Wargame.width / width, Wargame.height / height), scale);
+		
+		map.clampNewPosition();
 		return true;
 	}
 	

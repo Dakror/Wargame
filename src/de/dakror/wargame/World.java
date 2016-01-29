@@ -16,6 +16,8 @@
 
 package de.dakror.wargame;
 
+import static android.opengl.GLES20.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,7 +26,13 @@ import java.util.Iterator;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.opengl.GLUtils;
+import android.opengl.Matrix;
+import de.dakror.wargame.entity.Building;
 import de.dakror.wargame.entity.Entity;
+import de.dakror.wargame.entity.Unit;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.render.TextureAtlas.Tile;
@@ -64,8 +72,16 @@ public class World {
 	
 	public boolean dirty = true;
 	protected int width, depth;
-	public int rendered, all, rEntities;
-	protected Array<Entity> entities;
+	public int rEntities;
+	protected Array<Unit> units;
+	protected Array<Building> buildings;
+	
+	int[] fbo = new int[1];
+	int[] rbo = new int[1];
+	int[] tex = new int[1];
+	int texWidth, texHeight;
+	Bitmap fboBitmap;
+	float[] matrix = new float[16];
 	
 	public World(String worldFile) {
 		super();
@@ -124,10 +140,34 @@ public class World {
 	}
 	
 	void init() {
-		entities = new Array<Entity>();
+		units = new Array<Unit>();
+		buildings = new Array<Building>();
 		
 		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
 		newPos = new Vector3(pos);
+		
+		glGenFramebuffers(1, fbo, 0);
+		glGenRenderbuffers(1, rbo, 0);
+		glGenTextures(1, tex, 0);
+		
+		glBindTexture(GL_TEXTURE_2D, tex[0]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		
+		texWidth = (int) (depth * WIDTH / 2 + width * WIDTH / 2);
+		texHeight = (int) (depth * DEPTH / 2 + width * DEPTH / 2 + HEIGHT);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
+		fboBitmap = Bitmap.createBitmap(texWidth, texHeight, Config.ARGB_8888);
+		GLUtils.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fboBitmap, 0);
+		glBindRenderbuffer(GL_RENDERBUFFER, rbo[0]);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, texWidth, texHeight);
+		
+		float[] projMatrix = new float[16], viewMatrix = new float[16];
+		Matrix.orthoM(projMatrix, 0, -texWidth / 2, texWidth / 2, -texHeight / 2, texHeight / 2, -100, 1000);
+		Matrix.setLookAtM(viewMatrix, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0);
+		Matrix.multiplyMM(matrix, 0, projMatrix, 0, viewMatrix, 0);
 	}
 	
 	public void center(Entity e) {
@@ -157,20 +197,20 @@ public class World {
 		return oldVal != map[x][z];
 	}
 	
-	public Entity getEntityAt(float x, float y, boolean global) {
-		if (!global) {
-			x += pos.x;
-			y += pos.y;
-		}
-		
-		for (Entity e : entities) {
-			if (e.getX() * Wargame.scale <= x && x <= (e.getX() + e.getWidth()) * Wargame.scale && e.getY() * Wargame.scale <= y && y <= (e.getY() + e.getHeight()) * Wargame.scale) {
-				return e;
-			}
-		}
-		
-		return null;
-	}
+	//	public Entity getEntityAt(float x, float y, boolean global) {
+	//		if (!global) {
+	//			x += pos.x;
+	//			y += pos.y;
+	//		}
+	//		
+	//		for (Entity e : entities) {
+	//			if (e.getX() * Wargame.scale <= x && x <= (e.getX() + e.getWidth()) * Wargame.scale && e.getY() * Wargame.scale <= y && y <= (e.getY() + e.getHeight()) * Wargame.scale) {
+	//				return e;
+	//			}
+	//		}
+	//		
+	//		return null;
+	//	}
 	
 	public Type get(int x, int z) {
 		if (!isInBounds(x, z)) return Type.Air;
@@ -185,7 +225,12 @@ public class World {
 	}
 	
 	public void update(float timePassed) {
-		for (Iterator<Entity> iter = entities.iterator(); iter.hasNext();) {
+		update(buildings, timePassed);
+		update(units, timePassed);
+	}
+	
+	public <E extends Entity> void update(Array<E> arr, float timePassed) {
+		for (Iterator<E> iter = arr.iterator(); iter.hasNext();) {
 			Entity e = iter.next();
 			if (e.isDead()) {
 				e.onRemoval();
@@ -195,41 +240,70 @@ public class World {
 	}
 	
 	public void render(SpriteRenderer r) {
-		int rendered = 0, all = 0, rEntities = 0;
+		int rEntities = 0;
 		
-		for (int x = 0; x < width; x++) {
-			for (int z = depth - 1; z >= 0; z--) {
-				Tile t = Wargame.terrain.getTile(getFile(x, z));
-				if (t == null) continue;
-				TextureRegion tr = t.regions.get(0);
-				float x1 = pos.x + x * WIDTH / 2 + z * WIDTH / 2;
-				float y1 = pos.y - x * DEPTH / 2 + z * DEPTH / 2;
-				
-				if ((x1 + tr.width * 2048) * Wargame.scale >= -Wargame.width / 2 && x1 * Wargame.scale <= Wargame.width / 2 && y1 * Wargame.scale <= Wargame.height / 2 && (y1 + tr.height * 2048) * Wargame.scale >= -Wargame.height / 2) {
-					r.render(x1, y1, (depth - z + x * 1f / depth) - (2 * (width + depth)), tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
-					rendered++;
+		if (dirty) {
+			System.out.println("Rendering terrain");
+			r.end();
+			r.begin(matrix);
+			glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex[0], 0);
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo[0]);
+			glViewport(0, 0, texWidth, texHeight);
+			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+			
+			for (int x = 0; x < width; x++) {
+				for (int z = depth - 1; z >= 0; z--) {
+					Tile t = Wargame.terrain.getTile(getFile(x, z));
+					if (t == null) continue;
+					TextureRegion tr = t.regions.get(0);
+					float x1 = x * WIDTH / 2 + z * WIDTH / 2;
+					float y1 = -(x + 1) * DEPTH / 2 + z * DEPTH / 2;
+					
+					r.render(x1 - texWidth / 2, y1 - HEIGHT / 2, (depth - z + x * 1f / depth), tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
 				}
-				all++;
 			}
+			
+			r.end();
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			dirty = false;
+			r.begin(Wargame.instance.viewProjMatrix);
+			glViewport(0, 0, Wargame.width, Wargame.height);
 		}
 		
-		for (Entity e : entities) {
+		r.render(pos.x, pos.y - texHeight / 2 + HEIGHT / 2 + DEPTH / 2, 0, texWidth, texHeight, 0, 1, 1, -1, tex[0]);
+		
+		rEntities += render(buildings, r);
+		//		long t = System.nanoTime();
+		units.sort();
+		//		System.out.println((System.nanoTime() - t) / 1000000f);
+		rEntities += render(units, r);
+		
+		this.rEntities = rEntities;
+		
+		pos.set(newPos);
+	}
+	
+	public <E extends Entity> int render(Array<E> arr, SpriteRenderer r) {
+		int rEntities = 0;
+		for (Entity e : arr) {
 			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
 				r.render(e);
 				rEntities++;
 			}
 		}
 		
-		this.rEntities = rEntities;
-		this.rendered = rendered;
-		this.all = all;
-		
-		pos.set(newPos);
+		return rEntities;
 	}
 	
 	public void addEntity(Entity e) {
 		e.setWorld(this);
-		entities.add(e);
+		if (e instanceof Building) {
+			buildings.add((Building) e);
+			buildings.sort();
+		} else if (e instanceof Unit) {
+			units.add((Unit) e);
+		} else System.out.println("Can't handle Entity: " + e);
 		e.onSpawn();
 	}
 	

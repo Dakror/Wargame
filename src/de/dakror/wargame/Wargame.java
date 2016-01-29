@@ -47,7 +47,6 @@ import android.view.View.OnTouchListener;
 import de.dakror.wargame.entity.Building;
 import de.dakror.wargame.entity.Building.Type;
 import de.dakror.wargame.entity.Entity;
-import de.dakror.wargame.entity.Unit;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas;
@@ -66,7 +65,7 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	GestureDetector gestureDetector;
 	ScaleGestureDetector scaleGestureDetector;
 	GLSurfaceView glView;
-	World map;
+	World world;
 	
 	SpriteRenderer spriteRenderer;
 	TextRenderer textRenderer;
@@ -84,17 +83,19 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.hud);
 		
+		glView = (GLSurfaceView) findViewById(R.id.surface_view);
 		GdxAI.setLogger(new AndroidLogger());
 		instance = this;
-		glView = new GLSurfaceView(this);
+		//				glView = new GLSurfaceView(this);
 		glView.setEGLContextClientVersion(2);
-		//glView.setEGLConfigChooser(new MultisampleConfigChooser());
+		//		glView.setEGLConfigChooser(new MultisampleConfigChooser());
 		glView.setRenderer(this);
 		glView.setOnTouchListener(this);
 		gestureDetector = new GestureDetector(this, this);
 		scaleGestureDetector = new ScaleGestureDetector(this, this);
-		setContentView(glView);
+		//setContentView(glView);
 	}
 	
 	@Override
@@ -137,19 +138,31 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		//			System.out.println(animation.tiles.size());
 		//			System.out.println(animation.tr);
 		
-		map = new World("maps/lake.map");
+		world = new World("maps/lake.map");
+		
+		//		for (int i = 0; i < 5; i++)
+		//			for (int j = 0; j < 5; j++) {
+		//				Building myCity = new Building(8 + i, 8 + j, 0, Type.values()[(int) (Math.random() * Type.values().length)]);
+		//				world.addEntity(myCity);
+		//			}
+		//			
+		//		for (int i = 0; i < 5; i++)
+		//			for (int j = 0; j < 5; j++) {
+		//				Building myCity = new Building(20 - i, 12 - j, 1, Type.values()[(int) (Math.random() * Type.values().length)]);
+		//				world.addEntity(myCity);
+		//			}
 		
 		Building myCity = new Building(5, 7, 0, Type.City);
-		map.addEntity(myCity);
-		map.center(myCity);
+		world.addEntity(myCity);
+		world.center(myCity);
 		
 		Building theirCity = new Building(46, 23, 1, Type.City);
-		map.addEntity(theirCity);
+		world.addEntity(theirCity);
 		
-		for (int i = 0; i < 15; i++) {
-			Unit u = new Unit(2 + (float) Math.random() * 2, 3 + (float) Math.random() * 2, 0, Unit.Type.Infantry);
-			map.addEntity(u);
-		}
+		//		for (int i = 0; i < 15; i++) {
+		//			Unit u = new Unit(2 + i / 5f, 3 - (i % 2) * 0.5f, 0, Unit.Type.Infantry);
+		//			world.addEntity(u);
+		//		}
 		
 		//		Unit v = new Unit(0, 2, 0, Unit.Type.Infantry);
 		//		
@@ -158,15 +171,13 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		//		v.setSteeringBehavior(new Arrive<Vector2>(v).setTarget(new WorldLocation(new Vector2(6, 6), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f));
 		//		map.addEntity(v);
 		//		map.addEntity(u);
-		glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
-		//		glClearColor(114 / 255f, 163 / 255f, 107 / 255f, 1);
 	}
 	
 	@Override
 	public void onSurfaceChanged(GL10 gl10, int width, int height) {
 		Wargame.width = width;
 		Wargame.height = height;
-		map.clampNewPosition();
+		world.clampNewPosition();
 		glViewport(0, 0, width, height);
 		Matrix.orthoM(projMatrix, 0, -width / 2, width / 2, -height / 2, height / 2, -100, 1000);
 		Matrix.setLookAtM(viewMatrix, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0);
@@ -185,8 +196,9 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		float timeStep = Math.min(1.0f / fps, 1 / 60f);
 		GdxAI.getTimepiece().update(timeStep);
 		money += timeStep;
-		map.update(timeStep);
+		world.update(timeStep);
 		
+		glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glEnable(GL_DEPTH_TEST);
@@ -198,15 +210,14 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		Matrix.multiplyMM(viewProjMatrix, 0, projMatrix, 0, viewMatrix, 0);
 		
 		spriteRenderer.begin(viewProjMatrix);
-		map.render(spriteRenderer);
+		world.render(spriteRenderer);
 		spriteRenderer.end();
 		
 		glDisable(GL_DEPTH_TEST);
 		
 		spriteRenderer.begin(hudMatrix);
 		textRenderer.renderText(-width / 2, height / 2 - 30, 0, 0.5f, "FPS: " + fps, spriteRenderer);
-		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "R: " + map.rendered + " / " + map.all, spriteRenderer);
-		textRenderer.renderText(-width / 2, height / 2 - 90, 0, 0.5f, "E: " + map.rEntities + " / " + map.entities.size, spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "E: " + world.rEntities + " / " + (world.buildings.size + world.units.size), spriteRenderer);
 		
 		textRenderer.setFont(1);
 		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(money), spriteRenderer);
@@ -231,7 +242,7 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 				float dx = x - prevX;
 				float dy = y - prevY;
 				
-				if (e.getPointerCount() == prevNum) map.move(dx / scale * 60f / Math.max(fps, 25), dy / scale * 60f / Math.max(fps, 25));
+				if (e.getPointerCount() == prevNum) world.move(dx / scale * 60f / Math.max(fps, 25), dy / scale * 60f / Math.max(fps, 25));
 				break;
 		}
 		
@@ -244,6 +255,8 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
+		world.dirty = true;
+		/*
 		Entity entity = map.getEntityAt(e.getX() - width / 2, height - e.getY() - height / 2, true);
 		previousEntity = selectedEntity;
 		if (previousEntity != null) previousEntity.onDeselect();
@@ -251,16 +264,17 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		if (entity != null) entity.onSelect();
 		
 		return entity != null;
+		*/return false;
 	}
 	
 	@Override
 	public boolean onScale(ScaleGestureDetector detector) {
 		scale *= detector.getScaleFactor();
-		float width = map.getWidth() * World.WIDTH / 2 + map.getDepth() * World.WIDTH / 2;
-		float height = map.getWidth() * World.DEPTH / 2 + map.getDepth() * World.DEPTH / 2 + World.HEIGHT;
-		scale = Math.max(Math.max(Wargame.width / width, Wargame.height / height), scale);
+		float width = world.getWidth() * World.WIDTH / 2 + world.getDepth() * World.WIDTH / 2;
+		float height = world.getWidth() * World.DEPTH / 2 + world.getDepth() * World.DEPTH / 2 + World.HEIGHT;
+		scale = Math.max(Math.max(Wargame.width / width, Wargame.height / height), Math.min(7.5f, scale));
 		
-		map.clampNewPosition();
+		world.clampNewPosition();
 		return true;
 	}
 	

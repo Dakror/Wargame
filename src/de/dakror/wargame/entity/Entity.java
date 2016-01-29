@@ -24,7 +24,7 @@ import de.dakror.wargame.render.TextureAtlas.Tile;
 /**
  * @author Maximilian Stark | Dakror
  */
-public abstract class Entity extends AnimatedSprite implements EntityLifeCycle {
+public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, Comparable<Entity> {
 	boolean dead;
 	/**
 	 * 0 = X+<br>
@@ -100,6 +100,11 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle {
 	
 	public void setWorld(World world) {
 		this.world = world;
+	}
+	
+	@Override
+	public int compareTo(Entity another) {
+		return Float.compare(getZ(), another.getZ());
 	}
 	
 	@Override

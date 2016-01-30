@@ -71,7 +71,7 @@ public class TextRenderer {
 						
 						System.out.println("(TextRenderer) Loading Texture: " + texture);
 						if (textureId != 0) System.err.println("(TextRenderer) Conflict! Multiple Pages detected");
-						textureId = Wargame.instance.loadTexture(fontFile.substring(0, fontFile.lastIndexOf("/")) + "/" + texture);
+						textureId = GLUtil.loadTexture(fontFile.substring(0, fontFile.lastIndexOf("/")) + "/" + texture);
 					} else if (line.startsWith("char ")) {
 						String[] p = line.split(" +");
 						Glyph g = new Glyph();

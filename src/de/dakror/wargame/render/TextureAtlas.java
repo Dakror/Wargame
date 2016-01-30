@@ -109,7 +109,7 @@ public class TextureAtlas {
 					currentTexture.magFilter = Texture.TextureFilter.valueOf(l[2]).glEnum;
 					
 					System.out.println("(TextureAtlas) Loading Texture: " + currentTexture.name);
-					currentTexture.textureId = Wargame.instance.loadTexture(atlasFile.substring(0, atlasFile.lastIndexOf("/")) + "/" + currentTexture.name, currentTexture.minFilter, currentTexture.magFilter);
+					currentTexture.textureId = GLUtil.loadTexture(atlasFile.substring(0, atlasFile.lastIndexOf("/")) + "/" + currentTexture.name, currentTexture.minFilter, currentTexture.magFilter);
 					
 					// repeat
 					br.readLine();

@@ -16,24 +16,10 @@
 
 package de.dakror.wargame.render;
 
-import android.opengl.GLES20;
+import android.view.MotionEvent;
 
-/**
- * @author Maximilian Stark | Dakror
- */
-public class Texture {
-	public static enum TextureFilter {
-		Nearest(GLES20.GL_NEAREST),
-		Linear(GLES20.GL_LINEAR);
-		public final int glEnum;
-		
-		TextureFilter(int glEnum) {
-			this.glEnum = glEnum;
-		}
-	}
+public interface TouchListener {
+	public boolean onDown(MotionEvent e);
 	
-	public String name;
-	public int minFilter, magFilter, width, height;
-	
-	public int textureId;
+	public boolean onUp(MotionEvent e);
 }

@@ -27,13 +27,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import de.dakror.wargame.entity.Building;
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.Unit;
+import de.dakror.wargame.render.Renderable;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.render.TextureAtlas.Tile;
@@ -41,7 +39,7 @@ import de.dakror.wargame.render.TextureAtlas.Tile;
 /**
  * @author Maximilian Stark | Dakror
  */
-public class World {
+public class World implements Renderable {
 	public static enum Type {
 		Air,
 		Basement,
@@ -67,9 +65,9 @@ public class World {
 	
 	protected Vector3 pos, newPos;
 	
-	public static final float WIDTH = 129f;
-	public static final float HEIGHT = 18f;
-	public static final float DEPTH = 64f;
+	public static float WIDTH = 129f;
+	public static float HEIGHT = 18f;
+	public static float DEPTH = 64f;
 	
 	public boolean dirty = true;
 	protected int width, depth;
@@ -82,7 +80,6 @@ public class World {
 	int[] rbo = new int[1];
 	int[] tex = new int[1];
 	int texWidth, texHeight;
-	Bitmap fboBitmap;
 	float[] matrix = new float[16];
 	
 	public World(String worldFile) {
@@ -145,7 +142,7 @@ public class World {
 		units = new Array<Unit>();
 		buildings = new Array<Building>();
 		
-		add = depth >= width ? depth / (float) width : (width - depth - 2) * -0.5f;
+		add = (width - depth - 2) * -0.5f;
 		
 		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
 		newPos = new Vector3(pos);
@@ -160,11 +157,11 @@ public class World {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		
+		//TODO: for very large maps textures must be split into chunks, otherwise memory overflow happens
 		texWidth = (int) (depth * WIDTH / 2 + width * WIDTH / 2);
 		texHeight = (int) (depth * DEPTH / 2 + width * DEPTH / 2 + HEIGHT);
+		
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
-		fboBitmap = Bitmap.createBitmap(texWidth, texHeight, Config.ARGB_8888);
-		GLUtils.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fboBitmap, 0);
 		glBindRenderbuffer(GL_RENDERBUFFER, rbo[0]);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, texWidth, texHeight);
 		
@@ -223,8 +220,8 @@ public class World {
 		screenX -= texWidth / 2;
 		screenY -= texHeight / 2;
 		
-		int x = (int) Math.floor(screenX / WIDTH - screenY / DEPTH + width / 2f);
-		int z = (int) Math.floor(screenY / DEPTH + screenX / WIDTH + depth / 2f);
+		int x = (int) Math.floor(screenX / WIDTH * 2 - screenY / DEPTH * 2 + width);
+		int z = (int) Math.floor(screenY / DEPTH * 2 + screenX / WIDTH * 2 + depth);
 		
 		return new Vector2(x, z);
 	}

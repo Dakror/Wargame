@@ -18,11 +18,6 @@ package de.dakror.wargame;
 
 import static android.opengl.GLES20.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -31,14 +26,10 @@ import com.badlogic.gdx.ai.GdxAI;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -47,6 +38,7 @@ import android.view.View.OnTouchListener;
 import de.dakror.wargame.entity.Building;
 import de.dakror.wargame.entity.Building.Type;
 import de.dakror.wargame.entity.Entity;
+import de.dakror.wargame.render.Button;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas;
@@ -55,8 +47,8 @@ import de.dakror.wargame.util.AndroidLogger;
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouchListener, GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener {
-	public static TextureAtlas animation, standing, terrain;
+public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouchListener, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, ScaleGestureDetector.OnScaleGestureListener {
+	public static TextureAtlas animation, standing, terrain, ui;
 	public static int height, width;
 	public static float scale = 2f;
 	public static Wargame instance;
@@ -69,6 +61,8 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	
 	SpriteRenderer spriteRenderer;
 	TextRenderer textRenderer;
+	
+	Button buttonCity, buttonFactory;
 	
 	Entity previousEntity, selectedEntity;
 	
@@ -83,17 +77,17 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.hud);
-		
-		glView = (GLSurfaceView) findViewById(R.id.surface_view);
 		GdxAI.setLogger(new AndroidLogger());
 		instance = this;
+		glView = new GLSurfaceView(this);
 		glView.setEGLContextClientVersion(2);
 		//		glView.setEGLConfigChooser(new MultisampleConfigChooser());
 		glView.setRenderer(this);
 		glView.setOnTouchListener(this);
 		gestureDetector = new GestureDetector(this, this);
+		gestureDetector.setOnDoubleTapListener(this);
 		scaleGestureDetector = new ScaleGestureDetector(this, this);
+		setContentView(glView);
 	}
 	
 	@Override
@@ -121,6 +115,11 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		}
 	}
 	
+	public void initHud() {
+		buttonCity = new Button(0, 0, Button.BLUE, Button.SQUARE);
+		buttonFactory = new Button(Button.SQUARE_WIDTH + 6, 0, Button.BLUE, Button.SQUARE);
+	}
+	
 	@Override
 	public void onSurfaceCreated(GL10 gl10, EGLConfig config) {
 		spriteRenderer = new SpriteRenderer();
@@ -132,6 +131,7 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		
 		terrain = new TextureAtlas("packed/terrain.atlas");
 		standing = new TextureAtlas("packed/standing/standing.atlas");
+		ui = new TextureAtlas("packed/ui.atlas");
 		//			animation = new TextureAtlas("packed/animation.atlas");
 		//			System.out.println(animation.tiles.size());
 		//			System.out.println(animation.tr);
@@ -155,7 +155,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		
 		Building theirCity = new Building(46, 23, 1, Type.City);
 		world.addEntity(theirCity);
-		
 		//		for (int i = 0; i < 15; i++) {
 		//			Unit u = new Unit(2 + i / 5f, 3 - (i % 2) * 0.5f, 0, Unit.Type.Infantry);
 		//			world.addEntity(u);
@@ -168,6 +167,8 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		//		v.setSteeringBehavior(new Arrive<Vector2>(v).setTarget(new WorldLocation(new Vector2(6, 6), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f));
 		//		map.addEntity(v);
 		//		map.addEntity(u);
+		
+		initHud();
 	}
 	
 	@Override
@@ -221,6 +222,9 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(money), spriteRenderer);
 		textRenderer.setFont(0);
 		
+		buttonCity.render(spriteRenderer);
+		buttonFactory.render(spriteRenderer);
+		
 		spriteRenderer.end();
 		
 		frames++;
@@ -235,6 +239,14 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		float y = e.getY();
 		
 		switch (e.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				buttonCity.onDown(e);
+				buttonFactory.onDown(e);
+				break;
+			case MotionEvent.ACTION_UP:
+				buttonCity.onUp(e);
+				buttonFactory.onUp(e);
+				break;
 			case MotionEvent.ACTION_MOVE:
 				
 				float dx = x - prevX;
@@ -253,7 +265,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		System.out.println(world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2));
 		//world.dirty = true;
 		/*
 		Entity entity = map.getEntityAt(e.getX() - width / 2, height - e.getY() - height / 2, true);
@@ -263,7 +274,9 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		if (entity != null) entity.onSelect();
 		
 		return entity != null;
-		*/return false;
+		*/
+		
+		return false;
 	}
 	
 	@Override
@@ -278,64 +291,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		float width = world.getWidth() * World.WIDTH / 2 + world.getDepth() * World.WIDTH / 2;
 		float height = world.getWidth() * World.DEPTH / 2 + world.getDepth() * World.DEPTH / 2 + World.HEIGHT;
 		scale = Math.max(Math.max(Wargame.width / width, Wargame.height / height), Math.min(7.5f, scale));
-		
-	}
-	
-	public int loadTexture(String textureFile) {
-		return loadTexture(textureFile, GL_NEAREST, GL_NEAREST);
-	}
-	
-	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public int loadTexture(String textureFile, int filterMin, int filterMag) {
-		int[] id = new int[1];
-		try {
-			glGenTextures(1, id, 0);
-			Bitmap bitmap = BitmapFactory.decodeStream(getAssets().open(textureFile));
-			glBindTexture(GL_TEXTURE_2D, id[0]);
-			
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterMin);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMag);
-			
-			GLUtils.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap, 0);
-			
-			bitmap.recycle();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return id[0];
-	}
-	
-	public int createProgram(String vertexShaderFile, String fragmentShaderFile) {
-		try {
-			int vs = glCreateShader(GL_VERTEX_SHADER);
-			glShaderSource(vs, read(getAssets().open(vertexShaderFile)));
-			glCompileShader(vs);
-			String vsError = glGetShaderInfoLog(vs);
-			if (vsError != null && vsError.length() > 0) Log.e("createProgram", vertexShaderFile + ": " + vsError);
-			
-			int fs = glCreateShader(GL_FRAGMENT_SHADER);
-			glShaderSource(fs, read(getAssets().open(fragmentShaderFile)));
-			glCompileShader(fs);
-			String fsError = glGetShaderInfoLog(fs);
-			if (fsError != null && fsError.length() > 0) Log.e("createProgram", fragmentShaderFile + ": " + fsError);
-			
-			int program = glCreateProgram();
-			glAttachShader(program, vs);
-			glAttachShader(program, fs);
-			glLinkProgram(program);
-			
-			String pError = glGetProgramInfoLog(program);
-			if (pError != null && pError.length() > 0) {
-				Log.e("createProgram", "LNK: " + pError);
-				finish();
-			}
-			
-			return program;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return -1;
-		}
 	}
 	
 	@Override
@@ -367,29 +322,18 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	@Override
 	public void onShowPress(MotionEvent e) {}
 	
-	public static void printMatrix(float[] m) {
-		int len = 8;
-		for (int i = 0; i < 4; i++) {
-			System.out.println(l(m[i], len) + " " + l(m[i + 4], len) + " " + l(m[i + 8], len) + " " + l(m[i + 12], len));
-		}
+	@Override
+	public boolean onSingleTapConfirmed(MotionEvent e) {
+		return false;
 	}
 	
-	public static String read(InputStream is) throws IOException {
-		StringBuilder content = new StringBuilder();
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		String line = "";
-		while ((line = br.readLine()) != null) {
-			content.append(line);
-			content.append("\r\n");
-		}
-		br.close();
-		return content.toString();
+	@Override
+	public boolean onDoubleTap(MotionEvent e) {
+		return false;
 	}
 	
-	static String l(float f, int len) {
-		String s = "" + f;
-		while (s.length() < len)
-			s = f % 1 == 0 ? " " + s : s + "0";
-		return s;
+	@Override
+	public boolean onDoubleTapEvent(MotionEvent e) {
+		return false;
 	}
 }

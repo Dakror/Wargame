@@ -23,8 +23,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
-import de.dakror.wargame.Wargame;
-
 /**
  * @author Maximilian Stark | Dakror
  *
@@ -69,7 +67,7 @@ public class SpriteRenderer {
 		}
 		
 		indices.position(0);
-		program = Wargame.instance.createProgram("shader/sprite.vs", "shader/sprite.fs");
+		program = GLUtil.createProgram("shader/sprite.vs", "shader/sprite.fs");
 		
 		vbo = new int[1];
 		glGenBuffers(1, vbo, 0);
@@ -79,8 +77,8 @@ public class SpriteRenderer {
 		palettes = new int[9];
 		uPalettes = new int[9];
 		for (int i = 0; i < 8; i++)
-			palettes[i] = Wargame.instance.loadTexture("palettes/color" + i + ".png");
-		palettes[8] = Wargame.instance.loadTexture("palettes/terrain.png");
+			palettes[i] = GLUtil.loadTexture("palettes/color" + i + ".png");
+		palettes[8] = GLUtil.loadTexture("palettes/terrain.png");
 	}
 	
 	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, int texture) {

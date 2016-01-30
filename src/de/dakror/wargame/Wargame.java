@@ -88,14 +88,12 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		glView = (GLSurfaceView) findViewById(R.id.surface_view);
 		GdxAI.setLogger(new AndroidLogger());
 		instance = this;
-		//				glView = new GLSurfaceView(this);
 		glView.setEGLContextClientVersion(2);
 		//		glView.setEGLConfigChooser(new MultisampleConfigChooser());
 		glView.setRenderer(this);
 		glView.setOnTouchListener(this);
 		gestureDetector = new GestureDetector(this, this);
 		scaleGestureDetector = new ScaleGestureDetector(this, this);
-		//setContentView(glView);
 	}
 	
 	@Override
@@ -139,7 +137,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		//			System.out.println(animation.tr);
 		
 		world = new World("maps/lake.map");
-		
 		//		for (int i = 0; i < 5; i++)
 		//			for (int j = 0; j < 5; j++) {
 		//				Building myCity = new Building(8 + i, 8 + j, 0, Type.values()[(int) (Math.random() * Type.values().length)]);
@@ -177,6 +174,7 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	public void onSurfaceChanged(GL10 gl10, int width, int height) {
 		Wargame.width = width;
 		Wargame.height = height;
+		clampScale();
 		world.clampNewPosition();
 		glViewport(0, 0, width, height);
 		Matrix.orthoM(projMatrix, 0, -width / 2, width / 2, -height / 2, height / 2, -100, 1000);
@@ -255,7 +253,8 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		world.dirty = true;
+		System.out.println(world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2));
+		//world.dirty = true;
 		/*
 		Entity entity = map.getEntityAt(e.getX() - width / 2, height - e.getY() - height / 2, true);
 		previousEntity = selectedEntity;
@@ -270,12 +269,16 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	@Override
 	public boolean onScale(ScaleGestureDetector detector) {
 		scale *= detector.getScaleFactor();
+		clampScale();
+		world.clampNewPosition();
+		return true;
+	}
+	
+	public void clampScale() {
 		float width = world.getWidth() * World.WIDTH / 2 + world.getDepth() * World.WIDTH / 2;
 		float height = world.getWidth() * World.DEPTH / 2 + world.getDepth() * World.DEPTH / 2 + World.HEIGHT;
 		scale = Math.max(Math.max(Wargame.width / width, Wargame.height / height), Math.min(7.5f, scale));
 		
-		world.clampNewPosition();
-		return true;
 	}
 	
 	public int loadTexture(String textureFile) {

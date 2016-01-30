@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
@@ -73,6 +74,7 @@ public class World {
 	public boolean dirty = true;
 	protected int width, depth;
 	public int rEntities;
+	float add;
 	protected Array<Unit> units;
 	protected Array<Building> buildings;
 	
@@ -143,6 +145,8 @@ public class World {
 		units = new Array<Unit>();
 		buildings = new Array<Building>();
 		
+		add = depth >= width ? depth / (float) width : (width - depth - 2) * -0.5f;
+		
 		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
 		newPos = new Vector3(pos);
 		
@@ -153,8 +157,8 @@ public class World {
 		glBindTexture(GL_TEXTURE_2D, tex[0]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		
 		texWidth = (int) (depth * WIDTH / 2 + width * WIDTH / 2);
 		texHeight = (int) (depth * DEPTH / 2 + width * DEPTH / 2 + HEIGHT);
@@ -212,6 +216,19 @@ public class World {
 	//		return null;
 	//	}
 	
+	public Vector2 getMappedCoords(float screenX, float screenY) {
+		screenX = screenX / Wargame.scale - pos.x;
+		screenY = screenY / Wargame.scale - (pos.y - texHeight / 2 + HEIGHT / 2 + DEPTH / 2 * add);
+		
+		screenX -= texWidth / 2;
+		screenY -= texHeight / 2;
+		
+		int x = (int) Math.floor(screenX / WIDTH - screenY / DEPTH + width / 2f);
+		int z = (int) Math.floor(screenY / DEPTH + screenX / WIDTH + depth / 2f);
+		
+		return new Vector2(x, z);
+	}
+	
 	public Type get(int x, int z) {
 		if (!isInBounds(x, z)) return Type.Air;
 		return Type.values()[map[x][z]];
@@ -241,9 +258,7 @@ public class World {
 	
 	public void render(SpriteRenderer r) {
 		int rEntities = 0;
-		
 		if (dirty) {
-			System.out.println("Rendering terrain");
 			r.end();
 			r.begin(matrix);
 			glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
@@ -258,7 +273,7 @@ public class World {
 					if (t == null) continue;
 					TextureRegion tr = t.regions.get(0);
 					float x1 = x * WIDTH / 2 + z * WIDTH / 2;
-					float y1 = -(x + 1) * DEPTH / 2 + z * DEPTH / 2;
+					float y1 = -(x + add) * DEPTH / 2 + z * DEPTH / 2;
 					
 					r.render(x1 - texWidth / 2, y1 - HEIGHT / 2, (depth - z + x * 1f / depth), tr.width * 2048, tr.height * 2048, tr.x, tr.y, tr.width, tr.height, 8, tr.texture.textureId);
 				}
@@ -271,7 +286,7 @@ public class World {
 			glViewport(0, 0, Wargame.width, Wargame.height);
 		}
 		
-		r.render(pos.x, pos.y - texHeight / 2 + HEIGHT / 2 + DEPTH / 2, 0, texWidth, texHeight, 0, 1, 1, -1, tex[0]);
+		r.render(pos.x, pos.y - texHeight / 2 + HEIGHT / 2 + DEPTH / 2 * add, 0, texWidth, texHeight, 0, 1, 1, -1, tex[0]);
 		
 		rEntities += render(buildings, r);
 		//		long t = System.nanoTime();
@@ -280,7 +295,6 @@ public class World {
 		rEntities += render(units, r);
 		
 		this.rEntities = rEntities;
-		
 		pos.set(newPos);
 	}
 	

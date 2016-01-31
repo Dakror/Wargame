@@ -26,7 +26,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.Build;
@@ -35,7 +34,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import de.dakror.wargame.entity.Building;
 import de.dakror.wargame.entity.Building.Type;
 import de.dakror.wargame.render.Button;
@@ -43,13 +41,14 @@ import de.dakror.wargame.render.Sprite;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas;
+import de.dakror.wargame.util.ActivityStub;
 import de.dakror.wargame.util.AndroidLogger;
 import de.dakror.wargame.util.Listeners.ButtonListener;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouchListener, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, ScaleGestureDetector.OnScaleGestureListener {
+public class Wargame extends ActivityStub {
 	public static final float[] HALFWHITE = new float[] { 1, 1, 1, 0.5f };
 	public static final float[] HALFRED = new float[] { 1, 0, 0, 0.5f };
 	
@@ -110,15 +109,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	protected void onResume() {
 		super.onResume();
 		glView.onResume();
-	}
-	
-	@TargetApi(Build.VERSION_CODES.KITKAT)
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		if (hasFocus) {
-			glView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-		}
 	}
 	
 	public void initHud() {
@@ -271,6 +261,32 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		frames++;
 	}
 	
+	public void tryToPlaceBuilding(MotionEvent e, boolean single) {
+		if (!hudEvents) {
+			if (placeBuilding != null) {
+				Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
+				if (pos.x >= 0 && pos.y >= 0) {
+					if (!single || (placeBuilding.getRealX() == (int) pos.x && placeBuilding.getRealZ() == (int) pos.y)) {
+						if (world.isFree((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) && money >= placeBuilding.getType().costs) {
+							money -= placeBuilding.getType().costs;
+							world.addEntity(new Building((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), playerColor, placeBuilding.getType()));
+							placeBuilding.setColor(HALFRED);
+						}
+					} else {
+						placeBuilding.setX(pos.x);
+						placeBuilding.setZ(pos.y);
+					}
+				}
+			}
+		}
+	}
+
+	public void clampScale() {
+		float width = world.getWidth() * World.WIDTH / 2 + world.getDepth() * World.WIDTH / 2;
+		float height = world.getWidth() * World.DEPTH / 2 + world.getDepth() * World.DEPTH / 2 + World.HEIGHT;
+		scale = Math.max(Math.max(Wargame.width / width, Wargame.height / height), Math.min(7.5f, scale));
+	}
+
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouch(View v, MotionEvent e) {
@@ -316,26 +332,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		return false;
 	}
 	
-	public void tryToPlaceBuilding(MotionEvent e, boolean single) {
-		if (!hudEvents) {
-			if (placeBuilding != null) {
-				Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
-				if (pos.x >= 0 && pos.y >= 0) {
-					if (!single || (placeBuilding.getRealX() == (int) pos.x && placeBuilding.getRealZ() == (int) pos.y)) {
-						if (world.isFree((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) && money >= placeBuilding.getType().costs) {
-							money -= placeBuilding.getType().costs;
-							world.addEntity(new Building((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), playerColor, placeBuilding.getType()));
-							placeBuilding.setColor(HALFRED);
-						}
-					} else {
-						placeBuilding.setX(pos.x);
-						placeBuilding.setZ(pos.y);
-					}
-				}
-			}
-		}
-	}
-	
 	@Override
 	public boolean onDoubleTap(MotionEvent e) {
 		tryToPlaceBuilding(e, false);
@@ -349,53 +345,13 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		world.clampNewPosition();
 		return true;
 	}
-	
-	public void clampScale() {
-		float width = world.getWidth() * World.WIDTH / 2 + world.getDepth() * World.WIDTH / 2;
-		float height = world.getWidth() * World.DEPTH / 2 + world.getDepth() * World.DEPTH / 2 + World.HEIGHT;
-		scale = Math.max(Math.max(Wargame.width / width, Wargame.height / height), Math.min(7.5f, scale));
-	}
-	
+
+	@TargetApi(Build.VERSION_CODES.KITKAT)
 	@Override
-	public boolean onDown(MotionEvent e) {
-		return false;
-	}
-	
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-		//		if (!hudEvents) {
-		//			vX = velocityX;
-		//			vY = velocityY;
-		//		}
-		return false;
-	}
-	
-	@Override
-	public void onLongPress(MotionEvent e) {}
-	
-	@Override
-	public boolean onScaleBegin(ScaleGestureDetector detector) {
-		return true;
-	}
-	
-	@Override
-	public void onScaleEnd(ScaleGestureDetector detector) {}
-	
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-		return false;
-	}
-	
-	@Override
-	public void onShowPress(MotionEvent e) {}
-	
-	@Override
-	public boolean onSingleTapConfirmed(MotionEvent e) {
-		return false;
-	}
-	
-	@Override
-	public boolean onDoubleTapEvent(MotionEvent e) {
-		return false;
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus) {
+			glView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+		}
 	}
 }

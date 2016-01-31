@@ -36,11 +36,11 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import de.dakror.wargame.entity.Building;
 import de.dakror.wargame.entity.Building.Type;
-import de.dakror.wargame.render.Button;
 import de.dakror.wargame.render.Sprite;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas;
+import de.dakror.wargame.ui.Button;
 import de.dakror.wargame.util.ActivityStub;
 import de.dakror.wargame.util.AndroidLogger;
 import de.dakror.wargame.util.Listeners.ButtonListener;
@@ -76,10 +76,7 @@ public class Wargame extends ActivityStub {
 	float vX, vY;
 	int frames, fps = 60;
 	
-	int playerColor = 0;
-	int enemyColor = 1;
-	
-	public float money = 2000;
+	public static Player player, enemy;
 	
 	boolean hudEvents = false;
 	
@@ -99,18 +96,6 @@ public class Wargame extends ActivityStub {
 		setContentView(glView);
 	}
 	
-	@Override
-	protected void onPause() {
-		super.onPause();
-		glView.onPause();
-	}
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		glView.onResume();
-	}
-	
 	public void initHud() {
 		if (height == 0) return;
 		buyButtons = new Button[Building.Type.values().length];
@@ -128,7 +113,7 @@ public class Wargame extends ActivityStub {
 			@Override
 			public void onUp(Button b) {
 				if (b.isToggled()) {
-					placeBuilding = new Building(-5000, 0, playerColor, (Type) b.getPayload());
+					placeBuilding = new Building(-5000, 0, player, (Type) b.getPayload());
 					placeBuilding.setColor(HALFWHITE);
 					placeBuilding.setWorld(world);
 				} else placeBuilding = null;
@@ -137,7 +122,7 @@ public class Wargame extends ActivityStub {
 		
 		for (int i = 0; i < buyButtons.length; i++) {
 			Button b = new Button(width / 2 - Button.SQUARE_WIDTH * (buyButtons.length - i) - 10, -height / 2 + 5, Button.BROWN, Button.SQUARE).setToggle(Button.BEIGE);
-			b.setForeground(new Sprite(playerColor, standing.getTile("palette99_" + Building.Type.values()[i].name() + "_Large_face0").regions.get(0)));
+			b.setForeground(new Sprite(player.color, standing.getTile("palette99_" + Building.Type.values()[i].name() + "_Large_face0").regions.get(0)));
 			b.addListener(bl);
 			b.setPayload(Building.Type.values()[i]);
 			buyButtons[i] = b;
@@ -162,11 +147,14 @@ public class Wargame extends ActivityStub {
 		
 		world = new World("maps/lake.map");
 		
-		Building myCity = new Building(5, 7, playerColor, Type.City);
+		player = new Player("Player", 0);
+		enemy = new Player("CPU", 1);
+		
+		Building myCity = new Building(5, 7, player, Type.City);
 		world.addEntity(myCity);
 		world.center(myCity);
 		
-		Building theirCity = new Building(46, 23, enemyColor, Type.City);
+		Building theirCity = new Building(46, 23, enemy, Type.City);
 		world.addEntity(theirCity);
 		//		for (int i = 0; i < 15; i++) {
 		//			Unit u = new Unit(2 + i / 5f, 3 - (i % 2) * 0.5f, 0, Unit.Type.Infantry);
@@ -218,7 +206,9 @@ public class Wargame extends ActivityStub {
 			vY = Math.abs(vY) < stop ? 0 : vY;
 		}
 		
-		money += timeStep;
+		player.money += timeStep;
+		enemy.money += timeStep;
+		
 		world.update(timeStep);
 		
 		glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
@@ -236,7 +226,7 @@ public class Wargame extends ActivityStub {
 		
 		world.render(spriteRenderer);
 		if (placeBuilding != null) {
-			placeBuilding.setColor(money >= placeBuilding.getType().costs && world.isFree((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) ? HALFWHITE : HALFRED);
+			placeBuilding.setColor(player.money >= placeBuilding.getType().costs && world.canBuildOn((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) ? HALFWHITE : HALFRED);
 			spriteRenderer.render(placeBuilding);
 		}
 		world.updatePos();
@@ -249,8 +239,11 @@ public class Wargame extends ActivityStub {
 		textRenderer.renderText(-width / 2, height / 2 - 30, 0, 0.5f, "FPS: " + fps, spriteRenderer);
 		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "E: " + world.rEntities + " / " + (world.buildings.size() + world.units.size()), spriteRenderer);
 		
+		textRenderer.renderText(-width / 2, height / 2 - 100, 0, 0.5f, "Player: " + player.money, spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 130, 0, 0.5f, "CPU: " + enemy.money, spriteRenderer);
+		
 		textRenderer.setFont(1);
-		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(money), spriteRenderer);
+		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(player.money), spriteRenderer);
 		textRenderer.setFont(0);
 		
 		for (Button b : buyButtons)
@@ -267,9 +260,9 @@ public class Wargame extends ActivityStub {
 				Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
 				if (pos.x >= 0 && pos.y >= 0) {
 					if (!single || (placeBuilding.getRealX() == (int) pos.x && placeBuilding.getRealZ() == (int) pos.y)) {
-						if (world.isFree((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) && money >= placeBuilding.getType().costs) {
-							money -= placeBuilding.getType().costs;
-							world.addEntity(new Building((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), playerColor, placeBuilding.getType()));
+						if (world.canBuildOn((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) && player.money >= placeBuilding.getType().costs) {
+							player.money -= placeBuilding.getType().costs;
+							world.addEntity(new Building((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), player, placeBuilding.getType()));
 							placeBuilding.setColor(HALFRED);
 						}
 					} else {
@@ -280,13 +273,13 @@ public class Wargame extends ActivityStub {
 			}
 		}
 	}
-
+	
 	public void clampScale() {
 		float width = world.getWidth() * World.WIDTH / 2 + world.getDepth() * World.WIDTH / 2;
 		float height = world.getWidth() * World.DEPTH / 2 + world.getDepth() * World.DEPTH / 2 + World.HEIGHT;
 		scale = Math.max(Math.max(Wargame.width / width, Wargame.height / height), Math.min(7.5f, scale));
 	}
-
+	
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouch(View v, MotionEvent e) {
@@ -301,7 +294,6 @@ public class Wargame extends ActivityStub {
 					if (b.onDown(e)) hudEvents = true;
 				break;
 			case MotionEvent.ACTION_UP:
-				
 				for (Button b : buyButtons)
 					if (b.onUp(e)) hudEvents = false;
 					
@@ -345,7 +337,12 @@ public class Wargame extends ActivityStub {
 		world.clampNewPosition();
 		return true;
 	}
-
+	
+	@Override
+	public boolean onScaleBegin(ScaleGestureDetector detector) {
+		return true;
+	}
+	
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {

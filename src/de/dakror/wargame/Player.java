@@ -14,24 +14,40 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame.util;
+package de.dakror.wargame;
 
-import android.view.MotionEvent;
-import de.dakror.wargame.ui.Button;
+import de.dakror.wargame.entity.Building;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Listeners {
-	public static interface ButtonListener {
-		public void onDown(Button b);
-		
-		public void onUp(Button b);
+public class Player {
+	public float money;
+	int color;
+	
+	String name;
+	
+	Building mainCity;
+	
+	public Player(String name, int color) {
+		this.name = name;
+		this.color = color;
+		money = 2000;
 	}
 	
-	public static interface TouchListener {
-		public boolean onDown(MotionEvent e);
-		
-		public boolean onUp(MotionEvent e);
+	public int getColor() {
+		return color;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setMainCity(Building mainCity) {
+		this.mainCity = mainCity;
+	}
+	
+	public Building getMainCity() {
+		return mainCity;
 	}
 }

@@ -14,12 +14,15 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame.render;
+package de.dakror.wargame.ui;
 
 import java.util.ArrayList;
 
 import android.view.MotionEvent;
 import de.dakror.wargame.Wargame;
+import de.dakror.wargame.render.Renderable;
+import de.dakror.wargame.render.Sprite;
+import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.util.Listeners.ButtonListener;
 

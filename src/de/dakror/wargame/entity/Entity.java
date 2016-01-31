@@ -16,6 +16,7 @@
 
 package de.dakror.wargame.entity;
 
+import de.dakror.wargame.Player;
 import de.dakror.wargame.Wargame;
 import de.dakror.wargame.World;
 import de.dakror.wargame.render.AnimatedSprite;
@@ -36,14 +37,16 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 	Tile[] faces;
 	boolean huge;
 	World world;
+	Player owner;
 	
-	public Entity(float x, float z, int face, int color, boolean huge, String name) {
+	public Entity(float x, float z, int face, Player owner, boolean huge, String name) {
 		this.x = x;
 		y = 1;
 		this.z = z;
 		this.huge = huge;
 		this.face = face;
-		paletteIndex = color;
+		paletteIndex = owner.getColor();
+		this.owner = owner;
 		vAnim = 0.05f;
 		loopAnim = true;
 		faces = Wargame.standing.getFaces("palette99_" + name + "_" + (huge ? "Huge" : "Large"));
@@ -100,6 +103,14 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 	
 	public void setWorld(World world) {
 		this.world = world;
+	}
+	
+	public void setOwner(Player owner) {
+		this.owner = owner;
+	}
+	
+	public Player getOwner() {
+		return owner;
 	}
 	
 	@Override

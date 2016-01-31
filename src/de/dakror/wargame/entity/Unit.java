@@ -24,6 +24,7 @@ import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import de.dakror.wargame.Player;
 import de.dakror.wargame.World;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.util.WorldLocation;
@@ -106,23 +107,23 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	SteeringBehavior<Vector2> steeringBehavior;
 	float scale = 0.5f;
 	
-	public Unit(float x, float z, int face, int color, boolean huge, Type type) {
-		super(x, z, face, color, huge, type.name());
+	public Unit(float x, float z, int face, Player owner, boolean huge, Type type) {
+		super(x, z, face, owner, huge, type.name());
 		this.type = type;
 		pos.set(x, z);
 		onCreate();
 	}
 	
-	public Unit(float x, float z, int color, Type type) {
-		this(x, z, 0, color, type);
+	public Unit(float x, float z, Player owner, Type type) {
+		this(x, z, 0, owner, type);
 	}
 	
-	public Unit(float x, float z, int face, int color, Type type) {
-		this(x, z, face, color, false, type);
+	public Unit(float x, float z, int face, Player owner, Type type) {
+		this(x, z, face, owner, false, type);
 	}
 	
-	public Unit(float x, float z, int color, boolean huge, Type type) {
-		this(x, z, 0, color, huge, type);
+	public Unit(float x, float z, Player owner, boolean huge, Type type) {
+		this(x, z, 0, owner, huge, type);
 	}
 	
 	@Override

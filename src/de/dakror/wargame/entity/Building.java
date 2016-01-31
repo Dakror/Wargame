@@ -16,6 +16,7 @@
 
 package de.dakror.wargame.entity;
 
+import de.dakror.wargame.Player;
 import de.dakror.wargame.World;
 
 /**
@@ -26,15 +27,30 @@ public class Building extends Entity {
 	public static enum Type {
 		//		Airport(750, 160), // for planes
 		//		Castle(2500, 325), // for defense
-		City(1000, 125) {
+		City(1000, 850) {
 			@Override
 			public void onDeath(Building b) {
-				System.out.println("Team " + b.getPaletteIndex() + " lost.");
+				if (b.equals(b.owner.getMainCity())) System.out.println(b.owner.getName() + " lost.");
+			}
+			
+			@Override
+			public void update(Building b, float timePassed) {
+				b.owner.money -= 1 / 10f * timePassed; // maintenance cost or whatever lmao
 			}
 		}, // main building
 		//		Dock(650, 90), // for ships
-		Estate(350, 35), // for troops
-		Factory(550, 75), // for resources
+		Estate(350, 1575) {
+			@Override
+			public void update(Building b, float timePassed) {
+				b.owner.money -= 2 / 10f * timePassed; // maintenance cost or whatever lmao
+			}
+		}, // for troops
+		Factory(550, 450) {// for resources
+			@Override
+			public void update(Building b, float timePassed) {
+				b.owner.money += 5 * timePassed;
+			}
+		},
 		//		Laboratory(450, 1000), // for science!!!!
 		;
 		
@@ -62,22 +78,22 @@ public class Building extends Entity {
 	
 	protected Type type;
 	
-	public Building(int x, int z, int face, int color, boolean huge, Type type) {
-		super(x, z, face, color, huge, type.name());
+	public Building(int x, int z, int face, Player owner, boolean huge, Type type) {
+		super(x, z, face, owner, huge, type.name());
 		this.type = type;
 		onCreate();
 	}
 	
-	public Building(int x, int z, int color, Type type) {
-		this(x, z, 0, color, type);
+	public Building(int x, int z, Player owner, Type type) {
+		this(x, z, 0, owner, type);
 	}
 	
-	public Building(int x, int z, int face, int color, Type type) {
-		this(x, z, face, color, false, type);
+	public Building(int x, int z, int face, Player owner, Type type) {
+		this(x, z, face, owner, false, type);
 	}
 	
-	public Building(int x, int z, int color, boolean huge, Type type) {
-		this(x, z, 0, color, huge, type);
+	public Building(int x, int z, Player owner, boolean huge, Type type) {
+		this(x, z, 0, owner, huge, type);
 	}
 	
 	@Override

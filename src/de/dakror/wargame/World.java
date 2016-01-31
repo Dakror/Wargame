@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -42,8 +43,8 @@ import de.dakror.wargame.render.TextureAtlas.Tile;
  */
 public class World implements Renderable {
 	public static enum Type {
-		Air,
-		Basement,
+		Air(false),
+		Basement(),
 		Custom0,
 		Custom1,
 		Custom2,
@@ -53,11 +54,22 @@ public class World implements Renderable {
 		Jungle,
 		Mountains,
 		Plains,
-		River,
+		River(false),
 		Road,
 		Ruins,
-		Sea,
-		Tundra // 16
+		Sea(false),
+		Tundra, // 16
+		;
+		
+		boolean solid;
+		
+		private Type() {
+			this(true);
+		}
+		
+		private Type(boolean solid) {
+			this.solid = solid;
+		}
 	}
 	
 	// lol super dumb method, but idc 
@@ -74,8 +86,8 @@ public class World implements Renderable {
 	protected int width, depth;
 	public int rEntities;
 	float add;
-	protected ArrayList<Unit> units;
-	protected ArrayList<Building> buildings;
+	protected List<Unit> units;
+	protected List<Building> buildings;
 	
 	int[] fbo = new int[1];
 	int[] rbo = new int[1];
@@ -140,8 +152,8 @@ public class World implements Renderable {
 	}
 	
 	void init() {
-		units = new ArrayList<Unit>();
-		buildings = new ArrayList<Building>();
+		units = Collections.synchronizedList(new ArrayList<Unit>());
+		buildings = Collections.synchronizedList(new ArrayList<Building>());
 		
 		add = (width - depth - 2) * -0.5f;
 		
@@ -199,7 +211,9 @@ public class World implements Renderable {
 		return oldVal != map[x][z];
 	}
 	
-	public boolean isFree(int x, int z) {
+	public boolean canBuildOn(int x, int z) {
+		if (!get((int) Math.floor(x / 2f), (int) Math.floor(z / 2f)).solid) return false;
+		
 		for (Entity e : buildings) {
 			if (e.getRealX() == x && e.getRealZ() == z) return false;
 		}
@@ -293,7 +307,7 @@ public class World implements Renderable {
 		pos.set(newPos);
 	}
 	
-	public <E extends Entity> int render(Iterable<E> arr, SpriteRenderer r) {
+	public synchronized <E extends Entity> int render(Iterable<E> arr, SpriteRenderer r) {
 		int rEntities = 0;
 		for (Entity e : arr) {
 			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
@@ -301,7 +315,6 @@ public class World implements Renderable {
 				rEntities++;
 			}
 		}
-		
 		return rEntities;
 	}
 	

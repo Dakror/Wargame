@@ -113,7 +113,7 @@ public class Building extends Entity {
 	
 	@Override
 	public float getZ() {
-		return (world.getDepth() - z * 2 + x * 2) / 1024f; // nope
+		return (world.getDepth() - z * 2 + x * 2) / 1024f + (color[3] < 1.0f ? 10 : 0) /*Wargame#placeBuilding*/;
 	}
 	
 	@Override

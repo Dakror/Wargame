@@ -18,7 +18,6 @@ package de.dakror.wargame.render;
 
 /**
  * @author Maximilian Stark | Dakror
- *
  */
 public interface Renderable {
 	public void render(SpriteRenderer r);

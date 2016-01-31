@@ -14,12 +14,24 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame.render;
+package de.dakror.wargame.util;
 
 import android.view.MotionEvent;
+import de.dakror.wargame.render.Button;
 
-public interface TouchListener {
-	public boolean onDown(MotionEvent e);
+/**
+ * @author Maximilian Stark | Dakror
+ */
+public class Listeners {
+	public static interface ButtonListener {
+		public void onDown(Button b);
+		
+		public void onUp(Button b);
+	}
 	
-	public boolean onUp(MotionEvent e);
+	public static interface TouchListener {
+		public boolean onDown(MotionEvent e);
+		
+		public boolean onUp(MotionEvent e);
+	}
 }

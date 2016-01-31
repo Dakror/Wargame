@@ -16,6 +16,8 @@
 
 package de.dakror.wargame.render;
 
+import de.dakror.wargame.render.TextureAtlas.TextureRegion;
+
 /**
  * @author Maximilian Stark | Dakror
  */
@@ -24,11 +26,15 @@ public class Sprite {
 	protected float width, height;
 	protected float textureX, textureY, textureWidth, textureHeight;
 	protected float xOffset, yOffset, innerWidth, innerHeight;
+	protected float srcWidth, srcHeight;
 	protected float[] color;
 	protected int textureId;
+	protected int paletteIndex;
+	
+	public static final float[] WHITE = new float[] { 1, 1, 1, 1 };
 	
 	public Sprite() {
-		color = new float[] { 1, 1, 1, 1 };
+		color = WHITE;
 	}
 	
 	public Sprite(float x, float y, float z, float width, float height) {
@@ -37,6 +43,22 @@ public class Sprite {
 	
 	public Sprite(float x, float y, float z, float width, float height, float textureX, float textureY, float textureWidth, float textureHeight) {
 		this(x, y, z, width, height, textureX, textureY, textureWidth, textureHeight, 0, 0, width, height);
+	}
+	
+	public Sprite(float x, float y, float z, float width, float height, TextureRegion tr) {
+		this(x, y, z, width, height, -1, tr);
+	}
+	
+	public Sprite(int color, TextureRegion tr) {
+		this(0, 0, 0, 0, 0, color, tr);
+		srcWidth = tr.width * tr.texture.width;
+		srcHeight = tr.height * tr.texture.height;
+	}
+	
+	public Sprite(float x, float y, float z, float width, float height, int color, TextureRegion tr) {
+		this(x, y, z, width, height, tr.x, tr.y, tr.width, tr.height);
+		textureId = tr.texture.textureId;
+		paletteIndex = color;
 	}
 	
 	public Sprite(float x, float y, float z, float width, float height, float textureX, float textureY, float textureWidth, float textureHeight, float xOffset, float yOffset, float innerWidth, float innerHeight) {
@@ -53,14 +75,25 @@ public class Sprite {
 		this.yOffset = yOffset;
 		this.innerWidth = innerWidth;
 		this.innerHeight = innerHeight;
-		color = new float[] { 1, 1, 1, 1 };
+		color = WHITE;
+		paletteIndex = -1;
+	}
+	
+	public float getSourceWidth() {
+		return srcWidth;
+	}
+	
+	public float getSourceHeight() {
+		return srcHeight;
 	}
 	
 	public int getPaletteIndex() {
-		return -1;
+		return paletteIndex;
 	}
 	
-	public void setPaletteIndex(int i) {}
+	public void setPaletteIndex(int paletteIndex) {
+		this.paletteIndex = paletteIndex;
+	}
 	
 	public void setColor(float[] color) {
 		this.color = color;

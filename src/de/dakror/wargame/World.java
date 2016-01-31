@@ -21,11 +21,12 @@ import static android.opengl.GLES20.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 
 import android.opengl.Matrix;
 import de.dakror.wargame.entity.Building;
@@ -73,8 +74,8 @@ public class World implements Renderable {
 	protected int width, depth;
 	public int rEntities;
 	float add;
-	protected Array<Unit> units;
-	protected Array<Building> buildings;
+	protected ArrayList<Unit> units;
+	protected ArrayList<Building> buildings;
 	
 	int[] fbo = new int[1];
 	int[] rbo = new int[1];
@@ -139,8 +140,8 @@ public class World implements Renderable {
 	}
 	
 	void init() {
-		units = new Array<Unit>();
-		buildings = new Array<Building>();
+		units = new ArrayList<Unit>();
+		buildings = new ArrayList<Building>();
 		
 		add = (width - depth - 2) * -0.5f;
 		
@@ -198,20 +199,13 @@ public class World implements Renderable {
 		return oldVal != map[x][z];
 	}
 	
-	//	public Entity getEntityAt(float x, float y, boolean global) {
-	//		if (!global) {
-	//			x += pos.x;
-	//			y += pos.y;
-	//		}
-	//		
-	//		for (Entity e : entities) {
-	//			if (e.getX() * Wargame.scale <= x && x <= (e.getX() + e.getWidth()) * Wargame.scale && e.getY() * Wargame.scale <= y && y <= (e.getY() + e.getHeight()) * Wargame.scale) {
-	//				return e;
-	//			}
-	//		}
-	//		
-	//		return null;
-	//	}
+	public boolean isFree(int x, int z) {
+		for (Entity e : buildings) {
+			if (e.getRealX() == x && e.getRealZ() == z) return false;
+		}
+		
+		return true;
+	}
 	
 	public Vector2 getMappedCoords(float screenX, float screenY) {
 		screenX = screenX / Wargame.scale - pos.x;
@@ -243,7 +237,7 @@ public class World implements Renderable {
 		update(units, timePassed);
 	}
 	
-	public <E extends Entity> void update(Array<E> arr, float timePassed) {
+	public <E extends Entity> void update(Iterable<E> arr, float timePassed) {
 		for (Iterator<E> iter = arr.iterator(); iter.hasNext();) {
 			Entity e = iter.next();
 			if (e.isDead()) {
@@ -253,6 +247,7 @@ public class World implements Renderable {
 		}
 	}
 	
+	@Override
 	public void render(SpriteRenderer r) {
 		int rEntities = 0;
 		if (dirty) {
@@ -287,15 +282,18 @@ public class World implements Renderable {
 		
 		rEntities += render(buildings, r);
 		//		long t = System.nanoTime();
-		units.sort();
+		Collections.sort(units);
 		//		System.out.println((System.nanoTime() - t) / 1000000f);
 		rEntities += render(units, r);
 		
 		this.rEntities = rEntities;
+	}
+	
+	public void updatePos() {
 		pos.set(newPos);
 	}
 	
-	public <E extends Entity> int render(Array<E> arr, SpriteRenderer r) {
+	public <E extends Entity> int render(Iterable<E> arr, SpriteRenderer r) {
 		int rEntities = 0;
 		for (Entity e : arr) {
 			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
@@ -311,7 +309,7 @@ public class World implements Renderable {
 		e.setWorld(this);
 		if (e instanceof Building) {
 			buildings.add((Building) e);
-			buildings.sort();
+			Collections.sort(buildings);
 		} else if (e instanceof Unit) {
 			units.add((Unit) e);
 		} else System.out.println("Can't handle Entity: " + e);

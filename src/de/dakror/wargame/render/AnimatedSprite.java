@@ -24,7 +24,6 @@ import de.dakror.wargame.render.TextureAtlas.Tile;
  *
  */
 public class AnimatedSprite extends Sprite {
-	protected int color;
 	protected Tile tile;
 	protected int index;
 	protected float vAnim, lastAnim;
@@ -36,7 +35,7 @@ public class AnimatedSprite extends Sprite {
 		super(x, y, z, width, height);
 		
 		this.tile = tile;
-		this.color = color;
+		paletteIndex = color;
 		
 		updateTexture();
 	}
@@ -61,11 +60,6 @@ public class AnimatedSprite extends Sprite {
 				updateTexture();
 			}
 		}
-	}
-	
-	@Override
-	public int getPaletteIndex() {
-		return color;
 	}
 	
 	public TextureRegion getTextureRegion() {

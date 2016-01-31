@@ -38,5 +38,5 @@ void main() {
 	}
 //if(col.a < 0.25) discard;
 
-	gl_FragColor = col;//vec4(col.rgb,1);
+	gl_FragColor = col * vCol;//vec4(col.rgb,1);
 }

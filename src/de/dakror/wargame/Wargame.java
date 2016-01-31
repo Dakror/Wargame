@@ -22,6 +22,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.badlogic.gdx.ai.GdxAI;
+import com.badlogic.gdx.math.Vector2;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -37,17 +38,21 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import de.dakror.wargame.entity.Building;
 import de.dakror.wargame.entity.Building.Type;
-import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.render.Button;
+import de.dakror.wargame.render.Sprite;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas;
 import de.dakror.wargame.util.AndroidLogger;
+import de.dakror.wargame.util.Listeners.ButtonListener;
 
 /**
  * @author Maximilian Stark | Dakror
  */
 public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouchListener, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, ScaleGestureDetector.OnScaleGestureListener {
+	public static final float[] HALFWHITE = new float[] { 1, 1, 1, 0.5f };
+	public static final float[] HALFRED = new float[] { 1, 0, 0, 0.5f };
+	
 	public static TextureAtlas animation, standing, terrain, ui;
 	public static int height, width;
 	public static float scale = 2f;
@@ -62,9 +67,9 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	SpriteRenderer spriteRenderer;
 	TextRenderer textRenderer;
 	
-	Button buttonCity, buttonFactory;
+	Button[] buyButtons;
 	
-	Entity previousEntity, selectedEntity;
+	Building placeBuilding;
 	
 	long lastFrame;
 	long lastTimestamp;
@@ -72,7 +77,12 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	float vX, vY;
 	int frames, fps = 60;
 	
+	int playerColor = 0;
+	int enemyColor = 1;
+	
 	public float money = 2000;
+	
+	boolean hudEvents = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -92,16 +102,12 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	
 	@Override
 	protected void onPause() {
-		// Ideally a game should implement onResume() and onPause()
-		// to take appropriate action when the activity looses focus
 		super.onPause();
 		glView.onPause();
 	}
 	
 	@Override
 	protected void onResume() {
-		// Ideally a game should implement onResume() and onPause()
-		// to take appropriate action when the activity looses focus
 		super.onResume();
 		glView.onResume();
 	}
@@ -116,8 +122,36 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	}
 	
 	public void initHud() {
-		buttonCity = new Button(0, 0, Button.BLUE, Button.SQUARE);
-		buttonFactory = new Button(Button.SQUARE_WIDTH + 6, 0, Button.BLUE, Button.SQUARE);
+		if (height == 0) return;
+		buyButtons = new Button[Building.Type.values().length];
+		
+		final ButtonListener bl = new ButtonListener() {
+			
+			@Override
+			public void onDown(Button b) {
+				boolean t = b.isToggled();
+				for (Button bt : buyButtons)
+					bt.setToggled(false);
+				b.setToggled(t);
+			}
+			
+			@Override
+			public void onUp(Button b) {
+				if (b.isToggled()) {
+					placeBuilding = new Building(-5000, 0, playerColor, (Type) b.getPayload());
+					placeBuilding.setColor(HALFWHITE);
+					placeBuilding.setWorld(world);
+				} else placeBuilding = null;
+			}
+		};
+		
+		for (int i = 0; i < buyButtons.length; i++) {
+			Button b = new Button(width / 2 - Button.SQUARE_WIDTH * (buyButtons.length - i) - 10, -height / 2 + 5, Button.BROWN, Button.SQUARE).setToggle(Button.BEIGE);
+			b.setForeground(new Sprite(playerColor, standing.getTile("palette99_" + Building.Type.values()[i].name() + "_Large_face0").regions.get(0)));
+			b.addListener(bl);
+			b.setPayload(Building.Type.values()[i]);
+			buyButtons[i] = b;
+		}
 	}
 	
 	@Override
@@ -137,23 +171,12 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		//			System.out.println(animation.tr);
 		
 		world = new World("maps/lake.map");
-		//		for (int i = 0; i < 5; i++)
-		//			for (int j = 0; j < 5; j++) {
-		//				Building myCity = new Building(8 + i, 8 + j, 0, Type.values()[(int) (Math.random() * Type.values().length)]);
-		//				world.addEntity(myCity);
-		//			}
-		//			
-		//		for (int i = 0; i < 5; i++)
-		//			for (int j = 0; j < 5; j++) {
-		//				Building myCity = new Building(20 - i, 12 - j, 1, Type.values()[(int) (Math.random() * Type.values().length)]);
-		//				world.addEntity(myCity);
-		//			}
 		
-		Building myCity = new Building(5, 7, 0, Type.City);
+		Building myCity = new Building(5, 7, playerColor, Type.City);
 		world.addEntity(myCity);
 		world.center(myCity);
 		
-		Building theirCity = new Building(46, 23, 1, Type.City);
+		Building theirCity = new Building(46, 23, enemyColor, Type.City);
 		world.addEntity(theirCity);
 		//		for (int i = 0; i < 15; i++) {
 		//			Unit u = new Unit(2 + i / 5f, 3 - (i % 2) * 0.5f, 0, Unit.Type.Infantry);
@@ -167,14 +190,14 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		//		v.setSteeringBehavior(new Arrive<Vector2>(v).setTarget(new WorldLocation(new Vector2(6, 6), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f));
 		//		map.addEntity(v);
 		//		map.addEntity(u);
-		
-		initHud();
 	}
 	
 	@Override
 	public void onSurfaceChanged(GL10 gl10, int width, int height) {
 		Wargame.width = width;
 		Wargame.height = height;
+		
+		initHud();
 		clampScale();
 		world.clampNewPosition();
 		glViewport(0, 0, width, height);
@@ -209,22 +232,29 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		Matrix.multiplyMM(viewProjMatrix, 0, projMatrix, 0, viewMatrix, 0);
 		
 		spriteRenderer.begin(viewProjMatrix);
+		
 		world.render(spriteRenderer);
+		if (placeBuilding != null) {
+			placeBuilding.setColor(money >= placeBuilding.getType().costs && world.isFree((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) ? HALFWHITE : HALFRED);
+			spriteRenderer.render(placeBuilding);
+		}
+		world.updatePos();
+		
 		spriteRenderer.end();
 		
 		glDisable(GL_DEPTH_TEST);
 		
 		spriteRenderer.begin(hudMatrix);
 		textRenderer.renderText(-width / 2, height / 2 - 30, 0, 0.5f, "FPS: " + fps, spriteRenderer);
-		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "E: " + world.rEntities + " / " + (world.buildings.size + world.units.size), spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "E: " + world.rEntities + " / " + (world.buildings.size() + world.units.size()), spriteRenderer);
 		
 		textRenderer.setFont(1);
 		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(money), spriteRenderer);
 		textRenderer.setFont(0);
 		
-		buttonCity.render(spriteRenderer);
-		buttonFactory.render(spriteRenderer);
-		
+		for (Button b : buyButtons)
+			b.render(spriteRenderer);
+			
 		spriteRenderer.end();
 		
 		frames++;
@@ -240,19 +270,21 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		
 		switch (e.getAction()) {
 			case MotionEvent.ACTION_DOWN:
-				buttonCity.onDown(e);
-				buttonFactory.onDown(e);
+				for (Button b : buyButtons)
+					if (b.onDown(e)) hudEvents = true;
 				break;
 			case MotionEvent.ACTION_UP:
-				buttonCity.onUp(e);
-				buttonFactory.onUp(e);
+				
+				for (Button b : buyButtons)
+					if (b.onUp(e)) hudEvents = false;
+					
 				break;
 			case MotionEvent.ACTION_MOVE:
 				
 				float dx = x - prevX;
 				float dy = y - prevY;
 				
-				if (e.getPointerCount() == prevNum) world.move(dx / scale * 60f / Math.max(fps, 25), dy / scale * 60f / Math.max(fps, 25));
+				if (e.getPointerCount() == prevNum && !hudEvents) world.move(dx / scale * 60f / Math.max(fps, 25), dy / scale * 60f / Math.max(fps, 25));
 				break;
 		}
 		
@@ -265,17 +297,34 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		//world.dirty = true;
-		/*
-		Entity entity = map.getEntityAt(e.getX() - width / 2, height - e.getY() - height / 2, true);
-		previousEntity = selectedEntity;
-		if (previousEntity != null) previousEntity.onDeselect();
-		selectedEntity = entity;
-		if (entity != null) entity.onSelect();
+		tryToPlaceBuilding(e, true);
 		
-		return entity != null;
-		*/
-		
+		return false;
+	}
+	
+	public void tryToPlaceBuilding(MotionEvent e, boolean single) {
+		if (!hudEvents) {
+			if (placeBuilding != null) {
+				Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
+				if (pos.x >= 0 && pos.y >= 0) {
+					if (!single || (placeBuilding.getRealX() == (int) pos.x && placeBuilding.getRealZ() == (int) pos.y)) {
+						if (world.isFree((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) && money >= placeBuilding.getType().costs) {
+							money -= placeBuilding.getType().costs;
+							world.addEntity(new Building((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), playerColor, placeBuilding.getType()));
+							placeBuilding.setColor(HALFRED);
+						}
+					} else {
+						placeBuilding.setX(pos.x);
+						placeBuilding.setZ(pos.y);
+					}
+				}
+			}
+		}
+	}
+	
+	@Override
+	public boolean onDoubleTap(MotionEvent e) {
+		tryToPlaceBuilding(e, false);
 		return false;
 	}
 	
@@ -324,11 +373,6 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	
 	@Override
 	public boolean onSingleTapConfirmed(MotionEvent e) {
-		return false;
-	}
-	
-	@Override
-	public boolean onDoubleTap(MotionEvent e) {
 		return false;
 	}
 	

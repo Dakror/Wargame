@@ -43,7 +43,7 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 		this.z = z;
 		this.huge = huge;
 		this.face = face;
-		this.color = color;
+		paletteIndex = color;
 		vAnim = 0.05f;
 		loopAnim = true;
 		faces = Wargame.standing.getFaces("palette99_" + name + "_" + (huge ? "Huge" : "Large"));

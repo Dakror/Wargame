@@ -16,15 +16,17 @@
 
 package de.dakror.wargame.render;
 
+import java.util.ArrayList;
+
 import android.view.MotionEvent;
 import de.dakror.wargame.Wargame;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
+import de.dakror.wargame.util.Listeners.ButtonListener;
 
 /**
  * @author Maximilian Stark | Dakror
- *
  */
-public class Button implements Renderable, TouchListener {
+public class Button implements Renderable {
 	public static final String BEIGE = "_beige";
 	public static final String BROWN = "_brown";
 	public static final String BLUE = "_blue";
@@ -43,47 +45,73 @@ public class Button implements Renderable, TouchListener {
 	public static final int PRESSED_HEIGHT = 45 * DEFAULT_SCALE;
 	
 	TextureRegion background, backgroundPressed, backgroundDisabled;
-	TextureRegion foreground, foregroundPressed, foregroundDisabled;
+	TextureRegion backgroundToggle, backgroundTogglePressed, backgroundToggleDisabled;
+	Sprite foreground;
 	
-	boolean pressed, disabled;
+	boolean pressed, toggled, disabled;
 	int x, y;
 	int width, pressedHeight;
 	
-	TouchListener listener;
+	ArrayList<ButtonListener> listeners;
+	
+	Object payload;
+	String color, type;
 	
 	public Button(int x, int y, String color, String type) {
 		this.x = x;
 		this.y = y;
+		this.color = color;
+		this.type = type;
 		background = Wargame.ui.getTile("button" + type + color).regions.get(0);
 		backgroundPressed = Wargame.ui.getTile("button" + type + color + "_pressed").regions.get(0);
 		backgroundDisabled = Wargame.ui.getTile("button" + type + "_grey").regions.get(0);
-		
+		listeners = new ArrayList<ButtonListener>();
 		width = (int) (DEFAULT_SCALE * background.width * background.texture.width);
+	}
+	
+	public Button setToggle(String toggleColor) {
+		backgroundToggle = Wargame.ui.getTile("button" + type + toggleColor).regions.get(0);
+		backgroundTogglePressed = Wargame.ui.getTile("button" + type + toggleColor + "_pressed").regions.get(0);
+		backgroundToggleDisabled = Wargame.ui.getTile("button" + type + "_grey").regions.get(0);
+		
+		return this;
 	}
 	
 	@Override
 	public void render(SpriteRenderer r) {
-		renderTextureRegion(x, y, disabled ? backgroundDisabled : (pressed ? backgroundPressed : background), r);
+		renderTextureRegion(x, y, toggled ? (disabled ? backgroundToggleDisabled : (pressed ? backgroundTogglePressed : backgroundToggle)) : (disabled ? backgroundDisabled : (pressed ? backgroundPressed : background)), r);
+		if (foreground != null) {
+			foreground.setX(x + 15);
+			foreground.setZ(0);
+			foreground.setWidth(width - 30);
+			foreground.setHeight(foreground.getSourceHeight() * (foreground.getWidth() / foreground.getSourceWidth()));
+			foreground.setY(y + (pressed ? PRESSED_HEIGHT - HEIGHT : 0) + 20);
+			r.render(foreground);
+		}
 	}
 	
 	private void renderTextureRegion(int x, int y, TextureRegion tr, SpriteRenderer r) {
 		r.render(x, y, 0, width, getHeight(), tr.x, tr.y, tr.width, tr.height, tr.texture.textureId);
 	}
 	
-	@Override
 	public boolean onUp(MotionEvent e) {
 		if (!disabled) {
-			if (contains(e) && pressed && listener != null) listener.onUp(e);
+			if (contains(e) && pressed) {
+				toggled = !toggled;
+				for (ButtonListener l : listeners)
+					l.onUp(this);
+			}
 			pressed = false;
+			return true;
 		}
 		return false;
 	}
 	
-	@Override
 	public boolean onDown(MotionEvent e) {
 		if (contains(e) && !disabled) {
 			pressed = true;
-			if (listener != null) listener.onDown(e);
+			for (ButtonListener l : listeners)
+				l.onDown(this);
 			return true;
 		}
 		
@@ -94,36 +122,28 @@ public class Button implements Renderable, TouchListener {
 		return e.getX() - Wargame.width / 2 >= x && e.getX() - Wargame.width / 2 <= x + width && Wargame.height - e.getY() - Wargame.height / 2 >= y && Wargame.height - e.getY() - Wargame.height / 2 <= y + HEIGHT;
 	}
 	
-	public void setListener(TouchListener listener) {
-		this.listener = listener;
+	public void addListener(ButtonListener listener) {
+		listeners.add(listener);
 	}
 	
-	public TouchListener getListener() {
-		return listener;
+	public Object getPayload() {
+		return payload;
 	}
 	
-	public TextureRegion getForeground() {
+	public void setPayload(Object payload) {
+		this.payload = payload;
+	}
+	
+	public ArrayList<ButtonListener> getListener() {
+		return listeners;
+	}
+	
+	public Sprite getForeground() {
 		return foreground;
 	}
 	
-	public void setForeground(TextureRegion foreground) {
+	public void setForeground(Sprite foreground) {
 		this.foreground = foreground;
-	}
-	
-	public TextureRegion getForegroundPressed() {
-		return foregroundPressed;
-	}
-	
-	public void setForegroundPressed(TextureRegion foregroundPressed) {
-		this.foregroundPressed = foregroundPressed;
-	}
-	
-	public TextureRegion getForegroundDisabled() {
-		return foregroundDisabled;
-	}
-	
-	public void setForegroundDisabled(TextureRegion foregroundDisabled) {
-		this.foregroundDisabled = foregroundDisabled;
 	}
 	
 	public boolean isPressed() {
@@ -140,6 +160,14 @@ public class Button implements Renderable, TouchListener {
 	
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
+	}
+	
+	public boolean isToggled() {
+		return toggled;
+	}
+	
+	public void setToggled(boolean toggled) {
+		this.toggled = toggled;
 	}
 	
 	public int getX() {

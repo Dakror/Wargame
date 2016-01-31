@@ -41,6 +41,8 @@ import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas;
 import de.dakror.wargame.ui.Button;
+import de.dakror.wargame.ui.Panel;
+import de.dakror.wargame.ui.UI;
 import de.dakror.wargame.util.ActivityStub;
 import de.dakror.wargame.util.AndroidLogger;
 import de.dakror.wargame.util.Listeners.ButtonListener;
@@ -67,6 +69,8 @@ public class Wargame extends ActivityStub {
 	TextRenderer textRenderer;
 	
 	Button[] buyButtons;
+	
+	Panel panel;
 	
 	Building placeBuilding;
 	
@@ -98,6 +102,7 @@ public class Wargame extends ActivityStub {
 	
 	public void initHud() {
 		if (height == 0) return;
+		panel = new Panel(-width / 2 + 5, -height / 2 + 5, 400, 250, UI.BEIGE);
 		buyButtons = new Button[Building.Type.values().length];
 		
 		final ButtonListener bl = new ButtonListener() {
@@ -121,7 +126,7 @@ public class Wargame extends ActivityStub {
 		};
 		
 		for (int i = 0; i < buyButtons.length; i++) {
-			Button b = new Button(width / 2 - Button.SQUARE_WIDTH * (buyButtons.length - i) - 10, -height / 2 + 5, Button.BROWN, Button.SQUARE).setToggle(Button.BEIGE);
+			Button b = new Button(width / 2 - UI.BTN_SQUARE_WIDTH * (buyButtons.length - i) - 10, -height / 2 + 5, UI.BROWN, UI.BTN_SQUARE).setToggle(UI.BEIGE);
 			b.setForeground(new Sprite(player.color, standing.getTile("palette99_" + Building.Type.values()[i].name() + "_Large_face0").regions.get(0)));
 			b.addListener(bl);
 			b.setPayload(Building.Type.values()[i]);
@@ -246,6 +251,7 @@ public class Wargame extends ActivityStub {
 		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(player.money), spriteRenderer);
 		textRenderer.setFont(0);
 		
+		panel.render(spriteRenderer);
 		for (Button b : buyButtons)
 			b.render(spriteRenderer);
 			

@@ -30,23 +30,6 @@ import de.dakror.wargame.util.Listeners.ButtonListener;
  * @author Maximilian Stark | Dakror
  */
 public class Button implements Renderable {
-	public static final String BEIGE = "_beige";
-	public static final String BROWN = "_brown";
-	public static final String BLUE = "_blue";
-	
-	public static final String LONG = "Long";
-	public static final String ROUND = "Round";
-	public static final String SQUARE = "Square";
-	
-	public static final int DEFAULT_SCALE = 3;
-	
-	public static final int LONG_WIDTH = 190 * DEFAULT_SCALE;
-	public static final int ROUND_WIDTH = 35 * DEFAULT_SCALE;
-	public static final int SQUARE_WIDTH = 45 * DEFAULT_SCALE;
-	
-	public static final int HEIGHT = 49 * DEFAULT_SCALE;
-	public static final int PRESSED_HEIGHT = 45 * DEFAULT_SCALE;
-	
 	TextureRegion background, backgroundPressed, backgroundDisabled;
 	TextureRegion backgroundToggle, backgroundTogglePressed, backgroundToggleDisabled;
 	Sprite foreground;
@@ -69,7 +52,7 @@ public class Button implements Renderable {
 		backgroundPressed = Wargame.ui.getTile("button" + type + color + "_pressed").regions.get(0);
 		backgroundDisabled = Wargame.ui.getTile("button" + type + "_grey").regions.get(0);
 		listeners = new ArrayList<ButtonListener>();
-		width = (int) (DEFAULT_SCALE * background.width * background.texture.width);
+		width = (int) (UI.DEFAULT_SCALE * background.width * background.texture.width);
 	}
 	
 	public Button setToggle(String toggleColor) {
@@ -82,19 +65,17 @@ public class Button implements Renderable {
 	
 	@Override
 	public void render(SpriteRenderer r) {
-		renderTextureRegion(x, y, toggled ? (disabled ? backgroundToggleDisabled : (pressed ? backgroundTogglePressed : backgroundToggle)) : (disabled ? backgroundDisabled : (pressed ? backgroundPressed : background)), r);
+		TextureRegion tr = toggled ? (disabled ? backgroundToggleDisabled : (pressed ? backgroundTogglePressed : backgroundToggle)) : (disabled ? backgroundDisabled : (pressed ? backgroundPressed : background));
+		r.render(x, y, 0, width, getHeight(), tr.x, tr.y, tr.width, tr.height, tr.texture.textureId);
+		
 		if (foreground != null) {
 			foreground.setX(x + 15);
 			foreground.setZ(0);
 			foreground.setWidth(width - 30);
 			foreground.setHeight(foreground.getSourceHeight() * (foreground.getWidth() / foreground.getSourceWidth()));
-			foreground.setY(y + (pressed ? PRESSED_HEIGHT - HEIGHT : 0) + 20);
+			foreground.setY(y + (pressed ? UI.BTN_PRESSED_HEIGHT - UI.BTN_HEIGHT : 0) + 20);
 			r.render(foreground);
 		}
-	}
-	
-	private void renderTextureRegion(int x, int y, TextureRegion tr, SpriteRenderer r) {
-		r.render(x, y, 0, width, getHeight(), tr.x, tr.y, tr.width, tr.height, tr.texture.textureId);
 	}
 	
 	public boolean onUp(MotionEvent e) {
@@ -122,7 +103,7 @@ public class Button implements Renderable {
 	}
 	
 	public boolean contains(MotionEvent e) {
-		return e.getX() - Wargame.width / 2 >= x && e.getX() - Wargame.width / 2 <= x + width && Wargame.height - e.getY() - Wargame.height / 2 >= y && Wargame.height - e.getY() - Wargame.height / 2 <= y + HEIGHT;
+		return e.getX() - Wargame.width / 2 >= x && e.getX() - Wargame.width / 2 <= x + width && Wargame.height - e.getY() - Wargame.height / 2 >= y && Wargame.height - e.getY() - Wargame.height / 2 <= y + UI.BTN_HEIGHT;
 	}
 	
 	public void addListener(ButtonListener listener) {
@@ -194,6 +175,6 @@ public class Button implements Renderable {
 	}
 	
 	public int getHeight() {
-		return pressed ? PRESSED_HEIGHT : HEIGHT;
+		return pressed ? UI.BTN_PRESSED_HEIGHT : UI.BTN_HEIGHT;
 	}
 }

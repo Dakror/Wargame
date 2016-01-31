@@ -18,6 +18,9 @@ package de.dakror.wargame.entity;
 
 import de.dakror.wargame.Player;
 import de.dakror.wargame.World;
+import de.dakror.wargame.render.SpriteRenderer;
+import de.dakror.wargame.render.TextRenderer;
+import de.dakror.wargame.ui.Panel;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -74,6 +77,10 @@ public class Building extends Entity {
 		public void onSelect(Building b) {}
 		
 		public void onDeselect(Building b) {}
+		
+		public void renderDetails(Panel p, SpriteRenderer r, TextRenderer t) {
+			t.renderText(p.getX() + 20, p.getY() + p.getHeight() - 60, 0, 0.8f, name(), r);
+		}
 	}
 	
 	protected Type type;

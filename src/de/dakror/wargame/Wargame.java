@@ -70,7 +70,7 @@ public class Wargame extends ActivityStub {
 	
 	Button[] buyButtons;
 	
-	Panel panel;
+	Panel detailsPanel;
 	
 	Building placeBuilding;
 	
@@ -102,8 +102,8 @@ public class Wargame extends ActivityStub {
 	
 	public void initHud() {
 		if (height == 0) return;
-		panel = new Panel(-width / 2 + 5, -height / 2 + 5, 400, 250, UI.BEIGE);
 		buyButtons = new Button[Building.Type.values().length];
+		detailsPanel = new Panel(-width / 2 + 5, -height / 2 + 5, 500, 300, UI.BEIGE);
 		
 		final ButtonListener bl = new ButtonListener() {
 			
@@ -126,7 +126,7 @@ public class Wargame extends ActivityStub {
 		};
 		
 		for (int i = 0; i < buyButtons.length; i++) {
-			Button b = new Button(width / 2 - UI.BTN_SQUARE_WIDTH * (buyButtons.length - i) - 10, -height / 2 + 5, UI.BROWN, UI.BTN_SQUARE).setToggle(UI.BEIGE);
+			Button b = new Button(width / 2 - UI.BTN_SQUARE_WIDTH * (buyButtons.length - i) - 15, -height / 2 + 15, UI.BROWN, UI.BTN_SQUARE).setToggle(UI.BEIGE);
 			b.setForeground(new Sprite(player.color, standing.getTile("palette99_" + Building.Type.values()[i].name() + "_Large_face0").regions.get(0)));
 			b.addListener(bl);
 			b.setPayload(Building.Type.values()[i]);
@@ -156,10 +156,12 @@ public class Wargame extends ActivityStub {
 		enemy = new Player("CPU", 1);
 		
 		Building myCity = new Building(5, 7, player, Type.City);
+		player.setMainCity(myCity);
 		world.addEntity(myCity);
 		world.center(myCity);
 		
 		Building theirCity = new Building(46, 23, enemy, Type.City);
+		enemy.setMainCity(theirCity);
 		world.addEntity(theirCity);
 		//		for (int i = 0; i < 15; i++) {
 		//			Unit u = new Unit(2 + i / 5f, 3 - (i % 2) * 0.5f, 0, Unit.Type.Infantry);
@@ -251,7 +253,11 @@ public class Wargame extends ActivityStub {
 		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(player.money), spriteRenderer);
 		textRenderer.setFont(0);
 		
-		panel.render(spriteRenderer);
+		if (placeBuilding != null) {
+			detailsPanel.render(spriteRenderer);
+			placeBuilding.getType().renderDetails(detailsPanel, spriteRenderer, textRenderer);
+		}
+		
 		for (Button b : buyButtons)
 			b.render(spriteRenderer);
 			

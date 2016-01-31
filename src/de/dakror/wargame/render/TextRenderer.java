@@ -114,6 +114,10 @@ public class TextRenderer {
 	}
 	
 	public void renderText(float x, float y, float z, float size, String text, SpriteRenderer r) {
+		renderText(x, y, z, size, Sprite.WHITE, text, r);
+	}
+	
+	public void renderText(float x, float y, float z, float size, float[] color, String text, SpriteRenderer r) {
 		float w = 0;
 		Font font = fonts.get(this.font);
 		for (int i = 0; i < text.length(); i++) {

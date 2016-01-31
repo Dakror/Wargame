@@ -85,6 +85,10 @@ public class SpriteRenderer {
 		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, WHITE, -1, texture);
 	}
 	
+	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, float[] color, int texture) {
+		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, color, -1, texture);
+	}
+	
 	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, float p, int texture) {
 		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, WHITE, p, texture);
 	}

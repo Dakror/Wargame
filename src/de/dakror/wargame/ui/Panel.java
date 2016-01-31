@@ -67,4 +67,20 @@ public class Panel implements Renderable {
 		
 		r.render(x + width - 20 * s, y + 25 * s, 0, 20 * s, height - 50 * s, bg.x + bg.width / 5 * 4, bg.y + bg.height / 4, bg.width / 5, bg.height / 2, bg.texture.textureId); //right
 	}
+	
+	public int getX() {
+		return x;
+	}
+	
+	public int getY() {
+		return y;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
 }

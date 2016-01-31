@@ -217,6 +217,17 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 		
 		float timeStep = Math.min(1.0f / fps, 1 / 60f);
 		GdxAI.getTimepiece().update(timeStep);
+		
+		if (vX != 0 && vY != 0) {
+			final float stop = 0.00001f;
+			
+			world.move(vX / scale, vY / scale);
+			if (vX != 0.0f) vX -= vX * 0.185f;
+			vX = Math.abs(vX) < stop ? 0 : vX;
+			if (vY != 0.0f) vY -= vY * 0.185f;
+			vY = Math.abs(vY) < stop ? 0 : vY;
+		}
+		
 		money += timeStep;
 		world.update(timeStep);
 		
@@ -284,7 +295,10 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 				float dx = x - prevX;
 				float dy = y - prevY;
 				
-				if (e.getPointerCount() == prevNum && !hudEvents) world.move(dx / scale * 60f / Math.max(fps, 25), dy / scale * 60f / Math.max(fps, 25));
+				if (e.getPointerCount() == prevNum && !hudEvents) {
+					vX = dx;
+					vY = dy;
+				}
 				break;
 		}
 		
@@ -349,6 +363,10 @@ public class Wargame extends Activity implements GLSurfaceView.Renderer, OnTouch
 	
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+		//		if (!hudEvents) {
+		//			vX = velocityX;
+		//			vY = velocityY;
+		//		}
 		return false;
 	}
 	

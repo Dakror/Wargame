@@ -22,6 +22,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.badlogic.gdx.ai.GdxAI;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
 import android.annotation.SuppressLint;
@@ -51,8 +52,8 @@ import de.dakror.wargame.util.Listeners.ButtonListener;
  * @author Maximilian Stark | Dakror
  */
 public class Wargame extends ActivityStub {
-	public static final float[] HALFWHITE = new float[] { 1, 1, 1, 0.5f };
-	public static final float[] HALFRED = new float[] { 1, 0, 0, 0.5f };
+	public static final Color HALFWHITE = new Color(1, 1, 1, 0.5f);
+	public static final Color HALFRED = new Color(1, 0, 0, 0.5f);
 	
 	public static TextureAtlas animation, standing, terrain, ui;
 	public static int height, width;
@@ -193,7 +194,7 @@ public class Wargame extends ActivityStub {
 	}
 	
 	@Override
-	public void onDrawFrame(GL10 gl) {
+	public synchronized void onDrawFrame(GL10 gl) {
 		if (System.currentTimeMillis() - lastTimestamp >= 1000) {
 			fps = frames;
 			frames = 0;

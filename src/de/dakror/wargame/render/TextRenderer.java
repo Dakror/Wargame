@@ -22,6 +22,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import com.badlogic.gdx.graphics.Color;
+
 import de.dakror.wargame.Wargame;
 
 /**
@@ -114,15 +116,15 @@ public class TextRenderer {
 	}
 	
 	public void renderText(float x, float y, float z, float size, String text, SpriteRenderer r) {
-		renderText(x, y, z, size, Sprite.WHITE, text, r);
+		renderText(x, y, z, size, Color.WHITE, text, r);
 	}
 	
-	public void renderText(float x, float y, float z, float size, float[] color, String text, SpriteRenderer r) {
+	public void renderText(float x, float y, float z, float size, Color color, String text, SpriteRenderer r) {
 		float w = 0;
 		Font font = fonts.get(this.font);
 		for (int i = 0; i < text.length(); i++) {
 			Glyph g = font.glyphs.get(text.charAt(i));
-			r.render(x + w + (g.advanceX - g.width) / 2 * size, y + (font.base - g.height - g.offsetY) * size, z, g.width * size, g.height * size, g.x / font.textureWidth, g.y / font.textureHeight, g.width / font.textureWidth, g.height / font.textureHeight, font.textureId);
+			r.render(x + w + (g.advanceX - g.width) / 2 * size, y + (font.base - g.height - g.offsetY) * size, z, g.width * size, g.height * size, g.x / font.textureWidth, g.y / font.textureHeight, g.width / font.textureWidth, g.height / font.textureHeight, color, font.textureId);
 			w += g.advanceX * size;
 		}
 	}

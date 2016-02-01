@@ -16,6 +16,8 @@
 
 package de.dakror.wargame.render;
 
+import com.badlogic.gdx.graphics.Color;
+
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 
 /**
@@ -27,14 +29,12 @@ public class Sprite {
 	protected float textureX, textureY, textureWidth, textureHeight;
 	protected float xOffset, yOffset, innerWidth, innerHeight;
 	protected float srcWidth, srcHeight;
-	protected float[] color;
+	protected Color color;
 	protected int textureId;
 	protected int paletteIndex;
 	
-	public static final float[] WHITE = new float[] { 1, 1, 1, 1 };
-	
 	public Sprite() {
-		color = WHITE;
+		color = Color.WHITE;
 	}
 	
 	public Sprite(float x, float y, float z, float width, float height) {
@@ -75,7 +75,7 @@ public class Sprite {
 		this.yOffset = yOffset;
 		this.innerWidth = innerWidth;
 		this.innerHeight = innerHeight;
-		color = WHITE;
+		color = Color.WHITE;
 		paletteIndex = -1;
 	}
 	
@@ -95,11 +95,11 @@ public class Sprite {
 		this.paletteIndex = paletteIndex;
 	}
 	
-	public void setColor(float[] color) {
+	public void setColor(Color color) {
 		this.color = color;
 	}
 	
-	public float[] getColor() {
+	public Color getColor() {
 		return color;
 	}
 	

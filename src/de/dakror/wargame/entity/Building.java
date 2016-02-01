@@ -16,11 +16,14 @@
 
 package de.dakror.wargame.entity;
 
+import com.badlogic.gdx.graphics.Color;
+
 import de.dakror.wargame.Player;
 import de.dakror.wargame.World;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.ui.Panel;
+import de.dakror.wargame.util.Colors;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -38,20 +41,47 @@ public class Building extends Entity {
 			
 			@Override
 			public void update(Building b, float timePassed) {
-				b.owner.money -= 1 / 10f * timePassed; // maintenance cost or whatever lmao
+				b.owner.money -= 6 / 60f * timePassed; // maintenance cost per minute
+			}
+			
+			@Override
+			public void renderDetails(Panel p, SpriteRenderer r, TextRenderer t) {
+				super.renderDetails(p, r, t);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 140, 0, 0.5f, Colors.KHAKI, "Run cost: 6$/min", r);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 180, 0, 0.5f, Color.ROYAL, "Function: 404", r);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 230, 0, 0.5f, Color.WHITE, "If your main city is", r);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 260, 0, 0.5f, Color.WHITE, "destroyed you lose!", r);
 			}
 		}, // main building
 		//		Dock(650, 90), // for ships
 		Estate(350, 1575) {
 			@Override
 			public void update(Building b, float timePassed) {
-				b.owner.money -= 2 / 10f * timePassed; // maintenance cost or whatever lmao
+				b.owner.money -= 12 / 60f * timePassed; // maintenance cost or whatever lmao
+			}
+			
+			@Override
+			public void renderDetails(Panel p, SpriteRenderer r, TextRenderer t) {
+				super.renderDetails(p, r, t);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 140, 0, 0.5f, Colors.KHAKI, "Run cost: 12$/min", r);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 180, 0, 0.5f, Color.ROYAL, "Trains Infantry", r);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 230, 0, 0.5f, Color.WHITE, "These soldiers do the", r);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 260, 0, 0.5f, Color.WHITE, "dirty work for you.", r);
 			}
 		}, // for troops
 		Factory(550, 450) {// for resources
 			@Override
 			public void update(Building b, float timePassed) {
-				b.owner.money += 5 * timePassed;
+				b.owner.money += 3 * timePassed;
+			}
+			
+			@Override
+			public void renderDetails(Panel p, SpriteRenderer r, TextRenderer t) {
+				super.renderDetails(p, r, t);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 140, 0, 0.5f, Colors.MINT, "Profits: 240$/min", r);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 180, 0, 0.5f, Color.ROYAL, "Produces cash", r);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 230, 0, 0.5f, Color.WHITE, "Printing money so you", r);
+				t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 260, 0, 0.5f, Color.WHITE, "have more (not really)", r);
 			}
 		},
 		//		Laboratory(450, 1000), // for science!!!!
@@ -79,7 +109,8 @@ public class Building extends Entity {
 		public void onDeselect(Building b) {}
 		
 		public void renderDetails(Panel p, SpriteRenderer r, TextRenderer t) {
-			t.renderText(p.getX() + 20, p.getY() + p.getHeight() - 60, 0, 0.8f, name(), r);
+			t.renderText(p.getX() + 20, p.getY() + p.getHeight() - 60, 0, 0.8f, Colors.MEDIUM_BLUE, name(), r);
+			t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 100, 0, 0.5f, Colors.DARK_RED, "Costs: $" + costs, r);
 		}
 	}
 	
@@ -136,7 +167,7 @@ public class Building extends Entity {
 	
 	@Override
 	public float getZ() {
-		return (world.getDepth() - z * 2 + x * 2) / 1024f + (color[3] < 1.0f ? 10 : 0) /*Wargame#placeBuilding*/;
+		return (world.getDepth() - z * 2 + x * 2) / 1024f + (color.a < 1.0f ? 10 : 0) /*Wargame#placeBuilding*/;
 	}
 	
 	@Override

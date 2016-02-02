@@ -30,9 +30,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import android.opengl.Matrix;
-import de.dakror.wargame.entity.Building;
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.Unit;
+import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.render.Renderable;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;

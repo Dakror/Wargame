@@ -14,40 +14,26 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.entity.building;
 
-import de.dakror.wargame.entity.building.Building;
+import de.dakror.wargame.Player;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Player {
-	public float money;
-	int color;
-	
-	String name;
-	
-	Building mainCity;
-	
-	public Player(String name, int color) {
-		this.name = name;
-		this.color = color;
-		money = 2000;
+public class City extends Building {
+	public City(int x, int z, Player owner) {
+		super(x, z, owner, Type.City);
+		hp = 1000;
+		buildCosts = 850;
+		runCosts = 6;
+		function = "Function: 404";
+		detail1 = "If your main city is";
+		detail2 = "destroyed you lose!";
 	}
 	
-	public int getColor() {
-		return color;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setMainCity(Building mainCity) {
-		this.mainCity = mainCity;
-	}
-	
-	public Building getMainCity() {
-		return mainCity;
+	@Override
+	public void onDeath() {
+		if (equals(owner.getMainCity())) System.out.println(owner.getName() + " lost.");
 	}
 }

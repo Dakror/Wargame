@@ -26,18 +26,18 @@ import de.dakror.wargame.render.TextureAtlas.Tile;
  * @author Maximilian Stark | Dakror
  */
 public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, Comparable<Entity> {
-	boolean dead;
+	protected boolean dead;
 	/**
 	 * 0 = X+<br>
 	 * 1 = Z-<br>
 	 * 2 = X-<br>
 	 * 3 = Z+<br>
 	 */
-	int face;
-	Tile[] faces;
-	boolean huge;
-	World world;
-	Player owner;
+	protected int face;
+	protected Tile[] faces;
+	protected boolean huge;
+	protected World world;
+	protected Player owner;
 	
 	public Entity(float x, float z, int face, Player owner, boolean huge, String name) {
 		this.x = x;

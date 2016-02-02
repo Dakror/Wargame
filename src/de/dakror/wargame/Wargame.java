@@ -35,8 +35,9 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import de.dakror.wargame.entity.Building;
-import de.dakror.wargame.entity.Building.Type;
+import de.dakror.wargame.entity.building.Building;
+import de.dakror.wargame.entity.building.Building.Type;
+import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.render.Sprite;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
@@ -119,7 +120,7 @@ public class Wargame extends ActivityStub {
 			@Override
 			public void onUp(Button b) {
 				if (b.isToggled()) {
-					placeBuilding = new Building(-5000, 0, player, (Type) b.getPayload());
+					placeBuilding = Building.create(-5000, 0, player, (Type) b.getPayload());
 					placeBuilding.setColor(HALFWHITE);
 					placeBuilding.setWorld(world);
 				} else placeBuilding = null;
@@ -156,12 +157,12 @@ public class Wargame extends ActivityStub {
 		player = new Player("Player", 0);
 		enemy = new Player("CPU", 1);
 		
-		Building myCity = new Building(5, 7, player, Type.City);
+		Building myCity = new City(5, 7, player);
 		player.setMainCity(myCity);
 		world.addEntity(myCity);
 		world.center(myCity);
 		
-		Building theirCity = new Building(46, 23, enemy, Type.City);
+		Building theirCity = new City(46, 23, enemy);
 		enemy.setMainCity(theirCity);
 		world.addEntity(theirCity);
 		//		for (int i = 0; i < 15; i++) {
@@ -234,7 +235,7 @@ public class Wargame extends ActivityStub {
 		
 		world.render(spriteRenderer);
 		if (placeBuilding != null) {
-			placeBuilding.setColor(player.money >= placeBuilding.getType().costs && world.canBuildOn((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) ? HALFWHITE : HALFRED);
+			placeBuilding.setColor(player.money >= placeBuilding.getBuildCosts() && world.canBuildOn((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) ? HALFWHITE : HALFRED);
 			spriteRenderer.render(placeBuilding);
 		}
 		world.updatePos();
@@ -256,7 +257,7 @@ public class Wargame extends ActivityStub {
 		
 		if (placeBuilding != null) {
 			detailsPanel.render(spriteRenderer);
-			placeBuilding.getType().renderDetails(detailsPanel, spriteRenderer, textRenderer);
+			placeBuilding.renderDetails(detailsPanel, spriteRenderer, textRenderer);
 		}
 		
 		for (Button b : buyButtons)
@@ -273,9 +274,9 @@ public class Wargame extends ActivityStub {
 				Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
 				if (pos.x >= 0 && pos.y >= 0) {
 					if (!single || (placeBuilding.getRealX() == (int) pos.x && placeBuilding.getRealZ() == (int) pos.y)) {
-						if (world.canBuildOn((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) && player.money >= placeBuilding.getType().costs) {
-							player.money -= placeBuilding.getType().costs;
-							world.addEntity(new Building((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), player, placeBuilding.getType()));
+						if (world.canBuildOn((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) && player.money >= placeBuilding.getBuildCosts()) {
+							player.money -= placeBuilding.getBuildCosts();
+							world.addEntity(Building.create((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), player, placeBuilding.getType()));
 							placeBuilding.setColor(HALFRED);
 						}
 					} else {

@@ -14,40 +14,21 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.entity.building;
 
-import de.dakror.wargame.entity.building.Building;
+import de.dakror.wargame.Player;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Player {
-	public float money;
-	int color;
-	
-	String name;
-	
-	Building mainCity;
-	
-	public Player(String name, int color) {
-		this.name = name;
-		this.color = color;
-		money = 2000;
-	}
-	
-	public int getColor() {
-		return color;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setMainCity(Building mainCity) {
-		this.mainCity = mainCity;
-	}
-	
-	public Building getMainCity() {
-		return mainCity;
+public class Estate extends Building {
+	public Estate(int x, int z, Player owner) {
+		super(x, z, owner, Type.Estate);
+		hp = 350;
+		buildCosts = 1575;
+		runCosts = 12;
+		function = "Trains Infantry";
+		detail1 = "These soldiers do the";
+		detail2 = "dirty work for you.";
 	}
 }

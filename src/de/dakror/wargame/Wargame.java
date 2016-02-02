@@ -74,7 +74,9 @@ public class Wargame extends ActivityStub {
 	
 	Panel detailsPanel;
 	
-	Building placeBuilding;
+	Building placeBuilding;//@off
+	public synchronized Building getPlaceBuilding(){ return placeBuilding; }
+	public synchronized void setPlaceBuilding(Building b){ placeBuilding = b; }//@on
 	
 	long lastFrame;
 	long lastTimestamp;
@@ -95,6 +97,7 @@ public class Wargame extends ActivityStub {
 		glView.setEGLContextClientVersion(2);
 		//		glView.setEGLConfigChooser(new MultisampleConfigChooser());
 		glView.setRenderer(this);
+		
 		glView.setOnTouchListener(this);
 		gestureDetector = new GestureDetector(this, this);
 		gestureDetector.setOnDoubleTapListener(this);
@@ -120,10 +123,11 @@ public class Wargame extends ActivityStub {
 			@Override
 			public void onUp(Button b) {
 				if (b.isToggled()) {
-					placeBuilding = Building.create(-5000, 0, player, (Type) b.getPayload());
-					placeBuilding.setColor(HALFWHITE);
-					placeBuilding.setWorld(world);
-				} else placeBuilding = null;
+					Building pb = Building.create(-5000, 0, player, (Type) b.getPayload());
+					pb.setColor(HALFWHITE);
+					pb.setWorld(world);
+					setPlaceBuilding(pb);
+				} else setPlaceBuilding(null);
 			}
 		};
 		
@@ -234,9 +238,9 @@ public class Wargame extends ActivityStub {
 		spriteRenderer.begin(viewProjMatrix);
 		
 		world.render(spriteRenderer);
-		if (placeBuilding != null) {
-			placeBuilding.setColor(player.money >= placeBuilding.getBuildCosts() && world.canBuildOn((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) ? HALFWHITE : HALFRED);
-			spriteRenderer.render(placeBuilding);
+		if (getPlaceBuilding() != null) {
+			getPlaceBuilding().setColor(player.money >= getPlaceBuilding().getBuildCosts() && world.canBuildOn((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ()) ? HALFWHITE : HALFRED);
+			spriteRenderer.render(getPlaceBuilding());
 		}
 		world.updatePos();
 		
@@ -255,33 +259,32 @@ public class Wargame extends ActivityStub {
 		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(player.money), spriteRenderer);
 		textRenderer.setFont(0);
 		
-		if (placeBuilding != null) {
+		if (getPlaceBuilding() != null) {
 			detailsPanel.render(spriteRenderer);
-			placeBuilding.renderDetails(detailsPanel, spriteRenderer, textRenderer);
+			getPlaceBuilding().renderDetails(detailsPanel, spriteRenderer, textRenderer);
 		}
 		
 		for (Button b : buyButtons)
 			b.render(spriteRenderer);
 			
 		spriteRenderer.end();
-		
 		frames++;
 	}
 	
 	public void tryToPlaceBuilding(MotionEvent e, boolean single) {
 		if (!hudEvents) {
-			if (placeBuilding != null) {
+			if (getPlaceBuilding() != null) {
 				Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
 				if (pos.x >= 0 && pos.y >= 0) {
-					if (!single || (placeBuilding.getRealX() == (int) pos.x && placeBuilding.getRealZ() == (int) pos.y)) {
-						if (world.canBuildOn((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ()) && player.money >= placeBuilding.getBuildCosts()) {
-							player.money -= placeBuilding.getBuildCosts();
-							world.addEntity(Building.create((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), player, placeBuilding.getType()));
-							placeBuilding.setColor(HALFRED);
+					if (!single || (getPlaceBuilding().getRealX() == (int) pos.x && getPlaceBuilding().getRealZ() == (int) pos.y)) {
+						if (world.canBuildOn((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ()) && player.money >= getPlaceBuilding().getBuildCosts()) {
+							player.money -= getPlaceBuilding().getBuildCosts();
+							world.addEntity(Building.create((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ(), player, getPlaceBuilding().getType()));
+							getPlaceBuilding().setColor(HALFRED);
 						}
 					} else {
-						placeBuilding.setX(pos.x);
-						placeBuilding.setZ(pos.y);
+						getPlaceBuilding().setX(pos.x);
+						getPlaceBuilding().setZ(pos.y);
 					}
 				}
 			}

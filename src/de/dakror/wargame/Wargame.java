@@ -274,7 +274,7 @@ public class Wargame extends ActivityStub {
 		frames++;
 	}
 	
-	public void tryToPlaceBuilding(MotionEvent e, boolean single) {
+	public boolean tryToPlaceBuilding(MotionEvent e, boolean single) {
 		if (!hudEvents) {
 			if (getPlaceBuilding() != null) {
 				Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
@@ -284,14 +284,18 @@ public class Wargame extends ActivityStub {
 							player.money -= getPlaceBuilding().getBuildCosts();
 							world.addEntity(Building.create((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ(), player, getPlaceBuilding().getType()));
 							getPlaceBuilding().setColor(HALFRED);
+							return true;
 						}
 					} else {
 						getPlaceBuilding().setX(pos.x);
 						getPlaceBuilding().setZ(pos.y);
+						return true;
 					}
 				}
 			}
 		}
+		
+		return false;
 	}
 	
 	public void clampScale() {
@@ -339,8 +343,12 @@ public class Wargame extends ActivityStub {
 	
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		tryToPlaceBuilding(e, true);
-		
+		if (tryToPlaceBuilding(e, true)) return true;
+		if (!hudEvents) {
+			Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
+			Building b = world.getBuildingAt((int) pos.x, (int) pos.y, null);
+			if (b != null) b.onSelect();
+		}
 		return false;
 	}
 	

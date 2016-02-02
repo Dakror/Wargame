@@ -250,6 +250,12 @@ public class World implements Renderable {
 		return new CanBuildResult();
 	}
 	
+	public Building getBuildingAt(int x, int z, Player optionalOwner) {
+		for (Entity e : buildings)
+			if (e.getRealX() == x && e.getRealZ() == z && (optionalOwner != null ? e.getOwner().equals(optionalOwner) : true)) return (Building) e;
+		return null;
+	}
+	
 	public Vector2 getMappedCoords(float screenX, float screenY) {
 		screenX = screenX / Wargame.scale - pos.x;
 		screenY = screenY / Wargame.scale - (pos.y - texHeight / 2 + HEIGHT / 2 + DEPTH / 2 * add);

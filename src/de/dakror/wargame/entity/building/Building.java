@@ -31,7 +31,7 @@ import de.dakror.wargame.util.Colors;
  *
  */
 public abstract class Building extends Entity {
-	public static enum Type {
+	public static enum Buildings {
 		//		Airport(750, 160), // for planes
 		//		Castle(2500, 325), // for defense
 		City,
@@ -40,7 +40,7 @@ public abstract class Building extends Entity {
 		//		Laboratory(450, 1000), // for science!!!!
 	}
 	
-	public static Building create(int x, int y, Player player, Type type) {
+	public static Building create(int x, int y, Player player, Buildings type) {
 		try {
 			return (Building) Class.forName(Building.class.getPackage().getName() + "." + type.name()).getConstructor(int.class, int.class, Player.class).newInstance(x, y, player);
 		} catch (Exception e) {
@@ -51,15 +51,15 @@ public abstract class Building extends Entity {
 	
 	protected int hp, buildCosts, runCosts;
 	protected String function, detail1, detail2;
-	protected Type type;
+	protected Buildings type;
 	
-	private Building(int x, int z, int face, Player owner, boolean huge, Type type) {
+	private Building(int x, int z, int face, Player owner, boolean huge, Buildings type) {
 		super(x, z, face, owner, huge, type.name());
 		this.type = type;
 		onCreate();
 	}
 	
-	public Building(int x, int z, Player owner, Type type) {
+	public Building(int x, int z, Player owner, Buildings type) {
 		this(x, z, 0, owner, false, type);
 	}
 	
@@ -70,7 +70,7 @@ public abstract class Building extends Entity {
 		
 		float texWidth = textureWidth * tile.regions.get(index).texture.width;
 		
-		width = (float) (Math.ceil(texWidth / World.WIDTH) * (World.WIDTH / 2));
+		width = (float) (Math.ceil(texWidth / World.WIDTH) * World.WIDTH);
 		height = (textureHeight * tile.regions.get(index).texture.height) * (width / texWidth);
 	}
 	
@@ -102,18 +102,13 @@ public abstract class Building extends Entity {
 		return runCosts;
 	}
 	
-	public Type getType() {
+	public Buildings getType() {
 		return type;
 	}
 	
 	@Override
-	public float getX() {
-		return (x + (huge ? 1 : 0)) * (World.WIDTH / 2) / 2 + z * (World.WIDTH / 2) / 2 + world.getPos().x + ((World.WIDTH / 2) - width) / 2;
-	}
-	
-	@Override
 	public float getY() {
-		return y * World.HEIGHT - (x + (huge ? 1 : 0)) * (World.DEPTH / 2) / 2 + z * (World.DEPTH / 2) / 2 + world.getPos().y + World.HEIGHT - 1;
+		return y * World.HEIGHT - (x + (huge ? 1 : 0)) * (World.DEPTH / 2) + z * (World.DEPTH / 2) + world.getPos().y;
 	}
 	
 	@Override

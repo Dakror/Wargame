@@ -130,12 +130,16 @@ public class TextRenderer {
 	}
 	
 	public void renderTextCentered(float x, float y, float z, float size, String text, SpriteRenderer r) {
+		renderTextCentered(x, y, z, size, Color.WHITE, text, r);
+	}
+	
+	public void renderTextCentered(float x, float y, float z, float size, Color color, String text, SpriteRenderer r) {
 		float w = 0;
 		Font font = fonts.get(this.font);
 		for (int i = 0; i < text.length(); i++) {
 			Glyph g = font.glyphs.get(text.charAt(i));
 			w += g.advanceX * size;
 		}
-		renderText(x - w / 2, y, z, size, text, r);
+		renderText(x - w / 2, y, z, size, color, text, r);
 	}
 }

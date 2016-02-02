@@ -33,6 +33,7 @@ import android.opengl.Matrix;
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.Unit;
 import de.dakror.wargame.entity.building.Building;
+import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.render.Renderable;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
@@ -42,7 +43,7 @@ import de.dakror.wargame.render.TextureAtlas.Tile;
  * @author Maximilian Stark | Dakror
  */
 public class World implements Renderable {
-	public static enum Type {
+	public static enum Terrain {
 		Air(false),
 		Basement(),
 		Custom0,
@@ -63,12 +64,32 @@ public class World implements Renderable {
 		
 		boolean solid;
 		
-		private Type() {
+		private Terrain() {
 			this(true);
 		}
 		
-		private Type(boolean solid) {
+		private Terrain(boolean solid) {
 			this.solid = solid;
+		}
+	}
+	
+	public static class CanBuildResult {
+		public boolean result;
+		/**
+		 * 0 nothing
+		 * 1 no space
+		 * 2 building there
+		 * 3 too far from city
+		 */
+		public int reason;
+		
+		public CanBuildResult() {
+			result = true;
+		}
+		
+		public CanBuildResult(int reason) {
+			result = false;
+			this.reason = reason;
 		}
 	}
 	
@@ -131,7 +152,7 @@ public class World implements Renderable {
 						for (int i = 0; i < width; i++) {
 							String s = line.substring(i, i + 1);
 							if (s.equals(" ")) s = "0";
-							set(i, z, Type.values()[Integer.valueOf(s, 16)]);
+							set(i, z, Terrain.values()[Integer.valueOf(s, 16)]);
 						}
 						z--;
 					}
@@ -145,7 +166,7 @@ public class World implements Renderable {
 	}
 	
 	void generate() {
-		Type[] t = { Type.Desert, Type.Forest, Type.Mountains, Type.River, Type.Tundra };
+		Terrain[] t = { Terrain.Desert, Terrain.Forest, Terrain.Mountains, Terrain.River, Terrain.Tundra };
 		for (int i = 0; i < width; i++)
 			for (int j = 0; j < depth; j++)
 				set(i, j, t[(int) (Math.random() * t.length)]);
@@ -204,21 +225,29 @@ public class World implements Renderable {
 		return x >= 0 && x < width && z >= 0 && z < depth;
 	}
 	
-	public boolean set(int x, int z, Type type) {
+	public boolean set(int x, int z, Terrain type) {
 		if (!isInBounds(x, z)) return false;
 		byte oldVal = map[x][z];
 		map[x][z] = (byte) type.ordinal();
-		return oldVal != map[x][z];
+		boolean ch = oldVal != map[x][z];
+		if (ch) dirty = true;
+		return ch;
 	}
 	
-	public boolean canBuildOn(int x, int z) {
-		if (!get((int) Math.floor(x / 2f), (int) Math.floor(z / 2f)).solid) return false;
+	public CanBuildResult canBuildOn(int x, int z) {
+		if (!get(x, z).solid) return new CanBuildResult(1);
 		
+		boolean anyCity = false;
 		for (Entity e : buildings) {
-			if (e.getRealX() == x && e.getRealZ() == z) return false;
+			if (e.getRealX() == x && e.getRealZ() == z) return new CanBuildResult(2);
+			if (e instanceof City) {
+				if (Vector2.dst(e.getRealX(), e.getRealZ(), x, z) <= ((City) e).getRadius()) anyCity = true;
+			}
 		}
 		
-		return true;
+		if (!anyCity) return new CanBuildResult(3);
+		
+		return new CanBuildResult();
 	}
 	
 	public Vector2 getMappedCoords(float screenX, float screenY) {
@@ -231,12 +260,12 @@ public class World implements Renderable {
 		int x = (int) Math.floor(screenX / WIDTH * 2 - screenY / DEPTH * 2 + width);
 		int z = (int) Math.floor(screenY / DEPTH * 2 + screenX / WIDTH * 2 + depth);
 		
-		return new Vector2(x, z);
+		return new Vector2(x / 2, z / 2);
 	}
 	
-	public Type get(int x, int z) {
-		if (!isInBounds(x, z)) return Type.Air;
-		return Type.values()[map[x][z]];
+	public Terrain get(int x, int z) {
+		if (!isInBounds(x, z)) return Terrain.Air;
+		return Terrain.values()[map[x][z]];
 	}
 	
 	public String getFile(int x, int z) {

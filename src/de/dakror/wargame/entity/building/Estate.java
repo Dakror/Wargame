@@ -23,7 +23,7 @@ import de.dakror.wargame.Player;
  */
 public class Estate extends Building {
 	public Estate(int x, int z, Player owner) {
-		super(x, z, owner, Type.Estate);
+		super(x, z, owner, Buildings.Estate);
 		hp = 350;
 		buildCosts = 1575;
 		runCosts = 12;

@@ -23,7 +23,7 @@ import de.dakror.wargame.Player;
  */
 public class Factory extends Building {
 	public Factory(int x, int z, Player owner) {
-		super(x, z, owner, Type.Factory);
+		super(x, z, owner, Buildings.Factory);
 		hp = 550;
 		buildCosts = 450;
 		runCosts = -240;

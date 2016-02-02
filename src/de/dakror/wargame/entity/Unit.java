@@ -53,7 +53,7 @@ public class Unit extends Entity implements Steerable<Vector2> {
 		Torpedo
 	}
 	
-	public static enum Type {
+	public static enum Units {
 		Infantry(20, 35, false, AttackKind.Machine_Gun, null, 1, 0, null),
 		
 		;
@@ -64,7 +64,7 @@ public class Unit extends Entity implements Steerable<Vector2> {
 		public final boolean superAvailable;
 		public final AttackKind weapon0, weapon1;
 		
-		private Type(int hp, int costs, boolean superAvailable, AttackKind weapon0, AttackKind weapon1, int receiveStrength0, int receiveStrength1, String alias) {
+		private Units(int hp, int costs, boolean superAvailable, AttackKind weapon0, AttackKind weapon1, int receiveStrength0, int receiveStrength1, String alias) {
 			this.hp = hp;
 			this.costs = costs;
 			this.superAvailable = superAvailable;
@@ -103,26 +103,26 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	float orientation;
 	Vector2 linearVelocity = new Vector2();
 	Vector2 pos = new Vector2();
-	Type type;
+	Units type;
 	SteeringBehavior<Vector2> steeringBehavior;
 	float scale = 0.5f;
 	
-	public Unit(float x, float z, int face, Player owner, boolean huge, Type type) {
+	public Unit(float x, float z, int face, Player owner, boolean huge, Units type) {
 		super(x, z, face, owner, huge, type.name());
 		this.type = type;
 		pos.set(x, z);
 		onCreate();
 	}
 	
-	public Unit(float x, float z, Player owner, Type type) {
+	public Unit(float x, float z, Player owner, Units type) {
 		this(x, z, 0, owner, type);
 	}
 	
-	public Unit(float x, float z, int face, Player owner, Type type) {
+	public Unit(float x, float z, int face, Player owner, Units type) {
 		this(x, z, face, owner, false, type);
 	}
 	
-	public Unit(float x, float z, Player owner, boolean huge, Type type) {
+	public Unit(float x, float z, Player owner, boolean huge, Units type) {
 		this(x, z, 0, owner, huge, type);
 	}
 	
@@ -171,12 +171,12 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	
 	@Override
 	public float getX() {
-		return (pos.x + (huge ? 1 : 0)) * (World.WIDTH / 2) / 2 + pos.y * (World.WIDTH / 2) / 2 + world.getPos().x - xOffset + ((World.WIDTH) - width) / 4;
+		return (pos.x + (huge ? 1 : 0)) * (World.WIDTH / 2) + pos.y * (World.WIDTH / 2) + world.getPos().x - xOffset + ((World.WIDTH) - width) / 4;
 	}
 	
 	@Override
 	public float getY() {
-		return 2 * World.HEIGHT - (pos.x + (huge ? 1 : 0)) * (World.DEPTH / 2) / 2 + pos.y * (World.DEPTH / 2) / 2 + world.getPos().y + yOffset * 2;
+		return 2 * World.HEIGHT - (pos.x + (huge ? 1 : 0)) * (World.DEPTH / 2) + pos.y * (World.DEPTH / 2) + world.getPos().y + yOffset * 2;
 	}
 	
 	@Override

@@ -17,19 +17,37 @@
 package de.dakror.wargame.entity.building;
 
 import de.dakror.wargame.Player;
+import de.dakror.wargame.World.Terrain;
 
 /**
  * @author Maximilian Stark | Dakror
  */
 public class City extends Building {
+	int radius;
+	
 	public City(int x, int z, Player owner) {
-		super(x, z, owner, Type.City);
+		super(x, z, owner, Buildings.City);
 		hp = 1000;
 		buildCosts = 850;
 		runCosts = 6;
-		function = "Function: 404";
-		detail1 = "If your main city is";
-		detail2 = "destroyed you lose!";
+		function = "Function: Claim land";
+		detail1 = "Enables you to place";
+		detail2 = "buildings around.";
+		radius = 4;
+	}
+	
+	@Override
+	public void onSpawn() {
+		for (int i = -radius; i <= radius; i++)
+			for (int j = -radius; j <= radius; j++)
+				if (Math.sqrt(i * i + j * j) < radius) world.set((int) x + i, (int) z + j, Terrain.Mountains);
+	}
+	
+	@Override
+	public void onSelect() {}
+	
+	public int getRadius() {
+		return radius;
 	}
 	
 	@Override

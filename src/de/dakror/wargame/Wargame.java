@@ -241,7 +241,7 @@ public class Wargame extends ActivityStub {
 		
 		CanBuildResult cbr = null;
 		if (getPlaceBuilding() != null) {
-			cbr = world.canBuildOn((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ());
+			cbr = world.canBuildOn((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ(), player);
 			getPlaceBuilding().setColor(player.money >= getPlaceBuilding().getBuildCosts() && cbr.result ? HALFWHITE : HALFRED);
 			spriteRenderer.render(getPlaceBuilding());
 		}
@@ -255,17 +255,16 @@ public class Wargame extends ActivityStub {
 		textRenderer.renderText(-width / 2, height / 2 - 30, 0, 0.5f, "FPS: " + fps, spriteRenderer);
 		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "E: " + world.rEntities + " / " + (world.buildings.size() + world.units.size()), spriteRenderer);
 		
-		textRenderer.renderText(-width / 2, height / 2 - 100, 0, 0.5f, "Player: " + player.money, spriteRenderer);
-		textRenderer.renderText(-width / 2, height / 2 - 130, 0, 0.5f, "CPU: " + enemy.money, spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 100, 0, 0.5f, "CPU: " + (int) Math.floor(enemy.money), spriteRenderer);
 		
 		textRenderer.setFont(1);
-		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + Math.round(player.money), spriteRenderer);
+		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + (int) Math.floor(player.money), spriteRenderer);
 		textRenderer.setFont(0);
 		
 		if (getPlaceBuilding() != null) {
 			detailsPanel.render(spriteRenderer);
 			getPlaceBuilding().renderDetails(detailsPanel, spriteRenderer, textRenderer);
-			if ((!cbr.result || player.money < placeBuilding.getBuildCosts()) && getPlaceBuilding().getRealX() >= 0) textRenderer.renderTextCentered(0, -height / 2 + 80, 0, 0.6f, Color.RED, player.money < placeBuilding.getBuildCosts() ? "Not enough money." : (cbr.reason == 1 ? "Can't place on non-solid ground." : (cbr.reason == 2 ? "Occupied by existing building." : "Too far away from nearest City.")), spriteRenderer);
+			if ((!cbr.result || player.money < placeBuilding.getBuildCosts()) && getPlaceBuilding().getRealX() >= 0) textRenderer.renderTextCentered(0, -height / 2 + 80, 0, 0.6f, Color.RED, player.money < placeBuilding.getBuildCosts() ? "Not enough money." : (cbr.reason == 1 ? "Can't place on non-solid ground." : (cbr.reason == 2 ? "Occupied by existing building." : "Too far away from nearest own City.")), spriteRenderer);
 		}
 		
 		for (Button b : buyButtons)
@@ -279,9 +278,9 @@ public class Wargame extends ActivityStub {
 		if (!hudEvents) {
 			if (getPlaceBuilding() != null) {
 				Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
-				if (pos.x >= 0 && pos.y >= 0) {
+				if (pos.x >= 0 && pos.y >= 0 && pos.x < world.getWidth() && pos.y < world.getDepth()) {
 					if (!single || (getPlaceBuilding().getRealX() == (int) pos.x && getPlaceBuilding().getRealZ() == (int) pos.y)) {
-						if (world.canBuildOn((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ()).result && player.money >= getPlaceBuilding().getBuildCosts()) {
+						if (world.canBuildOn((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ(), player).result && player.money >= getPlaceBuilding().getBuildCosts()) {
 							player.money -= getPlaceBuilding().getBuildCosts();
 							world.addEntity(Building.create((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ(), player, getPlaceBuilding().getType()));
 							getPlaceBuilding().setColor(HALFRED);

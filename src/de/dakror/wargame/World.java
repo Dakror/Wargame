@@ -234,13 +234,13 @@ public class World implements Renderable {
 		return ch;
 	}
 	
-	public CanBuildResult canBuildOn(int x, int z) {
+	public CanBuildResult canBuildOn(int x, int z, Player player) {
 		if (!get(x, z).solid) return new CanBuildResult(1);
 		
 		boolean anyCity = false;
 		for (Entity e : buildings) {
 			if (e.getRealX() == x && e.getRealZ() == z) return new CanBuildResult(2);
-			if (e instanceof City) {
+			if (e instanceof City && player.equals(e.getOwner())) {
 				if (Vector2.dst(e.getRealX(), e.getRealZ(), x, z) <= ((City) e).getRadius()) anyCity = true;
 			}
 		}

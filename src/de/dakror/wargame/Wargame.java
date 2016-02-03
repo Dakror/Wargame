@@ -75,7 +75,7 @@ public class Wargame extends ActivityStub {
 	
 	Panel detailsPanel;
 	
-	Building placeBuilding;
+	Building placeBuilding, selectedBuilding;
 	long lastFrame;
 	long lastTimestamp;
 	float prevX, prevY, prevNum;
@@ -269,17 +269,19 @@ public class Wargame extends ActivityStub {
 				//@off
 				String[] reason = (
 						cbr.reason == 3 ? 
-								new String[]{"Too far away from","nearest own City."} : 
+								new String[]{ "Too far away from", "nearest own City." } : 
 								(cbr.reason == 2 ? 
-										new String[]{"Occupied by","existing building."} :
+										new String[]{ "Occupied by", "existing building." } :
 										cbr.reason == 1 ? 
-												new String[]{"Can't place on","non-solid ground."} : 
-													new String[]{"Not enough money."}));
+												new String[]{ "Can't place on", "non-solid ground." } : 
+													new String[]{ "Not enough money." }));
 				//@on
 				for (int i = 0; i < reason.length; i++)
 					// (x1 + x2) / 2
 					textRenderer.renderTextCentered((-width / 2 + detailsPanel.getWidth() + width / 2 - buyButtons.length * UI.BTN_SQUARE_WIDTH + 10) / 2, -height / 2 + 80 - i * 30, 0, 0.6f, Color.RED, reason[i], spriteRenderer);
 			}
+		} else if (selectedBuilding != null) {
+			selectedBuilding.renderContextMenu(spriteRenderer, textRenderer);
 		}
 		
 		for (Button b : buyButtons)
@@ -301,6 +303,7 @@ public class Wargame extends ActivityStub {
 					Vector2 pos = world.getMappedCoords(lastSingleTap.getX() - width / 2, height - lastSingleTap.getY() - height / 2);
 					Building b = world.getBuildingAt((int) pos.x, (int) pos.y, null);
 					if (b != null) b.onSelect();
+					selectedBuilding = b;
 				}
 			}
 			lastSingleTap = null;

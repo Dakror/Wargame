@@ -81,6 +81,8 @@ public abstract class Building extends Entity {
 		owner.money -= runCosts / 60f * timePassed;
 	}
 	
+	public void renderContextMenu(SpriteRenderer r, TextRenderer t) {}
+	
 	public void renderDetails(Panel p, SpriteRenderer r, TextRenderer t) {
 		t.renderText(p.getX() + 20, p.getY() + p.getHeight() - 60, 0, 0.8f, Colors.MEDIUM_BLUE, type.name(), r);
 		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 100, 0, 0.5f, Colors.DARK_RED, "Costs: $" + buildCosts, r);

@@ -36,6 +36,8 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import de.dakror.wargame.World.CanBuildResult;
+import de.dakror.wargame.entity.Unit;
+import de.dakror.wargame.entity.Unit.Units;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.Buildings;
 import de.dakror.wargame.entity.building.City;
@@ -173,12 +175,12 @@ public class Wargame extends ActivityStub {
 		//			world.addEntity(u);
 		//		}
 		
-		//		Unit v = new Unit(0, 2, 0, Unit.Type.Infantry);
-		//		
+		Unit v = new Unit(0, 2, player, Units.Infantry);
+		
 		//		SteeringBehavior<Vector2> sb = new Pursue<Vector2>(u, v, 0.3f)/*.setTarget(new WorldLocation(new Vector3(2, 2, 0), 0))/*.setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f)*/;
 		//		u.setSteeringBehavior(sb);
 		//		v.setSteeringBehavior(new Arrive<Vector2>(v).setTarget(new WorldLocation(new Vector2(6, 6), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f));
-		//		map.addEntity(v);
+		world.addEntity(v);
 		//		map.addEntity(u);
 	}
 	

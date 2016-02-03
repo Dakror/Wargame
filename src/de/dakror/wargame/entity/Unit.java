@@ -38,8 +38,6 @@ public class Unit extends Entity implements Steerable<Vector2> {
 		public UnitTypeProximity(Unit owner, Array<Unit> agents) {
 			super(owner, agents);
 		}
-		
-		
 	}
 	
 	public static enum AttackKind {

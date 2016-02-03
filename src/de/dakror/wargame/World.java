@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -107,8 +106,9 @@ public class World implements Renderable {
 	protected int width, depth;
 	public int rEntities;
 	float add;
-	protected List<Unit> units;
-	protected List<Building> buildings;
+	
+	protected ArrayList<Unit> units = new ArrayList<Unit>();
+	protected ArrayList<Building> buildings = new ArrayList<Building>();
 	
 	int[] fbo = new int[1];
 	int[] rbo = new int[1];
@@ -173,9 +173,6 @@ public class World implements Renderable {
 	}
 	
 	void init() {
-		units = Collections.synchronizedList(new ArrayList<Unit>());
-		buildings = Collections.synchronizedList(new ArrayList<Building>());
-		
 		add = (width - depth - 2) * -0.5f;
 		
 		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
@@ -234,6 +231,15 @@ public class World implements Renderable {
 		return ch;
 	}
 	
+	public boolean replace(int x, int z, Terrain from, Terrain to) {
+		if (!isInBounds(x, z) || get(x, z) != from) return false;
+		byte oldVal = map[x][z];
+		map[x][z] = (byte) to.ordinal();
+		boolean ch = oldVal != map[x][z];
+		if (ch) dirty = true;
+		return ch;
+	}
+	
 	public CanBuildResult canBuildOn(int x, int z, Player player) {
 		if (!get(x, z).solid) return new CanBuildResult(1);
 		
@@ -241,7 +247,7 @@ public class World implements Renderable {
 		for (Entity e : buildings) {
 			if (e.getRealX() == x && e.getRealZ() == z) return new CanBuildResult(2);
 			if (e instanceof City && player.equals(e.getOwner())) {
-				if (Vector2.dst(e.getRealX(), e.getRealZ(), x, z) <= ((City) e).getRadius()) anyCity = true;
+				if (Vector2.dst(e.getRealX(), e.getRealZ(), x, z) < ((City) e).getRadius()) anyCity = true;
 			}
 		}
 		
@@ -342,7 +348,7 @@ public class World implements Renderable {
 		pos.set(newPos);
 	}
 	
-	public synchronized <E extends Entity> int render(Iterable<E> arr, SpriteRenderer r) {
+	public <E extends Entity> int render(Iterable<E> arr, SpriteRenderer r) {
 		int rEntities = 0;
 		for (Entity e : arr) {
 			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {

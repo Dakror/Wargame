@@ -38,9 +38,11 @@ public class City extends Building {
 	
 	@Override
 	public void onSpawn() {
-		for (int i = -radius; i <= radius; i++)
-			for (int j = -radius; j <= radius; j++)
-				if (Math.sqrt(i * i + j * j) < radius) world.set((int) x + i, (int) z + j, Terrain.Mountains);
+		if (owner.isHuman()) {
+			for (int i = -radius; i <= radius; i++)
+				for (int j = -radius; j <= radius; j++)
+					if (Math.sqrt(i * i + j * j) < radius) world.replace((int) x + i, (int) z + j, Terrain.Forest, Terrain.Mountains);
+		}
 	}
 	
 	@Override

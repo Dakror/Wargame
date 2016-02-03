@@ -23,16 +23,22 @@ import de.dakror.wargame.entity.building.Building;
  */
 public class Player {
 	public float money;
+	boolean human;
 	int color;
 	
 	String name;
 	
 	Building mainCity;
 	
-	public Player(String name, int color) {
+	public Player(String name, boolean human, int color) {
 		this.name = name;
+		this.human = human;
 		this.color = color;
 		money = 2000;
+	}
+	
+	public boolean isHuman() {
+		return human;
 	}
 	
 	public int getColor() {

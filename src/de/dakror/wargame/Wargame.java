@@ -75,10 +75,7 @@ public class Wargame extends ActivityStub {
 	
 	Panel detailsPanel;
 	
-	Building placeBuilding;//@off
-	public synchronized Building getPlaceBuilding(){ return placeBuilding; }
-	public synchronized void setPlaceBuilding(Building b){ placeBuilding = b; }//@on
-	
+	Building placeBuilding;
 	long lastFrame;
 	long lastTimestamp;
 	float prevX, prevY, prevNum;
@@ -88,6 +85,8 @@ public class Wargame extends ActivityStub {
 	public static Player player, enemy;
 	
 	boolean hudEvents = false;
+	
+	MotionEvent lastTouchEvent, lastSingleTap, lastDoubleTap;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -126,8 +125,8 @@ public class Wargame extends ActivityStub {
 					Building pb = Building.create(-5000, 0, player, (Buildings) b.getPayload());
 					pb.setColor(HALFWHITE);
 					pb.setWorld(world);
-					setPlaceBuilding(pb);
-				} else setPlaceBuilding(null);
+					placeBuilding = pb;
+				} else placeBuilding = null;
 			}
 		};
 		
@@ -158,8 +157,8 @@ public class Wargame extends ActivityStub {
 		
 		world = new World("maps/lake.map");
 		
-		player = new Player("Player", 0);
-		enemy = new Player("CPU", 1);
+		player = new Player("Player", true, 0);
+		enemy = new Player("CPU", false, 1);
 		
 		Building myCity = new City(2, 3, player);
 		player.setMainCity(myCity);
@@ -199,12 +198,14 @@ public class Wargame extends ActivityStub {
 	}
 	
 	@Override
-	public synchronized void onDrawFrame(GL10 gl) {
+	public void onDrawFrame(GL10 gl) {
 		if (System.currentTimeMillis() - lastTimestamp >= 1000) {
 			fps = frames;
 			frames = 0;
 			lastTimestamp = System.currentTimeMillis();
 		}
+		
+		handleInput();
 		
 		float timeStep = Math.min(1.0f / fps, 1 / 60f);
 		GdxAI.getTimepiece().update(timeStep);
@@ -240,10 +241,10 @@ public class Wargame extends ActivityStub {
 		world.render(spriteRenderer);
 		
 		CanBuildResult cbr = null;
-		if (getPlaceBuilding() != null) {
-			cbr = world.canBuildOn((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ(), player);
-			getPlaceBuilding().setColor(player.money >= getPlaceBuilding().getBuildCosts() && cbr.result ? HALFWHITE : HALFRED);
-			spriteRenderer.render(getPlaceBuilding());
+		if (placeBuilding != null) {
+			cbr = world.canBuildOn((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), player);
+			placeBuilding.setColor(player.money >= placeBuilding.getBuildCosts() && cbr.result ? HALFWHITE : HALFRED);
+			spriteRenderer.render(placeBuilding);
 		}
 		world.updatePos();
 		
@@ -261,10 +262,24 @@ public class Wargame extends ActivityStub {
 		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + (int) Math.floor(player.money), spriteRenderer);
 		textRenderer.setFont(0);
 		
-		if (getPlaceBuilding() != null) {
+		if (placeBuilding != null) {
 			detailsPanel.render(spriteRenderer);
-			getPlaceBuilding().renderDetails(detailsPanel, spriteRenderer, textRenderer);
-			if ((!cbr.result || player.money < placeBuilding.getBuildCosts()) && getPlaceBuilding().getRealX() >= 0) textRenderer.renderTextCentered(0, -height / 2 + 80, 0, 0.6f, Color.RED, player.money < placeBuilding.getBuildCosts() ? "Not enough money." : (cbr.reason == 1 ? "Can't place on non-solid ground." : (cbr.reason == 2 ? "Occupied by existing building." : "Too far away from nearest own City.")), spriteRenderer);
+			placeBuilding.renderDetails(detailsPanel, spriteRenderer, textRenderer);
+			if ((!cbr.result || player.money < placeBuilding.getBuildCosts()) && placeBuilding.getRealX() >= 0) {
+				//@off
+				String[] reason = (
+						cbr.reason == 3 ? 
+								new String[]{"Too far away from","nearest own City."} : 
+								(cbr.reason == 2 ? 
+										new String[]{"Occupied by","existing building."} :
+										cbr.reason == 1 ? 
+												new String[]{"Can't place on","non-solid ground."} : 
+													new String[]{"Not enough money."}));
+				//@on
+				for (int i = 0; i < reason.length; i++)
+					// (x1 + x2) / 2
+					textRenderer.renderTextCentered((-width / 2 + detailsPanel.getWidth() + width / 2 - buyButtons.length * UI.BTN_SQUARE_WIDTH + 10) / 2, -height / 2 + 80 - i * 30, 0, 0.6f, Color.RED, reason[i], spriteRenderer);
+			}
 		}
 		
 		for (Button b : buyButtons)
@@ -274,21 +289,76 @@ public class Wargame extends ActivityStub {
 		frames++;
 	}
 	
+	public void handleInput() {
+		if (lastTouchEvent != null) {
+			gestureDetector.onTouchEvent(lastTouchEvent);
+			scaleGestureDetector.onTouchEvent(lastTouchEvent);
+		}
+		
+		if (lastSingleTap != null) {
+			if (!tryToPlaceBuilding(lastSingleTap, true)) {
+				if (!hudEvents) {
+					Vector2 pos = world.getMappedCoords(lastSingleTap.getX() - width / 2, height - lastSingleTap.getY() - height / 2);
+					Building b = world.getBuildingAt((int) pos.x, (int) pos.y, null);
+					if (b != null) b.onSelect();
+				}
+			}
+			lastSingleTap = null;
+		}
+		
+		if (lastDoubleTap != null) {
+			tryToPlaceBuilding(lastDoubleTap, false);
+			lastDoubleTap = null;
+		}
+		
+		if (lastTouchEvent != null) {
+			float x = lastTouchEvent.getX();
+			float y = lastTouchEvent.getY();
+			
+			switch (lastTouchEvent.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					for (Button b : buyButtons)
+						if (b.onDown(lastTouchEvent)) hudEvents = true;
+					break;
+				case MotionEvent.ACTION_UP:
+					for (Button b : buyButtons)
+						if (b.onUp(lastTouchEvent)) hudEvents = false;
+						
+					break;
+				case MotionEvent.ACTION_MOVE:
+					
+					float dx = x - prevX;
+					float dy = y - prevY;
+					
+					if (lastTouchEvent.getPointerCount() == prevNum && !hudEvents) {
+						vX = dx;
+						vY = dy;
+					}
+					break;
+			}
+			
+			prevX = x;
+			prevY = y;
+			prevNum = lastTouchEvent.getPointerCount();
+			lastTouchEvent = null;
+		}
+	}
+	
 	public boolean tryToPlaceBuilding(MotionEvent e, boolean single) {
 		if (!hudEvents) {
-			if (getPlaceBuilding() != null) {
+			if (placeBuilding != null) {
 				Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
 				if (pos.x >= 0 && pos.y >= 0 && pos.x < world.getWidth() && pos.y < world.getDepth()) {
-					if (!single || (getPlaceBuilding().getRealX() == (int) pos.x && getPlaceBuilding().getRealZ() == (int) pos.y)) {
-						if (world.canBuildOn((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ(), player).result && player.money >= getPlaceBuilding().getBuildCosts()) {
-							player.money -= getPlaceBuilding().getBuildCosts();
-							world.addEntity(Building.create((int) getPlaceBuilding().getRealX(), (int) getPlaceBuilding().getRealZ(), player, getPlaceBuilding().getType()));
-							getPlaceBuilding().setColor(HALFRED);
+					if (!single || (placeBuilding.getRealX() == (int) pos.x && placeBuilding.getRealZ() == (int) pos.y)) {
+						if (world.canBuildOn((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), player).result && player.money >= placeBuilding.getBuildCosts()) {
+							player.money -= placeBuilding.getBuildCosts();
+							world.addEntity(Building.create((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), player, placeBuilding.getType()));
+							placeBuilding.setColor(HALFRED);
 							return true;
 						}
 					} else {
-						getPlaceBuilding().setX(pos.x);
-						getPlaceBuilding().setZ(pos.y);
+						placeBuilding.setX(pos.x);
+						placeBuilding.setZ(pos.y);
 						return true;
 					}
 				}
@@ -307,55 +377,20 @@ public class Wargame extends ActivityStub {
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouch(View v, MotionEvent e) {
-		gestureDetector.onTouchEvent(e);
-		scaleGestureDetector.onTouchEvent(e);
-		float x = e.getX();
-		float y = e.getY();
-		
-		switch (e.getAction()) {
-			case MotionEvent.ACTION_DOWN:
-				for (Button b : buyButtons)
-					if (b.onDown(e)) hudEvents = true;
-				break;
-			case MotionEvent.ACTION_UP:
-				for (Button b : buyButtons)
-					if (b.onUp(e)) hudEvents = false;
-					
-				break;
-			case MotionEvent.ACTION_MOVE:
-				
-				float dx = x - prevX;
-				float dy = y - prevY;
-				
-				if (e.getPointerCount() == prevNum && !hudEvents) {
-					vX = dx;
-					vY = dy;
-				}
-				break;
-		}
-		
-		prevX = x;
-		prevY = y;
-		prevNum = e.getPointerCount();
-		
+		lastTouchEvent = e;
 		return true;
 	}
 	
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		if (tryToPlaceBuilding(e, true)) return true;
-		if (!hudEvents) {
-			Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
-			Building b = world.getBuildingAt((int) pos.x, (int) pos.y, null);
-			if (b != null) b.onSelect();
-		}
-		return false;
+		lastSingleTap = e;
+		return true;
 	}
 	
 	@Override
 	public boolean onDoubleTap(MotionEvent e) {
-		tryToPlaceBuilding(e, false);
-		return false;
+		lastDoubleTap = e;
+		return true;
 	}
 	
 	@Override
@@ -369,6 +404,11 @@ public class Wargame extends ActivityStub {
 	@Override
 	public boolean onScaleBegin(ScaleGestureDetector detector) {
 		return true;
+	}
+	
+	@Override
+	public void onLongPress(MotionEvent e) {
+		player.money += 1000;
 	}
 	
 	@TargetApi(Build.VERSION_CODES.KITKAT)

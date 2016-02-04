@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2015 Maximilian Stark | Dakror <mail@dakror.de>
+ * Copyright 2016 Maximilian Stark | Dakror <mail@dakror.de>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import de.dakror.wargame.Player;
 import de.dakror.wargame.Wargame;
 import de.dakror.wargame.entity.Unit.Units;
 import de.dakror.wargame.render.Sprite;
+import de.dakror.wargame.render.SpriteRenderer;
+import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.ui.Button;
 import de.dakror.wargame.ui.ContextMenu;
 import de.dakror.wargame.util.Listeners.ButtonListener;
@@ -36,7 +38,12 @@ public class Estate extends Building {
 		function = "Trains Infantry";
 		detail1 = "These soldiers do the";
 		detail2 = "dirty work for you.";
-		contextMenu = new ContextMenu(500, 300, this);
+		contextMenu = new ContextMenu(500, 300, this) {
+			@Override
+			public void render(SpriteRenderer r, TextRenderer t) {
+				super.render(r, t);
+			}
+		};
 		contextMenu.addButton(new Button(1, new Sprite(owner.getColor(), Wargame.standing.getTile("palette99_" + Units.values()[0].name() + "_Large_face0").regions.get(0)), new ButtonListener() {
 			@Override
 			public void onDown(Button b) {}

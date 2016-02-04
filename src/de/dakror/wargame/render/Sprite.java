@@ -29,13 +29,11 @@ public class Sprite {
 	protected float textureX, textureY, textureWidth, textureHeight;
 	protected float xOffset, yOffset, innerWidth, innerHeight;
 	protected float srcWidth, srcHeight;
-	protected Color color;
+	protected Color color = new Color(Color.WHITE), additive = new Color(Color.BLACK);
 	protected int textureId;
 	protected int paletteIndex;
 	
-	public Sprite() {
-		color = Color.WHITE;
-	}
+	public Sprite() {}
 	
 	public Sprite(float x, float y, float z, float width, float height) {
 		this(x, y, z, width, height, 0, 0, 1, 1);
@@ -75,7 +73,6 @@ public class Sprite {
 		this.yOffset = yOffset;
 		this.innerWidth = innerWidth;
 		this.innerHeight = innerHeight;
-		color = Color.WHITE;
 		paletteIndex = -1;
 	}
 	
@@ -101,6 +98,14 @@ public class Sprite {
 	
 	public Color getColor() {
 		return color;
+	}
+	
+	public void setAdditive(Color additive) {
+		this.additive = additive;
+	}
+	
+	public Color getAdditive() {
+		return additive;
 	}
 	
 	public int getTextureId() {

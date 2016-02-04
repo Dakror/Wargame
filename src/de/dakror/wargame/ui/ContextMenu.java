@@ -19,6 +19,8 @@ package de.dakror.wargame.ui;
 import java.util.ArrayList;
 
 import android.view.MotionEvent;
+import de.dakror.wargame.Wargame;
+import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.render.Renderable;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
@@ -31,13 +33,17 @@ public class ContextMenu implements Renderable, TouchListener {
 	Panel panel;
 	ArrayList<Button> buttons = new ArrayList<Button>();
 	int width, height;
+	Entity entity;
 	
-	public ContextMenu() {}
+	public ContextMenu(Entity entity) {
+		this.entity = entity;
+	}
 	
-	public ContextMenu(int width, int height) {
+	public ContextMenu(int width, int height, Entity entity) {
 		this.width = width;
 		this.height = height;
-		panel = new Panel(0, 0, width, height, UI.BEIGE);
+		this.entity = entity;
+		panel = new Panel(-Wargame.width / 2, -Wargame.height / 2, width, height, UI.BEIGE);
 	}
 	
 	public void addButton(Button b) {
@@ -47,23 +53,29 @@ public class ContextMenu implements Renderable, TouchListener {
 	@Override
 	public boolean onDown(MotionEvent e) {
 		boolean u = false;
-		for (Button b : buttons)
-			if (b.onDown(e)) u = true;
+		if (entity.getOwner().isHuman()) {
+			for (Button b : buttons)
+				if (b.onDown(e)) u = true;
+		}
 		return u;
 	}
 	
 	@Override
 	public boolean onUp(MotionEvent e) {
 		boolean u = false;
-		for (Button b : buttons)
-			if (b.onUp(e)) u = true;
+		if (entity.getOwner().isHuman()) {
+			for (Button b : buttons)
+				if (b.onUp(e)) u = true;
+		}
 		return u;
 	}
 	
 	@Override
 	public void render(SpriteRenderer r, TextRenderer t) {
 		if (panel != null) panel.render(r, t);
-		for (Button b : buttons)
-			b.render(r, t);
+		if (entity.getOwner().isHuman()) {
+			for (Button b : buttons)
+				b.render(r, t);
+		}
 	}
 }

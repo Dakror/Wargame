@@ -57,6 +57,9 @@ public abstract class Building extends Entity implements TouchListener {
 	protected Buildings type;
 	protected ContextMenu contextMenu;
 	
+	boolean selected = false;
+	float time = 0;
+	
 	private Building(int x, int z, int face, Player owner, boolean huge, Buildings type) {
 		super(x, z, face, owner, huge, type.name());
 		this.type = type;
@@ -81,12 +84,16 @@ public abstract class Building extends Entity implements TouchListener {
 	@Override
 	public void update(float timePassed) {
 		super.update(timePassed);
-		
+		if (selected) {
+			additive.r = (float) (Math.sin(time += timePassed * 4) * 0.125f + 0.125f);
+			additive.g = additive.r;
+			additive.b = additive.r;
+		}
 		owner.money -= runCosts / 60f * timePassed;
 	}
 	
 	public void renderContextMenu(SpriteRenderer r, TextRenderer t) {
-		contextMenu.render(r, t);
+		if (contextMenu != null) contextMenu.render(r, t);
 	}
 	
 	public void renderDetails(Panel p, SpriteRenderer r, TextRenderer t) {
@@ -100,12 +107,14 @@ public abstract class Building extends Entity implements TouchListener {
 	
 	@Override
 	public boolean onDown(MotionEvent e) {
-		return contextMenu.onDown(e);
+		if (contextMenu != null) return contextMenu.onDown(e);
+		return false;
 	}
 	
 	@Override
 	public boolean onUp(MotionEvent e) {
-		return contextMenu.onUp(e);
+		if (contextMenu != null) return contextMenu.onUp(e);
+		return false;
 	}
 	
 	public int getHp() {
@@ -114,6 +123,10 @@ public abstract class Building extends Entity implements TouchListener {
 	
 	public int getBuildCosts() {
 		return buildCosts;
+	}
+	
+	public ContextMenu getContextMenu() {
+		return contextMenu;
 	}
 	
 	public int getRunCosts() {
@@ -147,8 +160,13 @@ public abstract class Building extends Entity implements TouchListener {
 	public void onRemoval() {}
 	
 	@Override
-	public void onSelect() {}
+	public void onSelect() {
+		selected = true;
+	}
 	
 	@Override
-	public void onDeselect() {}
+	public void onDeselect() {
+		selected = false;
+		additive.set(Color.BLACK);
+	}
 }

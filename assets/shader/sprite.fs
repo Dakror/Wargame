@@ -15,6 +15,7 @@ uniform sampler2D terrain;
 
 varying vec2 vTex;
 varying vec4 vCol;
+varying vec4 vAdd;
 varying float vPal;
 
 void main() {
@@ -36,7 +37,5 @@ void main() {
 		//else 
 		col = vec4(0.0); 
 	}
-//if(col.a < 0.25) discard;
-
-	gl_FragColor = col * vCol;//vec4(col.rgb,1);
+	gl_FragColor = col * vCol + vec4(vAdd.rgb,0);
 }

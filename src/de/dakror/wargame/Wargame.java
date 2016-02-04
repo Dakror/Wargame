@@ -130,7 +130,7 @@ public class Wargame extends ActivityStub {
 		};
 		
 		for (int i = 0; i < buyButtons.length; i++)
-			buyButtons[i] = new Button(buyButtons.length - i, new Sprite(player.color, standing.getTile("palette99_" + Building.Buildings.values()[i].name() + "_Large_face0").regions.get(0)), bl, Building.Buildings.values()[i]);
+			buyButtons[i] = new Button(buyButtons.length - i, new Sprite(player.color, standing.getTile("palette99_" + Buildings.values()[i].name() + "_Large_face0").regions.get(0)), bl, Building.Buildings.values()[i], true);
 	}
 	
 	@Override
@@ -278,9 +278,11 @@ public class Wargame extends ActivityStub {
 			selectedBuilding.renderContextMenu(spriteRenderer, textRenderer);
 		}
 		
-		for (Button b : buyButtons)
-			b.render(spriteRenderer, textRenderer);
-			
+		if (selectedBuilding == null) {
+			for (Button b : buyButtons)
+				b.render(spriteRenderer, textRenderer);
+		}
+		
 		spriteRenderer.end();
 		frames++;
 	}
@@ -292,13 +294,18 @@ public class Wargame extends ActivityStub {
 		}
 		
 		if (lastSingleTap != null) {
-			if (!tryToPlaceBuilding(lastSingleTap, true)) {
+			if (!tryToPlaceBuilding(lastSingleTap, true) && placeBuilding == null) {
 				if (!hudEvents) {
 					Vector2 pos = world.getMappedCoords(lastSingleTap.getX() - width / 2, height - lastSingleTap.getY() - height / 2);
 					Building b = world.getBuildingAt((int) pos.x, (int) pos.y, null);
+					
+					if (selectedBuilding != null) selectedBuilding.onDeselect();
 					if (b != null) b.onSelect();
 					selectedBuilding = b;
-				} else selectedBuilding = null;
+				}
+			} else {
+				if (selectedBuilding != null) selectedBuilding.onDeselect();
+				selectedBuilding = null;
 			}
 			lastSingleTap = null;
 		}
@@ -314,15 +321,17 @@ public class Wargame extends ActivityStub {
 			
 			switch (lastTouchEvent.getAction()) {
 				case MotionEvent.ACTION_DOWN:
-					for (Button b : buyButtons)
-						if (b.onDown(lastTouchEvent)) hudEvents = true;
-						
+					if (selectedBuilding == null) {
+						for (Button b : buyButtons)
+							if (b.onDown(lastTouchEvent)) hudEvents = true;
+					}
 					if (selectedBuilding != null && selectedBuilding.onDown(lastTouchEvent)) hudEvents = true;
 					break;
 				case MotionEvent.ACTION_UP:
-					for (Button b : buyButtons)
-						if (b.onUp(lastTouchEvent)) hudEvents = false;
-						
+					if (selectedBuilding == null) {
+						for (Button b : buyButtons)
+							if (b.onUp(lastTouchEvent)) hudEvents = false;
+					}
 					if (selectedBuilding != null && selectedBuilding.onUp(lastTouchEvent)) hudEvents = false;
 					break;
 				case MotionEvent.ACTION_MOVE:

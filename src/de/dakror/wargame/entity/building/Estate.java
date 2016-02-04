@@ -17,6 +17,12 @@
 package de.dakror.wargame.entity.building;
 
 import de.dakror.wargame.Player;
+import de.dakror.wargame.Wargame;
+import de.dakror.wargame.entity.Unit.Units;
+import de.dakror.wargame.render.Sprite;
+import de.dakror.wargame.ui.Button;
+import de.dakror.wargame.ui.ContextMenu;
+import de.dakror.wargame.util.Listeners.ButtonListener;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -30,5 +36,13 @@ public class Estate extends Building {
 		function = "Trains Infantry";
 		detail1 = "These soldiers do the";
 		detail2 = "dirty work for you.";
+		contextMenu = new ContextMenu(500, 300, this);
+		contextMenu.addButton(new Button(1, new Sprite(owner.getColor(), Wargame.standing.getTile("palette99_" + Units.values()[0].name() + "_Large_face0").regions.get(0)), new ButtonListener() {
+			@Override
+			public void onDown(Button b) {}
+			
+			@Override
+			public void onUp(Button b) {}
+		}, Units.values()[0], false));
 	}
 }

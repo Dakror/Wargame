@@ -30,7 +30,7 @@ import com.badlogic.gdx.graphics.Color;
  *
  */
 public class SpriteRenderer {
-	public static final int VERTEX_SIZE = 10 * 4;
+	public static final int VERTEX_SIZE = 14 * 4;
 	
 	final int kAboSize = 2048;
 	final int kEboSize = kAboSize + (kAboSize / 2);
@@ -41,7 +41,7 @@ public class SpriteRenderer {
 	
 	int[] palettes;
 	int[] uPalettes;
-	int aPos, aTex, aCol, aPal;
+	int aPos, aTex, aCol, aPal, aAdd;
 	int uTex, uMat;
 	
 	FloatBuffer vertices;
@@ -81,23 +81,23 @@ public class SpriteRenderer {
 	}
 	
 	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, int texture) {
-		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, Color.WHITE, -1, texture);
+		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, Color.WHITE, Color.BLACK, -1, texture);
 	}
 	
 	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, Color color, int texture) {
-		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, color, -1, texture);
+		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, color, Color.BLACK, -1, texture);
 	}
 	
 	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, float p, int texture) {
-		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, Color.WHITE, p, texture);
+		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, Color.WHITE, Color.BLACK, p, texture);
 	}
 	
 	public void render(Sprite sprite) {
-		if (sprite.getXOffset() != 0 && sprite.getYOffset() != 0 && sprite.getInnerWidth() != 0 && sprite.getInnerHeight() != 0) render(sprite.getX(), sprite.getY(), sprite.getZ() - 0.001f, sprite.getWidth(), sprite.getHeight(), 0, 0, 1, 1, 0, 0, sprite.getWidth(), sprite.getHeight(), Color.BLACK, 255, sprite.getTextureId());
-		render(sprite.getX(), sprite.getY(), sprite.getZ(), sprite.getWidth(), sprite.getHeight(), sprite.getTextureX(), sprite.getTextureY(), sprite.getTextureWidth(), sprite.getTextureHeight(), sprite.getXOffset(), sprite.getYOffset(), sprite.getInnerWidth(), sprite.getInnerHeight(), sprite.getColor(), sprite.getPaletteIndex(), sprite.getTextureId());
+		if (sprite.getXOffset() != 0 && sprite.getYOffset() != 0 && sprite.getInnerWidth() != 0 && sprite.getInnerHeight() != 0) render(sprite.getX(), sprite.getY(), sprite.getZ() - 0.001f, sprite.getWidth(), sprite.getHeight(), 0, 0, 1, 1, 0, 0, sprite.getWidth(), sprite.getHeight(), Color.BLACK, sprite.getAdditive(), 255, sprite.getTextureId());
+		render(sprite.getX(), sprite.getY(), sprite.getZ(), sprite.getWidth(), sprite.getHeight(), sprite.getTextureX(), sprite.getTextureY(), sprite.getTextureWidth(), sprite.getTextureHeight(), sprite.getXOffset(), sprite.getYOffset(), sprite.getInnerWidth(), sprite.getInnerHeight(), sprite.getColor(), sprite.getAdditive(), sprite.getPaletteIndex(), sprite.getTextureId());
 	}
 	
-	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, float xOff, float yOff, float innerW, float innerH, Color c, float p, int texture) {
+	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, float xOff, float yOff, float innerW, float innerH, Color c, Color a, float p, int texture) {
 		if (texture != lastTexture) {
 			if (lastTexture != 0) flush();
 			lastTexture = texture;
@@ -107,22 +107,22 @@ public class SpriteRenderer {
 		
 		boolean useOffset = xOff != 0 && yOff != 0 && innerW != 0 && innerH != 0;
 		if (useOffset) {
-			vertices.put(new float[] { x + xOff, y + yOff + innerH, z, tx, ty, c.r, c.g, c.b, c.a, p });
+			vertices.put(new float[] { x + xOff, y + yOff + innerH, z, tx, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
 			vertexIndex++;
-			vertices.put(new float[] { x + xOff, y + yOff, z, tx, ty + th, c.r, c.g, c.b, c.a, p });
+			vertices.put(new float[] { x + xOff, y + yOff, z, tx, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
 			vertexIndex++;
-			vertices.put(new float[] { x + xOff + innerW, y + yOff, z, tx + tw, ty + th, c.r, c.g, c.b, c.a, p });
+			vertices.put(new float[] { x + xOff + innerW, y + yOff, z, tx + tw, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
 			vertexIndex++;
-			vertices.put(new float[] { x + xOff + innerW, y + yOff + innerH, z, tx + tw, ty, c.r, c.g, c.b, c.a, p });
+			vertices.put(new float[] { x + xOff + innerW, y + yOff + innerH, z, tx + tw, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
 			vertexIndex++;
 		} else {
-			vertices.put(new float[] { x, y + h, z, tx, ty, c.r, c.g, c.b, c.a, p });
+			vertices.put(new float[] { x, y + h, z, tx, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
 			vertexIndex++;
-			vertices.put(new float[] { x, y, z, tx, ty + th, c.r, c.g, c.b, c.a, p });
+			vertices.put(new float[] { x, y, z, tx, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
 			vertexIndex++;
-			vertices.put(new float[] { x + w, y, z, tx + tw, ty + th, c.r, c.g, c.b, c.a, p });
+			vertices.put(new float[] { x + w, y, z, tx + tw, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
 			vertexIndex++;
-			vertices.put(new float[] { x + w, y + h, z, tx + tw, ty, c.r, c.g, c.b, c.a, p });
+			vertices.put(new float[] { x + w, y + h, z, tx + tw, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
 			vertexIndex++;
 		}
 		
@@ -136,6 +136,7 @@ public class SpriteRenderer {
 		aTex = glGetAttribLocation(program, "aTex");
 		aCol = glGetAttribLocation(program, "aCol");
 		aPal = glGetAttribLocation(program, "aPal");
+		aAdd = glGetAttribLocation(program, "aAdd");
 		uMat = glGetUniformLocation(program, "uMat");
 		uTex = glGetUniformLocation(program, "uTex");
 		
@@ -187,6 +188,9 @@ public class SpriteRenderer {
 		glEnableVertexAttribArray(aPal);
 		glVertexAttribPointer(aPal, 1, GL_FLOAT, false, VERTEX_SIZE, 9 * 4);
 		
+		glEnableVertexAttribArray(aAdd);
+		glVertexAttribPointer(aAdd, 4, GL_FLOAT, false, VERTEX_SIZE, 10 * 4);
+		
 		glDrawElements(GL_TRIANGLES, elementIndex, GL_UNSIGNED_SHORT, 0);
 		//		indices.clear();
 		elementIndex = 0;
@@ -197,6 +201,7 @@ public class SpriteRenderer {
 		glDisableVertexAttribArray(aTex);
 		glDisableVertexAttribArray(aCol);
 		glDisableVertexAttribArray(aPal);
+		glDisableVertexAttribArray(aAdd);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}

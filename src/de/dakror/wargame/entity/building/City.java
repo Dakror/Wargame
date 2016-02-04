@@ -45,11 +45,6 @@ public class City extends Building {
 		}
 	}
 	
-	@Override
-	public void onSelect() {
-		System.out.println("fee");
-	}
-	
 	public int getRadius() {
 		return radius;
 	}

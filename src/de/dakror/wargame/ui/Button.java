@@ -48,7 +48,7 @@ public class Button implements Renderable, TouchListener {
 	/**
 	 * Initialize typical buyButton (square)
 	 */
-	public Button(int index, Sprite foreground, ButtonListener listener, Object payload) {
+	public Button(int index, Sprite foreground, ButtonListener listener, Object payload, boolean toggle) {
 		color = UI.BROWN;
 		type = UI.BTN_SQUARE;
 		x = Wargame.width / 2 - UI.BTN_SQUARE_WIDTH * index - 15;
@@ -61,7 +61,7 @@ public class Button implements Renderable, TouchListener {
 		this.foreground = foreground;
 		this.payload = payload;
 		width = (int) (UI.DEFAULT_SCALE * background.width * background.texture.width);
-		setToggle(UI.BEIGE);
+		if (toggle) setToggle(UI.BEIGE);
 	}
 	
 	public Button(int x, int y, String color, String type) {
@@ -90,10 +90,15 @@ public class Button implements Renderable, TouchListener {
 		r.render(x, y, 0, width, getHeight(), tr.x, tr.y, tr.width, tr.height, tr.texture.textureId);
 		
 		if (foreground != null) {
-			foreground.setX(x + 15);
 			foreground.setZ(0);
-			foreground.setWidth(width - 30);
-			foreground.setHeight(foreground.getSourceHeight() * (foreground.getWidth() / foreground.getSourceWidth()));
+			if (foreground.getSourceWidth() > foreground.getSourceHeight()) {
+				foreground.setWidth(width - 30);
+				foreground.setHeight(foreground.getSourceHeight() * (foreground.getWidth() / foreground.getSourceWidth()));
+			} else {
+				foreground.setHeight(getHeight() - 30);
+				foreground.setWidth(foreground.getSourceWidth() * (foreground.getHeight() / foreground.getSourceHeight()));
+			}
+			foreground.setX(x + (width - foreground.getWidth()) / 2);
 			foreground.setY(y + (pressed ? UI.BTN_PRESSED_HEIGHT - UI.BTN_HEIGHT : 0) + 20);
 			r.render(foreground);
 		}
@@ -103,7 +108,7 @@ public class Button implements Renderable, TouchListener {
 	public boolean onUp(MotionEvent e) {
 		if (!disabled) {
 			if (contains(e) && pressed) {
-				toggled = !toggled;
+				if (backgroundToggle != null) toggled = !toggled;
 				for (ButtonListener l : listeners)
 					l.onUp(this);
 			}

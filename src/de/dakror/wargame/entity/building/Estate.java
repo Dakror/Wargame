@@ -24,6 +24,8 @@ import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.ui.Button;
 import de.dakror.wargame.ui.ContextMenu;
+import de.dakror.wargame.ui.ProgressBar;
+import de.dakror.wargame.ui.UI;
 import de.dakror.wargame.util.Listeners.ButtonListener;
 
 /**
@@ -39,9 +41,12 @@ public class Estate extends Building {
 		detail1 = "These soldiers do the";
 		detail2 = "dirty work for you.";
 		contextMenu = new ContextMenu(500, 300, this) {
+			ProgressBar pb = new ProgressBar(-Wargame.width / 2 + 30, -Wargame.height / 2 + 30, 440, 0, UI.BAR_BLUE);
+			
 			@Override
 			public void render(SpriteRenderer r, TextRenderer t) {
 				super.render(r, t);
+				pb.render(r, t);
 			}
 		};
 		contextMenu.addButton(new Button(1, new Sprite(owner.getColor(), Wargame.standing.getTile("palette99_" + Units.values()[0].name() + "_Large_face0").regions.get(0)), new ButtonListener() {

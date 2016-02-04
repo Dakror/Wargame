@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import android.view.MotionEvent;
 import de.dakror.wargame.Wargame;
-import de.dakror.wargame.render.Renderable;
 import de.dakror.wargame.render.Sprite;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
@@ -31,14 +30,13 @@ import de.dakror.wargame.util.Listeners.TouchListener;
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Button implements Renderable, TouchListener {
+public class Button extends Component implements TouchListener {
 	TextureRegion background, backgroundPressed, backgroundDisabled;
 	TextureRegion backgroundToggle, backgroundTogglePressed, backgroundToggleDisabled;
 	Sprite foreground;
 	
 	boolean pressed, toggled, disabled;
-	int x, y;
-	int width, pressedHeight;
+	int pressedHeight;
 	
 	ArrayList<ButtonListener> listeners;
 	
@@ -182,26 +180,7 @@ public class Button implements Renderable, TouchListener {
 		this.toggled = toggled;
 	}
 	
-	public int getX() {
-		return x;
-	}
-	
-	public void setX(int x) {
-		this.x = x;
-	}
-	
-	public int getY() {
-		return y;
-	}
-	
-	public void setY(int y) {
-		this.y = y;
-	}
-	
-	public int getWidth() {
-		return width;
-	}
-	
+	@Override
 	public int getHeight() {
 		return pressed ? UI.BTN_PRESSED_HEIGHT : UI.BTN_HEIGHT;
 	}

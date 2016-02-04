@@ -17,7 +17,6 @@
 package de.dakror.wargame.ui;
 
 import de.dakror.wargame.Wargame;
-import de.dakror.wargame.render.Renderable;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
@@ -25,9 +24,7 @@ import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Panel implements Renderable {
-	int x, y, width, height;
-	
+public class Panel extends Component {
 	String color;
 	
 	TextureRegion bg;
@@ -67,21 +64,5 @@ public class Panel implements Renderable {
 		r.render(x + 20 * s, y + 25 * s, 0, width - 40 * s, height - 50 * s, bg.x + bg.width / 5, bg.y + bg.height / 4, bg.width / 5, bg.height / 4, bg.texture.textureId); //middle
 		
 		r.render(x + width - 20 * s, y + 25 * s, 0, 20 * s, height - 50 * s, bg.x + bg.width / 5 * 4, bg.y + bg.height / 4, bg.width / 5, bg.height / 2, bg.texture.textureId); //right
-	}
-	
-	public int getX() {
-		return x;
-	}
-	
-	public int getY() {
-		return y;
-	}
-	
-	public int getWidth() {
-		return width;
-	}
-	
-	public int getHeight() {
-		return height;
 	}
 }

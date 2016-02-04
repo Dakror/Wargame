@@ -102,18 +102,18 @@ barBack_verticalTop
   orig: 18, 9
   offset: 0, 0
   index: -1
-barBlue_horizontalBlue
-  rotate: false
-  xy: 551, 18
-  size: 18, 18
-  orig: 18, 18
-  offset: 0, 0
-  index: -1
 barBlue_horizontalLeft
   rotate: false
   xy: 685, 134
   size: 9, 18
   orig: 9, 18
+  offset: 0, 0
+  index: -1
+barBlue_horizontalMid
+  rotate: false
+  xy: 551, 18
+  size: 18, 18
+  orig: 18, 18
   offset: 0, 0
   index: -1
 barBlue_horizontalRight

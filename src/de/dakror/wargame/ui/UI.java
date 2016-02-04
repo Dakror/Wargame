@@ -26,6 +26,11 @@ public class UI {
 	public static final String BROWN = "_brown";
 	public static final String BLUE = "_blue";
 	
+	public static final String BAR_BLUE = "Blue";
+	public static final String BAR_GREEN = "Green";
+	public static final String BAR_RED = "Red";
+	public static final String BAR_YELLOW = "Yellow";
+	
 	public static final String BTN_LONG = "Long";
 	public static final String BTN_ROUND = "Round";
 	public static final String BTN_SQUARE = "Square";

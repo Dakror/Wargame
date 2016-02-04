@@ -20,5 +20,8 @@ package de.dakror.wargame.render;
  * @author Maximilian Stark | Dakror
  */
 public interface Renderable {
-	public void render(SpriteRenderer r);
+	/**
+	 * @param t will be null for non-hud rendering
+	 */
+	public void render(SpriteRenderer r, TextRenderer t);
 }

@@ -18,19 +18,22 @@ package de.dakror.wargame.entity.building;
 
 import com.badlogic.gdx.graphics.Color;
 
+import android.view.MotionEvent;
 import de.dakror.wargame.Player;
 import de.dakror.wargame.World;
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
+import de.dakror.wargame.ui.ContextMenu;
 import de.dakror.wargame.ui.Panel;
 import de.dakror.wargame.util.Colors;
+import de.dakror.wargame.util.Listeners.TouchListener;
 
 /**
  * @author Maximilian Stark | Dakror
  *
  */
-public abstract class Building extends Entity {
+public abstract class Building extends Entity implements TouchListener {
 	public static enum Buildings {
 		//		Airport(750, 160), // for planes
 		//		Castle(2500, 325), // for defense
@@ -52,6 +55,7 @@ public abstract class Building extends Entity {
 	protected int hp, buildCosts, runCosts;
 	protected String function, detail1, detail2;
 	protected Buildings type;
+	protected ContextMenu contextMenu;
 	
 	private Building(int x, int z, int face, Player owner, boolean huge, Buildings type) {
 		super(x, z, face, owner, huge, type.name());
@@ -81,7 +85,9 @@ public abstract class Building extends Entity {
 		owner.money -= runCosts / 60f * timePassed;
 	}
 	
-	public void renderContextMenu(SpriteRenderer r, TextRenderer t) {}
+	public void renderContextMenu(SpriteRenderer r, TextRenderer t) {
+		contextMenu.render(r, t);
+	}
 	
 	public void renderDetails(Panel p, SpriteRenderer r, TextRenderer t) {
 		t.renderText(p.getX() + 20, p.getY() + p.getHeight() - 60, 0, 0.8f, Colors.MEDIUM_BLUE, type.name(), r);
@@ -90,6 +96,16 @@ public abstract class Building extends Entity {
 		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 180, 0, 0.5f, Color.ROYAL, function, r);
 		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 230, 0, 0.5f, Color.WHITE, detail1, r);
 		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 260, 0, 0.5f, Color.WHITE, detail2, r);
+	}
+	
+	@Override
+	public boolean onDown(MotionEvent e) {
+		return contextMenu.onDown(e);
+	}
+	
+	@Override
+	public boolean onUp(MotionEvent e) {
+		return contextMenu.onUp(e);
 	}
 	
 	public int getHp() {

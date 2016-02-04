@@ -36,8 +36,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import de.dakror.wargame.World.CanBuildResult;
-import de.dakror.wargame.entity.Unit;
-import de.dakror.wargame.entity.Unit.Units;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.Buildings;
 import de.dakror.wargame.entity.building.City;
@@ -112,7 +110,6 @@ public class Wargame extends ActivityStub {
 		detailsPanel = new Panel(-width / 2 + 5, -height / 2 + 5, 500, 300, UI.BEIGE);
 		
 		final ButtonListener bl = new ButtonListener() {
-			
 			@Override
 			public void onDown(Button b) {
 				boolean t = b.isToggled();
@@ -132,13 +129,8 @@ public class Wargame extends ActivityStub {
 			}
 		};
 		
-		for (int i = 0; i < buyButtons.length; i++) {
-			Button b = new Button(width / 2 - UI.BTN_SQUARE_WIDTH * (buyButtons.length - i) - 15, -height / 2 + 15, UI.BROWN, UI.BTN_SQUARE).setToggle(UI.BEIGE);
-			b.setForeground(new Sprite(player.color, standing.getTile("palette99_" + Building.Buildings.values()[i].name() + "_Large_face0").regions.get(0)));
-			b.addListener(bl);
-			b.setPayload(Building.Buildings.values()[i]);
-			buyButtons[i] = b;
-		}
+		for (int i = 0; i < buyButtons.length; i++)
+			buyButtons[i] = new Button(buyButtons.length - i, new Sprite(player.color, standing.getTile("palette99_" + Building.Buildings.values()[i].name() + "_Large_face0").regions.get(0)), bl, Building.Buildings.values()[i]);
 	}
 	
 	@Override
@@ -175,12 +167,12 @@ public class Wargame extends ActivityStub {
 		//			world.addEntity(u);
 		//		}
 		
-		Unit v = new Unit(0, 2, player, Units.Infantry);
+		//		Unit v = new Unit(0, 2, player, Units.Infantry);
 		
 		//		SteeringBehavior<Vector2> sb = new Pursue<Vector2>(u, v, 0.3f)/*.setTarget(new WorldLocation(new Vector3(2, 2, 0), 0))/*.setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f)*/;
 		//		u.setSteeringBehavior(sb);
 		//		v.setSteeringBehavior(new Arrive<Vector2>(v).setTarget(new WorldLocation(new Vector2(6, 6), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f));
-		world.addEntity(v);
+		//		world.addEntity(v);
 		//		map.addEntity(u);
 	}
 	
@@ -240,7 +232,7 @@ public class Wargame extends ActivityStub {
 		
 		spriteRenderer.begin(viewProjMatrix);
 		
-		world.render(spriteRenderer);
+		world.render(spriteRenderer, null);
 		
 		CanBuildResult cbr = null;
 		if (placeBuilding != null) {
@@ -265,7 +257,7 @@ public class Wargame extends ActivityStub {
 		textRenderer.setFont(0);
 		
 		if (placeBuilding != null) {
-			detailsPanel.render(spriteRenderer);
+			detailsPanel.render(spriteRenderer, null);
 			placeBuilding.renderDetails(detailsPanel, spriteRenderer, textRenderer);
 			if ((!cbr.result || player.money < placeBuilding.getBuildCosts()) && placeBuilding.getRealX() >= 0) {
 				//@off
@@ -287,7 +279,7 @@ public class Wargame extends ActivityStub {
 		}
 		
 		for (Button b : buyButtons)
-			b.render(spriteRenderer);
+			b.render(spriteRenderer, textRenderer);
 			
 		spriteRenderer.end();
 		frames++;
@@ -306,7 +298,7 @@ public class Wargame extends ActivityStub {
 					Building b = world.getBuildingAt((int) pos.x, (int) pos.y, null);
 					if (b != null) b.onSelect();
 					selectedBuilding = b;
-				}
+				} else selectedBuilding = null;
 			}
 			lastSingleTap = null;
 		}
@@ -324,11 +316,14 @@ public class Wargame extends ActivityStub {
 				case MotionEvent.ACTION_DOWN:
 					for (Button b : buyButtons)
 						if (b.onDown(lastTouchEvent)) hudEvents = true;
+						
+					if (selectedBuilding != null && selectedBuilding.onDown(lastTouchEvent)) hudEvents = true;
 					break;
 				case MotionEvent.ACTION_UP:
 					for (Button b : buyButtons)
 						if (b.onUp(lastTouchEvent)) hudEvents = false;
 						
+					if (selectedBuilding != null && selectedBuilding.onUp(lastTouchEvent)) hudEvents = false;
 					break;
 				case MotionEvent.ACTION_MOVE:
 					

@@ -23,13 +23,15 @@ import de.dakror.wargame.Wargame;
 import de.dakror.wargame.render.Renderable;
 import de.dakror.wargame.render.Sprite;
 import de.dakror.wargame.render.SpriteRenderer;
+import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.util.Listeners.ButtonListener;
+import de.dakror.wargame.util.Listeners.TouchListener;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Button implements Renderable {
+public class Button implements Renderable, TouchListener {
 	TextureRegion background, backgroundPressed, backgroundDisabled;
 	TextureRegion backgroundToggle, backgroundTogglePressed, backgroundToggleDisabled;
 	Sprite foreground;
@@ -42,6 +44,25 @@ public class Button implements Renderable {
 	
 	Object payload;
 	String color, type;
+	
+	/**
+	 * Initialize typical buyButton (square)
+	 */
+	public Button(int index, Sprite foreground, ButtonListener listener, Object payload) {
+		color = UI.BROWN;
+		type = UI.BTN_SQUARE;
+		x = Wargame.width / 2 - UI.BTN_SQUARE_WIDTH * index - 15;
+		y = -Wargame.height / 2 + 15;
+		background = Wargame.ui.getTile("button" + type + color).regions.get(0);
+		backgroundPressed = Wargame.ui.getTile("button" + type + color + "_pressed").regions.get(0);
+		backgroundDisabled = Wargame.ui.getTile("button" + type + "_grey").regions.get(0);
+		listeners = new ArrayList<ButtonListener>();
+		listeners.add(listener);
+		this.foreground = foreground;
+		this.payload = payload;
+		width = (int) (UI.DEFAULT_SCALE * background.width * background.texture.width);
+		setToggle(UI.BEIGE);
+	}
 	
 	public Button(int x, int y, String color, String type) {
 		this.x = x;
@@ -64,7 +85,7 @@ public class Button implements Renderable {
 	}
 	
 	@Override
-	public void render(SpriteRenderer r) {
+	public void render(SpriteRenderer r, TextRenderer t) {
 		TextureRegion tr = toggled ? (disabled ? backgroundToggleDisabled : (pressed ? backgroundTogglePressed : backgroundToggle)) : (disabled ? backgroundDisabled : (pressed ? backgroundPressed : background));
 		r.render(x, y, 0, width, getHeight(), tr.x, tr.y, tr.width, tr.height, tr.texture.textureId);
 		
@@ -78,6 +99,7 @@ public class Button implements Renderable {
 		}
 	}
 	
+	@Override
 	public boolean onUp(MotionEvent e) {
 		if (!disabled) {
 			if (contains(e) && pressed) {
@@ -91,6 +113,7 @@ public class Button implements Renderable {
 		return false;
 	}
 	
+	@Override
 	public boolean onDown(MotionEvent e) {
 		if (contains(e) && !disabled) {
 			pressed = true;

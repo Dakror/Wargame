@@ -35,6 +35,7 @@ import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.render.Renderable;
 import de.dakror.wargame.render.SpriteRenderer;
+import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.render.TextureAtlas.Tile;
 
@@ -303,7 +304,7 @@ public class World implements Renderable {
 	}
 	
 	@Override
-	public void render(SpriteRenderer r) {
+	public void render(SpriteRenderer r, TextRenderer t) {
 		int rEntities = 0;
 		if (dirty) {
 			r.end();
@@ -316,9 +317,9 @@ public class World implements Renderable {
 			
 			for (int x = 0; x < width; x++) {
 				for (int z = depth - 1; z >= 0; z--) {
-					Tile t = Wargame.terrain.getTile(getFile(x, z));
-					if (t == null) continue;
-					TextureRegion tr = t.regions.get(0);
+					Tile tile = Wargame.terrain.getTile(getFile(x, z));
+					if (tile == null) continue;
+					TextureRegion tr = tile.regions.get(0);
 					float x1 = x * WIDTH / 2 + z * WIDTH / 2;
 					float y1 = -(x + add) * DEPTH / 2 + z * DEPTH / 2;
 					

@@ -19,6 +19,7 @@ package de.dakror.wargame.ui;
 import de.dakror.wargame.Wargame;
 import de.dakror.wargame.render.Renderable;
 import de.dakror.wargame.render.SpriteRenderer;
+import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 
 /**
@@ -42,7 +43,7 @@ public class Panel implements Renderable {
 	}
 	
 	@Override
-	public void render(SpriteRenderer r) {
+	public void render(SpriteRenderer r, TextRenderer t) {
 		//TODO: add FBOs for scalability
 		
 		float s = UI.DEFAULT_SCALE;

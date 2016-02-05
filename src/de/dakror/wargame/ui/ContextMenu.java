@@ -30,10 +30,10 @@ import de.dakror.wargame.util.Listeners.TouchListener;
  * @author Maximilian Stark | Dakror
  */
 public class ContextMenu implements Renderable, TouchListener {
-	Panel panel;
-	ArrayList<Button> buttons = new ArrayList<Button>();
-	int width, height;
-	Entity entity;
+	protected Panel panel;
+	protected ArrayList<Button> buttons = new ArrayList<Button>();
+	protected int width, height;
+	protected Entity entity;
 	
 	public ContextMenu(Entity entity) {
 		this.entity = entity;

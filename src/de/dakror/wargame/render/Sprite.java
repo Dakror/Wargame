@@ -76,6 +76,16 @@ public class Sprite {
 		paletteIndex = -1;
 	}
 	
+	public void resizeSoft(float width, float height) {
+		if (srcWidth > srcHeight) {
+			this.width = width;
+			this.height = srcHeight * (this.width / srcWidth);
+		} else {
+			this.height = height;
+			this.width = srcWidth * (this.height / srcHeight);
+		}
+	}
+	
 	public float getSourceWidth() {
 		return srcWidth;
 	}

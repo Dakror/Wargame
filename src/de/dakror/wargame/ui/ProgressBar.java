@@ -51,11 +51,14 @@ public class ProgressBar extends Component {
 		r.render(x + backLeft.origWidth * UI.DEFAULT_SCALE, y, 0, width - (backLeft.origWidth + backRight.origWidth) * UI.DEFAULT_SCALE, getHeight(), backMid.x, backMid.y, backMid.width, backMid.height, backMid.texture.textureId);
 		r.render(x + width - backRight.origWidth * UI.DEFAULT_SCALE, y, 0, backRight.origWidth * UI.DEFAULT_SCALE, getHeight(), backRight.x, backRight.y, backRight.width, backRight.height, backRight.texture.textureId);
 		
-		if (value > 0.0f) {
-			r.render(x, y, 0, barLeft.origWidth * UI.DEFAULT_SCALE, getHeight(), barLeft.x, barLeft.y, barLeft.width, barLeft.height, barLeft.texture.textureId);
-			r.render(x + barLeft.origWidth * UI.DEFAULT_SCALE, y, 0, (width - (barLeft.origWidth + barRight.origWidth) * UI.DEFAULT_SCALE) * value, getHeight(), barMid.x, barMid.y, barMid.width, barMid.height, barMid.texture.textureId);
-			if (value == 1.0f) r.render(x + width - barRight.origWidth * UI.DEFAULT_SCALE, y, 0, barRight.origWidth * UI.DEFAULT_SCALE, getHeight(), barRight.x, barRight.y, barRight.width, barRight.height, barRight.texture.textureId);
-		}
+		float w = barLeft.origWidth * UI.DEFAULT_SCALE;
+		float u = width * value;
+		float v = Math.min(w, u);
+		float s = Math.max(0, u - (width - w));
+		
+		r.render(x, y, 0, v, getHeight(), barLeft.x, barLeft.y, barLeft.width * v / w, barLeft.height, barLeft.texture.textureId);
+		r.render(x + w, y, 0, Math.min(width - 2 * w, Math.max(0, u - w)), getHeight(), barMid.x, barMid.y, barMid.width, barMid.height, barMid.texture.textureId);
+		r.render(x + width - w, y, 0, s, getHeight(), barRight.x, barRight.y, barRight.width * s / w, barRight.height, barRight.texture.textureId);
 	}
 	
 	public float getValue() {

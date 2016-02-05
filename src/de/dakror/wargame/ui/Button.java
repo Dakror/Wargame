@@ -89,13 +89,7 @@ public class Button extends Component implements TouchListener {
 		
 		if (foreground != null) {
 			foreground.setZ(0);
-			if (foreground.getSourceWidth() > foreground.getSourceHeight()) {
-				foreground.setWidth(width - 30);
-				foreground.setHeight(foreground.getSourceHeight() * (foreground.getWidth() / foreground.getSourceWidth()));
-			} else {
-				foreground.setHeight(getHeight() - 30);
-				foreground.setWidth(foreground.getSourceWidth() * (foreground.getHeight() / foreground.getSourceHeight()));
-			}
+			foreground.resizeSoft(width - 30, getHeight() - 30);
 			foreground.setX(x + (width - foreground.getWidth()) / 2);
 			foreground.setY(y + (pressed ? UI.BTN_PRESSED_HEIGHT - UI.BTN_HEIGHT : 0) + 20);
 			r.render(foreground);

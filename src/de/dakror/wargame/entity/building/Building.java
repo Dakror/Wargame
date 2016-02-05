@@ -34,7 +34,7 @@ import de.dakror.wargame.util.Listeners.TouchListener;
  *
  */
 public abstract class Building extends Entity implements TouchListener {
-	public static enum Buildings {
+	public static enum BuildingType {
 		//		Airport(750, 160), // for planes
 		//		Castle(2500, 325), // for defense
 		City,
@@ -43,7 +43,7 @@ public abstract class Building extends Entity implements TouchListener {
 		//		Laboratory(450, 1000), // for science!!!!
 	}
 	
-	public static Building create(int x, int y, Player player, Buildings type) {
+	public static Building create(int x, int y, Player player, BuildingType type) {
 		try {
 			return (Building) Class.forName(Building.class.getPackage().getName() + "." + type.name()).getConstructor(int.class, int.class, Player.class).newInstance(x, y, player);
 		} catch (Exception e) {
@@ -54,19 +54,19 @@ public abstract class Building extends Entity implements TouchListener {
 	
 	protected int hp, buildCosts, runCosts;
 	protected String function, detail1, detail2;
-	protected Buildings type;
+	protected BuildingType type;
 	protected ContextMenu contextMenu;
 	
 	boolean selected = false;
 	float time = 0;
 	
-	private Building(int x, int z, int face, Player owner, boolean huge, Buildings type) {
+	private Building(int x, int z, int face, Player owner, boolean huge, BuildingType type) {
 		super(x, z, face, owner, huge, type.name());
 		this.type = type;
 		onCreate();
 	}
 	
-	public Building(int x, int z, Player owner, Buildings type) {
+	public Building(int x, int z, Player owner, BuildingType type) {
 		this(x, z, 0, owner, false, type);
 	}
 	
@@ -125,15 +125,15 @@ public abstract class Building extends Entity implements TouchListener {
 		return buildCosts;
 	}
 	
-	public ContextMenu getContextMenu() {
-		return contextMenu;
+	protected ContextMenu getContextMenu() {
+		return new ContextMenu(this);
 	}
 	
 	public int getRunCosts() {
 		return runCosts;
 	}
 	
-	public Buildings getType() {
+	public BuildingType getType() {
 		return type;
 	}
 	
@@ -161,6 +161,7 @@ public abstract class Building extends Entity implements TouchListener {
 	
 	@Override
 	public void onSelect() {
+		if (contextMenu == null) contextMenu = getContextMenu();
 		selected = true;
 	}
 	

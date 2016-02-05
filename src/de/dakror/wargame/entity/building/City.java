@@ -26,7 +26,7 @@ public class City extends Building {
 	int radius;
 	
 	public City(int x, int z, Player owner) {
-		super(x, z, owner, Buildings.City);
+		super(x, z, owner, BuildingType.City);
 		hp = 1000;
 		buildCosts = 850;
 		runCosts = 6;

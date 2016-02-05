@@ -37,8 +37,9 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import de.dakror.wargame.World.CanBuildResult;
 import de.dakror.wargame.entity.building.Building;
-import de.dakror.wargame.entity.building.Building.Buildings;
+import de.dakror.wargame.entity.building.Building.BuildingType;
 import de.dakror.wargame.entity.building.City;
+import de.dakror.wargame.entity.building.Estate;
 import de.dakror.wargame.render.Sprite;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
@@ -106,7 +107,7 @@ public class Wargame extends ActivityStub {
 	
 	public void initHud() {
 		if (height == 0) return;
-		buyButtons = new Button[Building.Buildings.values().length];
+		buyButtons = new Button[Building.BuildingType.values().length];
 		detailsPanel = new Panel(-width / 2 + 5, -height / 2 + 5, 500, 300, UI.BEIGE);
 		
 		final ButtonListener bl = new ButtonListener() {
@@ -121,7 +122,7 @@ public class Wargame extends ActivityStub {
 			@Override
 			public void onUp(Button b) {
 				if (b.isToggled()) {
-					Building pb = Building.create(-5000, 0, player, (Buildings) b.getPayload());
+					Building pb = Building.create(-5000, 0, player, (BuildingType) b.getPayload());
 					pb.setColor(HALFWHITE);
 					pb.setWorld(world);
 					placeBuilding = pb;
@@ -130,7 +131,7 @@ public class Wargame extends ActivityStub {
 		};
 		
 		for (int i = 0; i < buyButtons.length; i++)
-			buyButtons[i] = new Button(buyButtons.length - i, new Sprite(player.color, standing.getTile("palette99_" + Buildings.values()[i].name() + "_Large_face0").regions.get(0)), bl, Building.Buildings.values()[i], true);
+			buyButtons[i] = new Button(buyButtons.length - i, new Sprite(player.color, standing.getTile("palette99_" + BuildingType.values()[i].name() + "_Large_face0").regions.get(0)), bl, Building.BuildingType.values()[i], true);
 	}
 	
 	@Override
@@ -158,6 +159,7 @@ public class Wargame extends ActivityStub {
 		player.setMainCity(myCity);
 		world.addEntity(myCity);
 		world.center(myCity);
+		world.addEntity(new Estate(4, 3, player));
 		
 		Building theirCity = new City(18, 19, enemy);
 		enemy.setMainCity(theirCity);

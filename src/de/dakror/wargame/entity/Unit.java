@@ -51,20 +51,22 @@ public class Unit extends Entity implements Steerable<Vector2> {
 		Torpedo
 	}
 	
-	public static enum Units {
-		Infantry(20, 35, false, AttackKind.Machine_Gun, null, 1, 0, null),
+	public static enum UnitType {
+		Infantry(20, 35, 5.0f, false, AttackKind.Machine_Gun, null, 1, 0, null),
 		
 		;
 		
 		public final String alias;
 		public final int hp, costs;
+		public final float produceDuration; // in seconds
 		public final int receiveStrength0, receiveStrength1;
 		public final boolean superAvailable;
 		public final AttackKind weapon0, weapon1;
 		
-		private Units(int hp, int costs, boolean superAvailable, AttackKind weapon0, AttackKind weapon1, int receiveStrength0, int receiveStrength1, String alias) {
+		private UnitType(int hp, int costs, float produceDuration, boolean superAvailable, AttackKind weapon0, AttackKind weapon1, int receiveStrength0, int receiveStrength1, String alias) {
 			this.hp = hp;
 			this.costs = costs;
+			this.produceDuration = produceDuration;
 			this.superAvailable = superAvailable;
 			this.weapon0 = weapon0;
 			this.weapon1 = weapon1;
@@ -101,26 +103,26 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	float orientation;
 	Vector2 linearVelocity = new Vector2();
 	Vector2 pos = new Vector2();
-	Units type;
+	UnitType type;
 	SteeringBehavior<Vector2> steeringBehavior;
 	float scale = 0.5f;
 	
-	public Unit(float x, float z, int face, Player owner, boolean huge, Units type) {
+	public Unit(float x, float z, int face, Player owner, boolean huge, UnitType type) {
 		super(x, z, face, owner, huge, type.name());
 		this.type = type;
 		pos.set(x, z);
 		onCreate();
 	}
 	
-	public Unit(float x, float z, Player owner, Units type) {
+	public Unit(float x, float z, Player owner, UnitType type) {
 		this(x, z, 0, owner, type);
 	}
 	
-	public Unit(float x, float z, int face, Player owner, Units type) {
+	public Unit(float x, float z, int face, Player owner, UnitType type) {
 		this(x, z, face, owner, false, type);
 	}
 	
-	public Unit(float x, float z, Player owner, boolean huge, Units type) {
+	public Unit(float x, float z, Player owner, boolean huge, UnitType type) {
 		this(x, z, 0, owner, huge, type);
 	}
 	

@@ -47,6 +47,10 @@ public class Sprite {
 		this(x, y, z, width, height, -1, tr);
 	}
 	
+	public Sprite(TextureRegion tr) {
+		this(-1, tr);
+	}
+	
 	public Sprite(int color, TextureRegion tr) {
 		this(0, 0, 0, 0, 0, color, tr);
 		srcWidth = tr.width * tr.texture.width;

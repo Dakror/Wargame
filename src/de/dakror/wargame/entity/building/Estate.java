@@ -29,6 +29,7 @@ import de.dakror.wargame.ui.Button;
 import de.dakror.wargame.ui.ContextMenu;
 import de.dakror.wargame.ui.ProgressBar;
 import de.dakror.wargame.ui.UI;
+import de.dakror.wargame.util.Colors;
 import de.dakror.wargame.util.Listeners.ButtonListener;
 
 /**
@@ -71,28 +72,38 @@ public class Estate extends Building {
 				super.render(r, t);
 				
 				if (queue.size > 0) {
-					pb.setValue(1 - (queue.first().timeLeft / queue.first().allTime));
+					ProductionTask first = queue.first();
+					pb.setValue(1 - (first.timeLeft / first.allTime));
 					pb.render(r, t);
-					Sprite s = queue.first().src.getForeground();
+					Sprite s = first.src.getForeground();
 					s.resizeSoft(150, 150);
 					s.setX(-Wargame.width / 2 + 30);
 					s.setY(-Wargame.height / 2 + height - 30 - s.getHeight());
 					r.render(s);
+					t.renderText(s.getX() + 150, -Wargame.height / 2 + height - 60, 0, 0.8f, Colors.MEDIUM_BLUE, first.unitType.name(), r);
 				}
+				
 			}
 		};
-		contextMenu.addButton(new Button(1, new Sprite(owner.getColor(), Wargame.standing.getTile("palette99_" + UnitType.values()[0].name() + "_Large_face0").regions.get(0)), new ButtonListener() {
+		contextMenu.addButton(new Button(1, 0, new Sprite(owner.getColor(), Wargame.standing.getTile("palette99_" + UnitType.values()[0].name() + "_Large_face0").regions.get(0)), new ButtonListener() {
 			@Override
 			public void onDown(Button b) {}
 			
 			@Override
 			public void onUp(Button b) {
-				if (getOwner().money >= ((UnitType) b.getPayload()).costs) {
-					getOwner().money -= ((UnitType) b.getPayload()).costs;
-					queue.addLast(new ProductionTask((UnitType) b.getPayload(), b));
-				}
+				//				if (getOwner().money >= ((UnitType) b.getPayload()).costs) {
+				//					getOwner().money -= ((UnitType) b.getPayload()).costs;
+				//					queue.addLast(new ProductionTask((UnitType) b.getPayload(), b));
+				//				}
 			}
-		}, UnitType.values()[0], false));
+		}, UnitType.values()[0], true));
+		contextMenu.addButton(new Button(1, 1, new Sprite(Wargame.ui.getTile("iconCheck_beige").regions.get(0)), new ButtonListener() {
+			@Override
+			public void onDown(Button b) {}
+			
+			@Override
+			public void onUp(Button b) {}
+		}, null, false).setPadding(30, 15).setColor(UI.BLUE));
 		return contextMenu;
 	}
 	

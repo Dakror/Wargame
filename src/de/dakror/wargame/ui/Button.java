@@ -42,18 +42,16 @@ public class Button extends Component implements TouchListener {
 	
 	Object payload;
 	String color, type;
+	float padding = 15, paddingBot = 5;
 	
 	/**
 	 * Initialize typical buyButton (square)
 	 */
-	public Button(int index, Sprite foreground, ButtonListener listener, Object payload, boolean toggle) {
-		color = UI.BROWN;
+	public Button(int index, int y, Sprite foreground, ButtonListener listener, Object payload, boolean toggle) {
 		type = UI.BTN_SQUARE;
 		x = Wargame.width / 2 - UI.BTN_SQUARE_WIDTH * index - 15;
-		y = -Wargame.height / 2 + 15;
-		background = Wargame.ui.getTile("button" + type + color).regions.get(0);
-		backgroundPressed = Wargame.ui.getTile("button" + type + color + "_pressed").regions.get(0);
-		backgroundDisabled = Wargame.ui.getTile("button" + type + "_grey").regions.get(0);
+		this.y = -Wargame.height / 2 + 15 + y * (UI.BTN_HEIGHT + 5);
+		setColor(UI.BROWN);
 		listeners = new ArrayList<ButtonListener>();
 		listeners.add(listener);
 		this.foreground = foreground;
@@ -82,6 +80,20 @@ public class Button extends Component implements TouchListener {
 		return this;
 	}
 	
+	public Button setPadding(float p, float b) {
+		padding = p;
+		paddingBot = b;
+		return this;
+	}
+	
+	public Button setColor(String color) {
+		this.color = color;
+		background = Wargame.ui.getTile("button" + type + color).regions.get(0);
+		backgroundPressed = Wargame.ui.getTile("button" + type + color + "_pressed").regions.get(0);
+		backgroundDisabled = Wargame.ui.getTile("button" + type + "_grey").regions.get(0);
+		return this;
+	}
+	
 	@Override
 	public void render(SpriteRenderer r, TextRenderer t) {
 		TextureRegion tr = toggled ? (disabled ? backgroundToggleDisabled : (pressed ? backgroundTogglePressed : backgroundToggle)) : (disabled ? backgroundDisabled : (pressed ? backgroundPressed : background));
@@ -89,9 +101,9 @@ public class Button extends Component implements TouchListener {
 		
 		if (foreground != null) {
 			foreground.setZ(0);
-			foreground.resizeSoft(width - 30, getHeight() - 30);
+			foreground.resizeSoft(width - padding * 2, getHeight() - padding * 2);
 			foreground.setX(x + (width - foreground.getWidth()) / 2);
-			foreground.setY(y + (pressed ? UI.BTN_PRESSED_HEIGHT - UI.BTN_HEIGHT : 0) + 20);
+			foreground.setY(y + (pressed ? UI.BTN_PRESSED_HEIGHT - UI.BTN_HEIGHT : 0) + (padding + paddingBot));
 			r.render(foreground);
 		}
 	}

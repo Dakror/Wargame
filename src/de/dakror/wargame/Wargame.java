@@ -131,7 +131,7 @@ public class Wargame extends ActivityStub {
 		};
 		
 		for (int i = 0; i < buyButtons.length; i++)
-			buyButtons[i] = new Button(buyButtons.length - i, new Sprite(player.color, standing.getTile("palette99_" + BuildingType.values()[i].name() + "_Large_face0").regions.get(0)), bl, Building.BuildingType.values()[i], true);
+			buyButtons[i] = new Button(buyButtons.length - i, 0, new Sprite(player.color, standing.getTile("palette99_" + BuildingType.values()[i].name() + "_Large_face0").regions.get(0)), bl, Building.BuildingType.values()[i], true);
 	}
 	
 	@Override

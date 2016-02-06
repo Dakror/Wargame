@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame.util;
+package de.dakror.wargame.ui;
 
 import com.badlogic.gdx.graphics.Color;
 

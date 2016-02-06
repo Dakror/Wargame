@@ -115,11 +115,11 @@ public class TextRenderer {
 		this.font = font;
 	}
 	
-	public void renderText(float x, float y, float z, float size, String text, SpriteRenderer r) {
-		renderText(x, y, z, size, Color.WHITE, text, r);
+	public float renderText(float x, float y, float z, float size, String text, SpriteRenderer r) {
+		return renderText(x, y, z, size, Color.WHITE, text, r);
 	}
 	
-	public void renderText(float x, float y, float z, float size, Color color, String text, SpriteRenderer r) {
+	public float renderText(float x, float y, float z, float size, Color color, String text, SpriteRenderer r) {
 		float w = 0;
 		Font font = fonts.get(this.font);
 		for (int i = 0; i < text.length(); i++) {
@@ -127,6 +127,8 @@ public class TextRenderer {
 			r.render(x + w + (g.advanceX - g.width) / 2 * size, y + (font.base - g.height - g.offsetY) * size, z, g.width * size, g.height * size, g.x / font.textureWidth, g.y / font.textureHeight, g.width / font.textureWidth, g.height / font.textureHeight, color, font.textureId);
 			w += g.advanceX * size;
 		}
+		
+		return w;
 	}
 	
 	public void renderTextCentered(float x, float y, float z, float size, String text, SpriteRenderer r) {

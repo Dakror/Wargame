@@ -108,7 +108,7 @@ public class Wargame extends ActivityStub {
 	public void initHud() {
 		if (height == 0) return;
 		buyButtons = new Button[Building.BuildingType.values().length];
-		detailsPanel = new Panel(-width / 2 + 5, -height / 2 + 5, 500, 300, UI.BEIGE);
+		detailsPanel = new Panel(-width / 2 + 5, -height / 2 + 5, 500, 300, UI.BEIGE_LIGHT);
 		
 		final ButtonListener bl = new ButtonListener() {
 			@Override

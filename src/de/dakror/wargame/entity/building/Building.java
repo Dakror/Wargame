@@ -20,15 +20,14 @@ import com.badlogic.gdx.graphics.Color;
 
 import android.view.MotionEvent;
 import de.dakror.wargame.Player;
-import de.dakror.wargame.Wargame;
 import de.dakror.wargame.World;
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
-import de.dakror.wargame.render.TextureAtlas.TextureRegion;
+import de.dakror.wargame.ui.Colors;
 import de.dakror.wargame.ui.ContextMenu;
 import de.dakror.wargame.ui.Panel;
-import de.dakror.wargame.util.Colors;
+import de.dakror.wargame.ui.UI;
 import de.dakror.wargame.util.Listeners.TouchListener;
 
 /**
@@ -104,25 +103,10 @@ public abstract class Building extends Entity implements TouchListener {
 		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 135, 0, 0.5f, runCosts > 0 ? Colors.KHAKI : Colors.MINT, (runCosts > 0 ? "Run costs: " : "Profits: ") + Math.abs(runCosts) + "$/min", r);
 		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 170, 0, 0.5f, Color.ROYAL, function, r);
 		
-		final float icoHeight = 35;
-		TextureRegion heartIcon = Wargame.ui.getTile("hud_heartFull").regions.get(0);
-		float hW = heartIcon.origWidth * (icoHeight / heartIcon.origHeight);
-		r.render(p.getX() + 30, p.getY() + p.getHeight() - 213, 0, hW, icoHeight, heartIcon.x, heartIcon.y, heartIcon.width, heartIcon.height, heartIcon.texture.textureId);
-		t.renderText(p.getX() + 30 + hW, p.getY() + p.getHeight() - 205, 0, 0.5f, Color.WHITE, hp + "", r);
+		UI.renderStats(p.getX() + 30, p.getY() + p.getHeight() - 205, p.getWidth(), hp, atk, def, r, t);
 		
-		TextureRegion swordIcon = Wargame.ui.getTile("cursorSword_gold").regions.get(0);
-		float sW = swordIcon.origWidth * (icoHeight / swordIcon.origHeight);
-		r.render(p.getX() + p.getWidth() / 3 + 10, p.getY() + p.getHeight() - 213, 0, sW, icoHeight, swordIcon.x, swordIcon.y, swordIcon.width, swordIcon.height, swordIcon.texture.textureId);
-		t.renderText(p.getX() + p.getWidth() / 3 + 15 + sW, p.getY() + p.getHeight() - 205, 0, 0.5f, Color.WHITE, atk + "", r);
-		
-		
-		TextureRegion shieldIcon = Wargame.ui.getTile("shieldSilver").regions.get(0);
-		float dW = shieldIcon.origWidth * (icoHeight / shieldIcon.origHeight);
-		r.render(p.getX() + p.getWidth() / 3 * 2 + 10, p.getY() + p.getHeight() - 213, 0, dW, icoHeight, shieldIcon.x, shieldIcon.y, shieldIcon.width, shieldIcon.height, shieldIcon.texture.textureId);
-		t.renderText(p.getX() + p.getWidth() / 3 * 2 + 15 + dW, p.getY() + p.getHeight() - 205, 0, 0.5f, Color.WHITE, def + "", r);
-		
-		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 245, 0, 0.5f, Color.WHITE, detail1, r);
-		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 275, 0, 0.5f, Color.WHITE, detail2, r);
+		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 245, 0, 0.5f, Color.SLATE, detail1, r);
+		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 275, 0, 0.5f, Color.SLATE, detail2, r);
 	}
 	
 	@Override

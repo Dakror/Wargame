@@ -16,6 +16,7 @@
 
 package de.dakror.wargame.entity.building;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Queue;
 
 import de.dakror.wargame.Player;
@@ -27,11 +28,11 @@ import de.dakror.wargame.render.Sprite;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.ui.Button;
+import de.dakror.wargame.ui.Colors;
 import de.dakror.wargame.ui.ContextMenu;
 import de.dakror.wargame.ui.Panel;
 import de.dakror.wargame.ui.ProgressBar;
 import de.dakror.wargame.ui.UI;
-import de.dakror.wargame.util.Colors;
 import de.dakror.wargame.util.Listeners.ButtonListener;
 
 /**
@@ -59,7 +60,7 @@ public class Estate extends Building {
 		
 		public EstateContextMenu(Entity entity) {
 			super(500, 300, entity);
-			secondary = new Panel(-Wargame.width / 2 + 500, -Wargame.height / 2, 500, 300, UI.BEIGE);
+			secondary = new Panel(-Wargame.width / 2 + 500, -Wargame.height / 2, 500, 240, UI.BEIGE_LIGHT);
 			pb = new ProgressBar(-Wargame.width / 2 + 30, -Wargame.height / 2 + 30, 440, 0, UI.BAR_BLUE);
 			buttons.add(new Button(1, 0, new Sprite(owner.getColor(), Wargame.standing.getTile("palette99_" + UnitType.values()[0].name() + "_Large_face0").regions.get(0)), new ButtonListener() {
 				@Override
@@ -105,16 +106,15 @@ public class Estate extends Building {
 				UnitType type = ((UnitType) selected.getPayload());
 				t.renderText(secondary.getX() + 20, secondary.getY() + secondary.getHeight() - 60, 0, 0.8f, Colors.MEDIUM_BLUE, type.name(), r);
 				t.renderText(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 100, 0, 0.5f, Colors.DARK_RED, "Costs: $" + type.costs, r);
-				//				t.renderText(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 140, 0, 0.5f, runCosts > 0 ? Colors.KHAKI : Colors.MINT, (runCosts > 0 ? "Run costs: " : "Profits: ") + Math.abs(runCosts) + "$/min", r);
-				//				t.renderText(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 180, 0, 0.5f, Color.ROYAL, function, r);
-				//				t.renderText(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 230, 0, 0.5f, Color.WHITE, detail1, r);
-				//				t.renderText(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 260, 0, 0.5f, Color.WHITE, detail2, r);
+				t.renderText(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 135, 0, 0.5f, Colors.KHAKI, "Train time: " + type.produceDuration + "s", r);
+				float w = t.renderText(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 170, 0, 0.5f, Color.ROYAL, type.weapon0.getName(), r);
+				t.renderText(secondary.getX() + 40 + w, secondary.getY() + secondary.getHeight() - 170, 0, 0.5f, Colors.MINT, "(" + type.weapon1.getName() + ")", r);
+				UI.renderStats(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 205, secondary.getWidth(), type.hp, type.atk, type.def, r, t);
 			}
 			
 			if (queue.size > 0) {
 				ProductionTask first = queue.first();
 				pb.setValue(1 - (first.timeLeft / first.allTime));
-				pb.render(r, t);
 				Sprite s = first.src.getForeground();
 				s.resizeSoft(150, 150);
 				s.setX(-Wargame.width / 2 + 30);
@@ -134,8 +134,8 @@ public class Estate extends Building {
 					
 					i++;
 				}
-				//t.renderText(s.getX() + 150, -Wargame.height / 2 + height - 60, 0, 0.8f, Colors.MEDIUM_BLUE, first.unitType.name(), r);
-			}
+			} else pb.setValue(0);
+			pb.render(r, t);
 		}
 	}
 	

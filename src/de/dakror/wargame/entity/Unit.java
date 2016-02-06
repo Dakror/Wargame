@@ -48,11 +48,16 @@ public class Unit extends Entity implements Steerable<Vector2> {
 		Long_Cannon,
 		Machine_Gun,
 		Rocket,
-		Torpedo
+		Torpedo,
+		N$A;
+		
+		public String getName() {
+			return name().replace("_", " ").replace("$", "/");
+		}
 	}
 	
 	public static enum UnitType {
-		Infantry(20, 6, 2, 35, 5.0f, false, AttackKind.Machine_Gun, null, 1, 0, null),
+		Infantry(20, 6, 2, 35, 5.0f, false, AttackKind.Machine_Gun, AttackKind.N$A, 1, 0, null),
 		
 		;
 		

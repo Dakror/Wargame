@@ -16,6 +16,13 @@
 
 package de.dakror.wargame.ui;
 
+import com.badlogic.gdx.graphics.Color;
+
+import de.dakror.wargame.Wargame;
+import de.dakror.wargame.render.SpriteRenderer;
+import de.dakror.wargame.render.TextRenderer;
+import de.dakror.wargame.render.TextureAtlas.TextureRegion;
+
 /**
  * @author Maximilian Stark | Dakror
  *
@@ -43,4 +50,22 @@ public class UI {
 	
 	public static final int BTN_HEIGHT = 49 * DEFAULT_SCALE;
 	public static final int BTN_PRESSED_HEIGHT = 45 * DEFAULT_SCALE;
+	
+	public static void renderStats(float x, float y, float width, int hp, int atk, int def, SpriteRenderer r, TextRenderer t) {
+		final float icoHeight = 35;
+		TextureRegion heartIcon = Wargame.ui.getTile("hud_heartFull").regions.get(0);
+		float hW = heartIcon.origWidth * (icoHeight / heartIcon.origHeight);
+		r.render(x, y - 8, 0, hW, icoHeight, heartIcon.x, heartIcon.y, heartIcon.width, heartIcon.height, heartIcon.texture.textureId);
+		t.renderText(x + hW, y - 1, 0, 0.5f, Color.SLATE, hp + "", r);
+		
+		TextureRegion swordIcon = Wargame.ui.getTile("cursorSword_gold").regions.get(0);
+		float sW = swordIcon.origWidth * (icoHeight / swordIcon.origHeight);
+		r.render(x + width / 3 - 20, y - 8, 0, sW, icoHeight, swordIcon.x, swordIcon.y, swordIcon.width, swordIcon.height, swordIcon.texture.textureId);
+		t.renderText(x + width / 3 - 15 + sW, y - 1, 0, 0.5f, Color.SLATE, atk + "", r);
+		
+		TextureRegion shieldIcon = Wargame.ui.getTile("shieldSilver").regions.get(0);
+		float dW = shieldIcon.origWidth * (icoHeight / shieldIcon.origHeight);
+		r.render(x + width / 3 * 2 - 20, y - 8, 0, dW, icoHeight, shieldIcon.x, shieldIcon.y, shieldIcon.width, shieldIcon.height, shieldIcon.texture.textureId);
+		t.renderText(x + width / 3 * 2 - 15 + dW, y - 1, 0, 0.5f, Color.SLATE, def + "", r);
+	}
 }

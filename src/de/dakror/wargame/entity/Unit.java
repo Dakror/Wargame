@@ -188,7 +188,7 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	
 	@Override
 	public float getZ() {
-		return (world.getDepth() - pos.y * 2 + pos.x * 2) / 1024f;
+		return (world.getDepth() - (float) Math.floor(pos.y) * 2 + (float) Math.floor(pos.x) * 2) / 10f;
 	}
 	
 	@Override

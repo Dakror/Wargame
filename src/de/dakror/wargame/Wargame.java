@@ -36,6 +36,8 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import de.dakror.wargame.World.CanBuildResult;
+import de.dakror.wargame.entity.Unit;
+import de.dakror.wargame.entity.Unit.UnitType;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.BuildingType;
 import de.dakror.wargame.entity.building.City;
@@ -164,10 +166,12 @@ public class Wargame extends ActivityStub {
 		Building theirCity = new City(18, 19, enemy);
 		enemy.setMainCity(theirCity);
 		world.addEntity(theirCity);
-		//		for (int i = 0; i < 15; i++) {
-		//			Unit u = new Unit(2 + i / 5f, 3 - (i % 2) * 0.5f, 0, Unit.Type.Infantry);
-		//			world.addEntity(u);
-		//		}
+		for (int i = 0; i < 15; i++) {
+			for (int j = 0; j < 15; j++) {
+				Unit u = new Unit(i * 0.4f, j * 0.4f, 0, player, UnitType.Infantry);
+				world.addEntity(u);
+			}
+		}
 		
 		//		Unit v = new Unit(0, 2, player, Units.Infantry);
 		
@@ -223,10 +227,9 @@ public class Wargame extends ActivityStub {
 		
 		glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 		Matrix.setLookAtM(viewMatrix, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0);
 		Matrix.scaleM(viewMatrix, 0, scale, scale, scale);
 		

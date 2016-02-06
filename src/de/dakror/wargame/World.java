@@ -338,7 +338,7 @@ public class World implements Renderable {
 		
 		rEntities += render(buildings, r);
 		//		long t = System.nanoTime();
-		Collections.sort(units);
+		//		Collections.sort(units);
 		//		System.out.println((System.nanoTime() - t) / 1000000f);
 		rEntities += render(units, r);
 		

@@ -148,7 +148,7 @@ public abstract class Building extends Entity implements TouchListener {
 	
 	@Override
 	public float getZ() {
-		return (world.getDepth() - z * 2 + x * 2) / 1024f + (color.a < 1.0f ? 10 : 0) /*Wargame#placeBuilding*/;
+		return (world.getDepth() - z * 2 + x * 2) / 10f + (color.a < 1.0f ? 10 : 0) /*Wargame#placeBuilding*/;
 	}
 	
 	@Override

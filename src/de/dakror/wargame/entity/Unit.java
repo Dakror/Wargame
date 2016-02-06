@@ -52,19 +52,21 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	}
 	
 	public static enum UnitType {
-		Infantry(20, 35, 5.0f, false, AttackKind.Machine_Gun, null, 1, 0, null),
+		Infantry(20, 6, 2, 35, 5.0f, false, AttackKind.Machine_Gun, null, 1, 0, null),
 		
 		;
 		
 		public final String alias;
-		public final int hp, costs;
+		public final int hp, atk, def, costs;
 		public final float produceDuration; // in seconds
 		public final int receiveStrength0, receiveStrength1;
 		public final boolean superAvailable;
 		public final AttackKind weapon0, weapon1;
 		
-		private UnitType(int hp, int costs, float produceDuration, boolean superAvailable, AttackKind weapon0, AttackKind weapon1, int receiveStrength0, int receiveStrength1, String alias) {
+		private UnitType(int hp, int atk, int def, int costs, float produceDuration, boolean superAvailable, AttackKind weapon0, AttackKind weapon1, int receiveStrength0, int receiveStrength1, String alias) {
 			this.hp = hp;
+			this.atk = atk;
+			this.def = def;
 			this.costs = costs;
 			this.produceDuration = produceDuration;
 			this.superAvailable = superAvailable;

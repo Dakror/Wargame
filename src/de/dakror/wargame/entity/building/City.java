@@ -28,6 +28,7 @@ public class City extends Building {
 	public City(int x, int z, Player owner) {
 		super(x, z, owner, BuildingType.City);
 		hp = 1000;
+		def = 5;
 		buildCosts = 850;
 		runCosts = 6;
 		function = "Function: Claim land";

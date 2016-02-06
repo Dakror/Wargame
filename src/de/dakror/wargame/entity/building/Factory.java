@@ -24,7 +24,8 @@ import de.dakror.wargame.Player;
 public class Factory extends Building {
 	public Factory(int x, int z, Player owner) {
 		super(x, z, owner, BuildingType.Factory);
-		hp = 550;
+		hp = 350;
+		def = 5;
 		buildCosts = 450;
 		runCosts = -240;
 		function = "Produces cash";

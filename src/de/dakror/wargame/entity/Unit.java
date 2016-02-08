@@ -49,6 +49,7 @@ public class Unit extends Entity implements Steerable<Vector2> {
 		Machine_Gun,
 		Rocket,
 		Torpedo,
+		Medkit,
 		N$A;
 		
 		public String getName() {
@@ -57,7 +58,9 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	}
 	
 	public static enum UnitType {
-		Infantry(20, 6, 2, 35, 5.0f, false, AttackKind.Machine_Gun, AttackKind.N$A, 1, 0, null),
+		Infantry(20, 6, 2, 35, 5.0f, false, AttackKind.Machine_Gun, AttackKind.N$A, 1, 0, "Infantry"),
+		Bazooka(10, 15, 0, 65, 11.0f, false, AttackKind.Handgun, AttackKind.Rocket, 1, 3, "Infantry_P"),
+		Medic(28, 0, 2, 110, 15.0f, false, AttackKind.Medkit, AttackKind.N$A, 0, 0, "Volunteer_T"),
 		
 		;
 		
@@ -115,7 +118,7 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	float scale = 0.5f;
 	
 	public Unit(float x, float z, int face, Player owner, boolean huge, UnitType type) {
-		super(x, z, face, owner, huge, type.name());
+		super(x, z, face, owner, huge, type.alias);
 		this.type = type;
 		pos.set(x, z);
 		onCreate();
@@ -188,7 +191,7 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	
 	@Override
 	public float getZ() {
-		return (world.getDepth() - (float) Math.floor(pos.y) * 2 + (float) Math.floor(pos.x) * 2) / 10f;
+		return (world.getDepth() - pos.y * 2 + pos.x * 2) / 10f;
 	}
 	
 	@Override

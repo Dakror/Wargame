@@ -58,25 +58,30 @@ public class Estate extends Building {
 		Panel secondary;
 		Button selected;
 		
+		ButtonListener bl = new ButtonListener() {
+			@Override
+			public void onDown(Button b) {
+				boolean t = b.isToggled();
+				for (Button bt : buttons)
+					if (bt.getPayload() != null) bt.setToggled(false);
+				b.setToggled(t);
+			}
+			
+			@Override
+			public void onUp(Button b) {
+				if (b.isToggled()) selected = b;
+				else selected = null;
+			}
+		};
+		
 		public EstateContextMenu(Entity entity) {
 			super(500, 300, entity);
 			secondary = new Panel(-Wargame.width / 2 + 500, -Wargame.height / 2, 500, 240, UI.BEIGE_LIGHT);
 			pb = new ProgressBar(-Wargame.width / 2 + 30, -Wargame.height / 2 + 30, 440, 0, UI.BAR_BLUE);
-			buttons.add(new Button(1, 0, new Sprite(owner.getColor(), Wargame.standing.getTile("palette99_" + UnitType.values()[0].name() + "_Large_face0").regions.get(0)), new ButtonListener() {
-				@Override
-				public void onDown(Button b) {
-					boolean t = b.isToggled();
-					for (Button bt : buttons)
-						bt.setToggled(false);
-					b.setToggled(t);
-				}
-				
-				@Override
-				public void onUp(Button b) {
-					if (b.isToggled()) selected = b;
-					else selected = null;
-				}
-			}, UnitType.values()[0], true));
+			
+			addUnitType(UnitType.Infantry);
+			addUnitType(UnitType.Bazooka);
+			addUnitType(UnitType.Medic);
 			
 			buttons.add(new Button(1, 1, new Sprite(Wargame.ui.getTile("iconPlus_green").regions.get(0)), new ButtonListener() {
 				@Override
@@ -95,6 +100,22 @@ public class Estate extends Building {
 				}
 				
 			}, null, false).setPadding(30, 5).setColor(UI.BLUE));
+			
+			buttons.add(new Button(2, 1, new Sprite(Wargame.ui.getTile("iconLoop_beigeLight").regions.get(0)), new ButtonListener() {
+				@Override
+				public void onDown(Button b) {}
+				
+				@Override
+				public void onUp(Button b) {}
+				
+			}, null, true).setPadding(30, 5).setColor(UI.BLUE));
+		}
+		
+		int index = 1;
+		
+		void addUnitType(UnitType type) {
+			buttons.add(new Button(index, 0, new Sprite(owner.getColor(), Wargame.standing.getTile("palette99_" + type.alias + "_Large_face0").regions.get(0)), bl, type, true));
+			index++;
 		}
 		
 		@Override
@@ -136,6 +157,9 @@ public class Estate extends Building {
 				}
 			} else pb.setValue(0);
 			pb.render(r, t);
+			if (queue.size > 0) {
+				t.renderText(pb.getX() + pb.getWidth() / 2 - 30, pb.getY() + 10, 0, 0.7f, Color.BLACK, (int) Math.ceil(queue.first().timeLeft) + "s", r);
+			}
 		}
 	}
 	

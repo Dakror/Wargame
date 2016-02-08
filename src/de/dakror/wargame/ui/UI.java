@@ -32,6 +32,7 @@ public class UI {
 	public static final String BEIGE_LIGHT = "_beigeLight";
 	public static final String BROWN = "_brown";
 	public static final String BLUE = "_blue";
+	public static final String GREY = "_grey";
 	
 	public static final String BAR_BLUE = "Blue";
 	public static final String BAR_GREEN = "Green";
@@ -63,7 +64,7 @@ public class UI {
 		r.render(x + width / 3 - 20, y - 8, 0, sW, icoHeight, swordIcon.x, swordIcon.y, swordIcon.width, swordIcon.height, swordIcon.texture.textureId);
 		t.renderText(x + width / 3 - 15 + sW, y - 1, 0, 0.5f, Color.SLATE, atk + "", r);
 		
-		TextureRegion shieldIcon = Wargame.ui.getTile("shieldSilver").regions.get(0);
+		TextureRegion shieldIcon = Wargame.ui.getTile("shieldSilver2").regions.get(0);
 		float dW = shieldIcon.origWidth * (icoHeight / shieldIcon.origHeight);
 		r.render(x + width / 3 * 2 - 20, y - 8, 0, dW, icoHeight, shieldIcon.x, shieldIcon.y, shieldIcon.width, shieldIcon.height, shieldIcon.texture.textureId);
 		t.renderText(x + width / 3 * 2 - 15 + dW, y - 1, 0, 0.5f, Color.SLATE, def + "", r);

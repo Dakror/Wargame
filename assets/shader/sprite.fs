@@ -1,5 +1,5 @@
 //#define LOWP lowp
-precision highp float;
+precision mediump float;
 
 uniform sampler2D uTex;
 
@@ -20,9 +20,11 @@ varying float vPal;
 
 void main() {
 	vec4 col = vec4(1.0);
-	vec2 c99 = vec2(texture2D(uTex, vTex).r, 0);
+	vec4 c = texture2D(uTex, vTex);
+	if(c.a == 0.0) discard;
+	vec2 c99 = vec2(c.r, 0);
 	
-	if (vPal == -1.0) col = texture2D(uTex, vTex);
+	if (vPal == -1.0) col = c;
 	else if(vPal == 0.0) col = texture2D(color0, c99);
 	else if(vPal == 1.0) col = texture2D(color1, c99);
 	else if(vPal == 2.0) col = texture2D(color2, c99);

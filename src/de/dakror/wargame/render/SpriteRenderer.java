@@ -32,13 +32,14 @@ import com.badlogic.gdx.graphics.Color;
 public class SpriteRenderer {
 	public static final int VERTEX_SIZE = 14 * 4;
 	
-	final int kAboSize = 2048;
+	final int kAboSize = VERTEX_SIZE * 1024;
 	final int kEboSize = kAboSize + (kAboSize / 2);
-	int vertexIndex = 0, elementIndex = 0;
+	int vertexIndex = 0;
 	int lastTexture;
 	int program;
 	int[] vbo, ibo;
 	
+	//	float[][] palettes;
 	int[] palettes;
 	int[] uPalettes;
 	int aPos, aTex, aCol, aPal, aAdd;
@@ -47,12 +48,12 @@ public class SpriteRenderer {
 	FloatBuffer vertices;
 	ShortBuffer indices;
 	
+	boolean drawBuffer1 = true;
+	
 	float[] matrix;
 	
 	public SpriteRenderer() {
-		ByteBuffer bb = ByteBuffer.allocateDirect(VERTEX_SIZE * kAboSize);
-		bb.order(ByteOrder.nativeOrder());
-		vertices = bb.asFloatBuffer();
+		vertices = FloatBuffer.allocate(kAboSize);
 		ByteBuffer blb = ByteBuffer.allocateDirect(kEboSize * 2);
 		blb.order(ByteOrder.nativeOrder());
 		indices = blb.asShortBuffer();
@@ -73,11 +74,48 @@ public class SpriteRenderer {
 		ibo = new int[1];
 		glGenBuffers(1, ibo, 0);
 		
+		//		palettes = new float[9][3 * 256];
 		palettes = new int[9];
 		uPalettes = new int[9];
+		Color c = new Color();
+		for (int i = 0; i < 9; i++) {
+			//			try {
+			palettes[i] = GLUtil.loadTexture("palettes/" + (i < 8 ? ("color" + i) : "terrain") + ".png");
+			//				Bitmap bitmap = BitmapFactory.decodeStream(Wargame.instance.getAssets().open("palettes/" + (i < 9 ? ("color" + i) : "terrain") + ".png"));
+			//				for (int j = 0; j < 256; j++) {
+			//					c.set(bitmap.getPixel(j, 0));
+			//					// first part is 'a'
+			//					palettes[i][j * 3] = c.g;
+			//					palettes[i][j * 3 + 1] = c.b;
+			//					palettes[i][j * 3 + 2] = c.a;
+			//				}
+			//				bitmap.recycle();
+			//			} catch (IOException e) {
+			//				e.printStackTrace();
+			//			}
+		}
+		
+		glUseProgram(program);
+		aPos = glGetAttribLocation(program, "aPos");
+		aTex = glGetAttribLocation(program, "aTex");
+		aCol = glGetAttribLocation(program, "aCol");
+		aPal = glGetAttribLocation(program, "aPal");
+		aAdd = glGetAttribLocation(program, "aAdd");
+		uMat = glGetUniformLocation(program, "uMat");
+		uTex = glGetUniformLocation(program, "uTex");
+		
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, kEboSize * 2, indices, GL_STREAM_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		
+		//		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+		//		glBufferData(GL_ARRAY_BUFFER, kAboSize * VERTEX_SIZE, null, GL_STREAM_DRAW);
+		//		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		
 		for (int i = 0; i < 8; i++)
-			palettes[i] = GLUtil.loadTexture("palettes/color" + i + ".png");
-		palettes[8] = GLUtil.loadTexture("palettes/terrain.png");
+			uPalettes[i] = glGetUniformLocation(program, "color" + i);
+		uPalettes[8] = glGetUniformLocation(program, "terrain");
+		glUseProgram(0);
 	}
 	
 	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, int texture) {
@@ -93,7 +131,6 @@ public class SpriteRenderer {
 	}
 	
 	public void render(Sprite sprite) {
-		if (sprite.getXOffset() != 0 && sprite.getYOffset() != 0 && sprite.getInnerWidth() != 0 && sprite.getInnerHeight() != 0) render(sprite.getX(), sprite.getY(), sprite.getZ() - 0.001f, sprite.getWidth(), sprite.getHeight(), 0, 0, 1, 1, 0, 0, sprite.getWidth(), sprite.getHeight(), Color.BLACK, sprite.getAdditive(), 255, sprite.getTextureId());
 		render(sprite.getX(), sprite.getY(), sprite.getZ(), sprite.getWidth(), sprite.getHeight(), sprite.getTextureX(), sprite.getTextureY(), sprite.getTextureWidth(), sprite.getTextureHeight(), sprite.getXOffset(), sprite.getYOffset(), sprite.getInnerWidth(), sprite.getInnerHeight(), sprite.getColor(), sprite.getAdditive(), sprite.getPaletteIndex(), sprite.getTextureId());
 	}
 	
@@ -103,55 +140,41 @@ public class SpriteRenderer {
 			lastTexture = texture;
 		}
 		
-		elementIndex += 6;
-		
+		if (vertexIndex + 4 >= (kAboSize / (VERTEX_SIZE / 4))) flush();
 		boolean useOffset = xOff != 0 && yOff != 0 && innerW != 0 && innerH != 0;
 		if (useOffset) {
-			vertices.put(new float[] { x + xOff, y + yOff + innerH, z, tx, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
-			vertexIndex++;
-			vertices.put(new float[] { x + xOff, y + yOff, z, tx, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
-			vertexIndex++;
-			vertices.put(new float[] { x + xOff + innerW, y + yOff, z, tx + tw, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
-			vertexIndex++;
-			vertices.put(new float[] { x + xOff + innerW, y + yOff + innerH, z, tx + tw, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
-			vertexIndex++;
+			put(x + xOff, y + yOff + innerH, z, tx, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a, //
+			x + xOff, y + yOff, z, tx, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a, //
+			x + xOff + innerW, y + yOff, z, tx + tw, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a, //
+			x + xOff + innerW, y + yOff + innerH, z, tx + tw, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a);
 		} else {
-			vertices.put(new float[] { x, y + h, z, tx, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
-			vertexIndex++;
-			vertices.put(new float[] { x, y, z, tx, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
-			vertexIndex++;
-			vertices.put(new float[] { x + w, y, z, tx + tw, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
-			vertexIndex++;
-			vertices.put(new float[] { x + w, y + h, z, tx + tw, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a });
-			vertexIndex++;
+			put(x, y + h, z, tx, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a, //
+			x, y, z, tx, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a, //
+			x + w, y, z, tx + tw, ty + th, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a, //
+			x + w, y + h, z, tx + tw, ty, c.r, c.g, c.b, c.a, p, a.r, a.g, a.b, a.a);
 		}
-		
-		if (vertexIndex >= kAboSize) flush();
+	}
+	
+	void put(float... f) {
+		System.arraycopy(f, 0, vertices.array(), vertexIndex * (VERTEX_SIZE / 4), f.length);
+		vertexIndex += 4;
 	}
 	
 	public void begin(float[] matrix) {
 		this.matrix = matrix;
+		
 		glUseProgram(program);
-		aPos = glGetAttribLocation(program, "aPos");
-		aTex = glGetAttribLocation(program, "aTex");
-		aCol = glGetAttribLocation(program, "aCol");
-		aPal = glGetAttribLocation(program, "aPal");
-		aAdd = glGetAttribLocation(program, "aAdd");
-		uMat = glGetUniformLocation(program, "uMat");
-		uTex = glGetUniformLocation(program, "uTex");
-		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, kEboSize * 2, indices, GL_STREAM_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		
-		for (int i = 0; i < 8; i++)
-			uPalettes[i] = glGetUniformLocation(program, "color" + i);
-		uPalettes[8] = glGetUniformLocation(program, "terrain");
-		
 		glUniform1i(uTex, 0);
 		for (int i = 0; i < 9; i++)
 			glUniform1i(uPalettes[i], i + 1);
+		//			glUniform3fv(uPalettes[i], 256, palettes[i], 0);
 		glUniformMatrix4fv(uMat, 1, false, matrix, 0);
+		
+		glEnable(GL_TEXTURE_2D);
+		for (int i = 0; i < palettes.length; i++) {
+			glActiveTexture(GL_TEXTURE0 + i + 1);
+			glBindTexture(GL_TEXTURE_2D, palettes[i]);
+		}
 	}
 	
 	public void end() {
@@ -161,20 +184,22 @@ public class SpriteRenderer {
 	}
 	
 	public void flush() {
-		glEnable(GL_TEXTURE_2D);
-		glActiveTexture(GL_TEXTURE0 + 0);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, lastTexture);
+		//		glActiveTexture(GL_TEXTURE0);
+		//		glBindTexture(GL_TEXTURE_2D, lastTexture);
 		
-		for (int i = 0; i < palettes.length; i++) {
-			glActiveTexture(GL_TEXTURE0 + i + 1);
-			glBindTexture(GL_TEXTURE_2D, palettes[i]);
-		}
+		//		for (int i = 0; i < palettes.length; i++) {
+		//			glActiveTexture(GL_TEXTURE0 + i + 1);
+		//			glBindTexture(GL_TEXTURE_2D, palettes[i]);
+		//		}
 		
 		vertices.position(0);
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 		glBufferData(GL_ARRAY_BUFFER, vertexIndex * VERTEX_SIZE, vertices, GL_STREAM_DRAW);
+		//		glBufferSubData(GL_ARRAY_BUFFER, 0, vertexIndex * VERTEX_SIZE, vertices); // slow AF
 		
 		glEnableVertexAttribArray(aPos);
 		glVertexAttribPointer(aPos, 3, GL_FLOAT, false, VERTEX_SIZE, 0);
@@ -191,10 +216,7 @@ public class SpriteRenderer {
 		glEnableVertexAttribArray(aAdd);
 		glVertexAttribPointer(aAdd, 4, GL_FLOAT, false, VERTEX_SIZE, 10 * 4);
 		
-		glDrawElements(GL_TRIANGLES, elementIndex, GL_UNSIGNED_SHORT, 0);
-		//		indices.clear();
-		elementIndex = 0;
-		vertices.clear();
+		glDrawElements(GL_TRIANGLES, vertexIndex * 3 / 2, GL_UNSIGNED_SHORT, 0);
 		vertexIndex = 0;
 		
 		glDisableVertexAttribArray(aPos);

@@ -49,7 +49,7 @@ public class Button extends Component implements TouchListener {
 	 */
 	public Button(int index, int y, Sprite foreground, ButtonListener listener, Object payload, boolean toggle) {
 		type = UI.BTN_SQUARE;
-		x = Wargame.width / 2 - UI.BTN_SQUARE_WIDTH * index - 15;
+		x = Wargame.width / 2 - (UI.BTN_SQUARE_WIDTH + 5) * index - 15;
 		this.y = -Wargame.height / 2 + 15 + y * (UI.BTN_HEIGHT + 5);
 		setColor(UI.BROWN);
 		listeners = new ArrayList<ButtonListener>();

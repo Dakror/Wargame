@@ -30,7 +30,6 @@ import com.badlogic.gdx.math.Vector3;
 
 import android.opengl.Matrix;
 import de.dakror.wargame.entity.Entity;
-import de.dakror.wargame.entity.Unit;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.render.Renderable;
@@ -108,8 +107,9 @@ public class World implements Renderable {
 	public int rEntities;
 	float add;
 	
-	protected ArrayList<Unit> units = new ArrayList<Unit>();
-	protected ArrayList<Building> buildings = new ArrayList<Building>();
+	protected ArrayList<Entity> entities = new ArrayList<Entity>();
+	
+	protected ArrayList<Entity> pendingSpawns = new ArrayList<Entity>();
 	
 	int[] fbo = new int[1];
 	int[] rbo = new int[1];
@@ -245,7 +245,8 @@ public class World implements Renderable {
 		if (!get(x, z).solid) return new CanBuildResult(1);
 		
 		boolean anyCity = false;
-		for (Entity e : buildings) {
+		for (Entity e : entities) {
+			if (!(e instanceof Building)) continue;
 			if (e.getRealX() == x && e.getRealZ() == z) return new CanBuildResult(2);
 			if (e instanceof City && player.equals(e.getOwner())) {
 				if (Vector2.dst(e.getRealX(), e.getRealZ(), x, z) < ((City) e).getRadius()) anyCity = true;
@@ -258,8 +259,10 @@ public class World implements Renderable {
 	}
 	
 	public Building getBuildingAt(int x, int z, Player optionalOwner) {
-		for (Entity e : buildings)
+		for (Entity e : entities) {
+			if (!(e instanceof Building)) continue;
 			if (e.getRealX() == x && e.getRealZ() == z && (optionalOwner != null ? e.getOwner().equals(optionalOwner) : true)) return (Building) e;
+		}
 		return null;
 	}
 	
@@ -289,17 +292,18 @@ public class World implements Renderable {
 	}
 	
 	public void update(float timePassed) {
-		update(buildings, timePassed);
-		update(units, timePassed);
-	}
-	
-	public <E extends Entity> void update(Iterable<E> arr, float timePassed) {
-		for (Iterator<E> iter = arr.iterator(); iter.hasNext();) {
+		for (Iterator<Entity> iter = entities.iterator(); iter.hasNext();) {
 			Entity e = iter.next();
 			if (e.isDead()) {
 				e.onRemoval();
 				iter.remove();
 			} else e.update(timePassed);
+		}
+		
+		while (pendingSpawns.size() > 0) {
+			Entity e = pendingSpawns.remove(0);
+			e.onSpawn();
+			entities.add(e);
 		}
 	}
 	
@@ -336,11 +340,15 @@ public class World implements Renderable {
 		
 		r.render(pos.x, pos.y - texHeight / 2 + HEIGHT / 2 + DEPTH / 2 * add, 0, texWidth, texHeight, 0, 1, 1, -1, tex[0]);
 		
-		rEntities += render(buildings, r);
-		//		long t = System.nanoTime();
-		//		Collections.sort(units);
-		//		System.out.println((System.nanoTime() - t) / 1000000f);
-		rEntities += render(units, r);
+		//TODO maybe replace with faster sorting algorithm
+		Collections.sort(entities);
+		
+		for (Entity e : entities) {
+			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
+				r.render(e);
+				rEntities++;
+			}
+		}
 		
 		this.rEntities = rEntities;
 	}
@@ -349,26 +357,9 @@ public class World implements Renderable {
 		pos.set(newPos);
 	}
 	
-	public <E extends Entity> int render(Iterable<E> arr, SpriteRenderer r) {
-		int rEntities = 0;
-		for (Entity e : arr) {
-			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
-				r.render(e);
-				rEntities++;
-			}
-		}
-		return rEntities;
-	}
-	
 	public void addEntity(Entity e) {
 		e.setWorld(this);
-		if (e instanceof Building) {
-			buildings.add((Building) e);
-			Collections.sort(buildings);
-		} else if (e instanceof Unit) {
-			units.add((Unit) e);
-		} else System.out.println("Can't handle Entity: " + e);
-		e.onSpawn();
+		pendingSpawns.add(e);
 	}
 	
 	public void move(float x, float y) {

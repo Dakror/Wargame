@@ -51,4 +51,15 @@ public class MiscUtil {
 			s = f % 1 == 0 ? " " + s : s + "0";
 		return s;
 	}
+	
+	static long time = 0;
+	
+	public static void time() {
+		if (time == 0) {
+			time = System.nanoTime();
+		} else {
+			System.out.println((System.nanoTime() - time) / 1000000f);
+			time = 0;
+		}
+	}
 }

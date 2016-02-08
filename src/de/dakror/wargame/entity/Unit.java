@@ -16,15 +16,33 @@
 
 package de.dakror.wargame.entity;
 
+import com.badlogic.gdx.ai.steer.Proximity;
+import com.badlogic.gdx.ai.steer.Steerable;
+import com.badlogic.gdx.ai.steer.SteeringAcceleration;
+import com.badlogic.gdx.ai.steer.SteeringBehavior;
+import com.badlogic.gdx.ai.steer.behaviors.Separation;
+import com.badlogic.gdx.ai.steer.proximities.InfiniteProximity;
+import com.badlogic.gdx.ai.steer.proximities.RadiusProximity;
+import com.badlogic.gdx.ai.utils.Location;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+
 import de.dakror.wargame.Player;
 import de.dakror.wargame.World;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
+import de.dakror.wargame.util.WorldLocation;
 
 /**
  * @author Maximilian Stark | Dakror
  *
  */
-public class Unit extends Entity {
+public class Unit extends Entity implements Steerable<Vector2> {
+	public static class UnitTypeProximity extends InfiniteProximity<Vector2> {
+		public UnitTypeProximity(Unit owner, Array<Unit> agents) {
+			super(owner, agents);
+		}
+	}
+	
 	public static enum AttackKind {
 		Arc_Missile,
 		Bomb,
@@ -85,12 +103,27 @@ public class Unit extends Entity {
 		public void update(Unit u, float timePassed) {}
 	}
 	
+	private static final SteeringAcceleration<Vector2> steeringOutput = new SteeringAcceleration<Vector2>(new Vector2());
+	
+	boolean tagged;
+	boolean independentFacing = false;
+	float maxLinearSpeed = 2;
+	float maxLinearAcceleration = 1;
+	float maxAngularSpeed = 5;
+	float maxAngularAcceleration = 10;
+	float angularVelocity;
+	float boundingRadius = 0.075f;
+	float orientation;
+	Vector2 linearVelocity = new Vector2();
+	Vector2 pos = new Vector2();
 	UnitType type;
+	SteeringBehavior<Vector2> steering;
 	float scale = 0.5f;
 	
 	public Unit(float x, float z, int face, Player owner, boolean huge, UnitType type) {
-		super(x, z, face, owner, huge, type.alias);
+		super(x + (float) (Math.random() / 100), z + (float) (Math.random() / 100), face, owner, huge, type.alias);
 		this.type = type;
+		pos.set(this.x, this.z);
 		onCreate();
 	}
 	
@@ -124,30 +157,158 @@ public class Unit extends Entity {
 	public void update(float deltaTime) {
 		super.update(deltaTime);
 		
-		//		if (steering != null) {
-		//			steering.calculateSteering(steeringOutput);
-		//			applySteering(steeringOutput, deltaTime);
-		//			
-		//			face = ((((int) Math.round(Math.toDegrees(orientation) + 360)) % 360) / 90 + 3) % 4;
-		//			updateTexture();
-		//		}
+		if (steering != null) {
+			steering.calculateSteering(steeringOutput);
+			applySteering(steeringOutput, deltaTime);
+			
+			face = ((((int) Math.round(Math.toDegrees(orientation) + 360)) % 360) / 90 + 3) % 4;
+			updateTexture();
+		}
 		
 		type.update(this, deltaTime);
 	}
 	
+	private void applySteering(SteeringAcceleration<Vector2> steering, float deltaTime) {
+		pos.mulAdd(linearVelocity, deltaTime);
+		if (steering.linear.isZero(0.5f)) linearVelocity.setZero();
+		else linearVelocity.mulAdd(steering.linear, deltaTime).limit(getMaxLinearSpeed());
+		
+		if (independentFacing) {
+			orientation += angularVelocity * deltaTime;
+			angularVelocity += steering.angular * deltaTime;
+		} else if (!linearVelocity.isZero(getZeroLinearSpeedThreshold())) {
+			float newOrientation = vectorToAngle(linearVelocity);
+			angularVelocity = (newOrientation - getOrientation()) * deltaTime; // this is superfluous if independentFacing is always true
+			orientation = newOrientation;
+		}
+	}
+	
 	@Override
 	public float getX() {
-		return (x + (huge ? 1 : 0)) * (World.WIDTH / 2) + y * (World.WIDTH / 2) + world.getPos().x - xOffset + ((World.WIDTH) - width) / 4;
+		return (pos.x + (huge ? 1 : 0)) * (World.WIDTH / 2) + pos.y * (World.WIDTH / 2) + world.getPos().x - xOffset + ((World.WIDTH) - width) / 4;
 	}
 	
 	@Override
 	public float getY() {
-		return 2 * World.HEIGHT - (x + (huge ? 1 : 0)) * (World.DEPTH / 2) + y * (World.DEPTH / 2) + world.getPos().y + yOffset * 2;
+		return 2 * World.HEIGHT - (pos.x + (huge ? 1 : 0)) * (World.DEPTH / 2) + pos.y * (World.DEPTH / 2) + world.getPos().y + yOffset * 2;
 	}
 	
 	@Override
 	public float getZ() {
-		return (world.getDepth() - y * 2 + x * 2) / 10f;
+		return (world.getDepth() - pos.y * 2 + pos.x * 2) / 10f;
+	}
+	
+	@Override
+	public Vector2 angleToVector(Vector2 outVector, float angle) {
+		return WorldLocation.AngleToVector(outVector, angle);
+	}
+	
+	@Override
+	public float vectorToAngle(Vector2 vector) {
+		return WorldLocation.VectorToAngle(vector);
+	}
+	
+	@Override
+	public float getAngularVelocity() {
+		return angularVelocity;
+	}
+	
+	@Override
+	public float getBoundingRadius() {
+		return boundingRadius;
+	}
+	
+	public boolean isIndependentFacing() {
+		return independentFacing;
+	}
+	
+	public void setIndependentFacing(boolean independentFacing) {
+		this.independentFacing = independentFacing;
+	}
+	
+	@Override
+	public Vector2 getLinearVelocity() {
+		return linearVelocity;
+	}
+	
+	@Override
+	public float getMaxAngularAcceleration() {
+		return maxAngularAcceleration;
+	}
+	
+	@Override
+	public void setMaxAngularAcceleration(float maxAngularAcceleration) {
+		this.maxAngularAcceleration = maxAngularAcceleration;
+	}
+	
+	@Override
+	public float getMaxAngularSpeed() {
+		return maxAngularSpeed;
+	}
+	
+	@Override
+	public void setMaxAngularSpeed(float maxAngularSpeed) {
+		this.maxAngularSpeed = maxAngularSpeed;
+	}
+	
+	@Override
+	public float getMaxLinearAcceleration() {
+		return maxLinearAcceleration;
+	}
+	
+	@Override
+	public void setMaxLinearAcceleration(float maxLinearAcceleration) {
+		this.maxLinearAcceleration = maxLinearAcceleration;
+	}
+	
+	@Override
+	public float getMaxLinearSpeed() {
+		return maxLinearSpeed;
+	}
+	
+	@Override
+	public void setMaxLinearSpeed(float maxLinearSpeed) {
+		this.maxLinearSpeed = maxLinearSpeed;
+	}
+	
+	@Override
+	public float getOrientation() {
+		return orientation; //(float) (face * Math.PI);
+	}
+	
+	@Override
+	public void setOrientation(float orientation) {
+		face = (int) Math.round(orientation / Math.PI);
+	}
+	
+	@Override
+	public Vector2 getPosition() {
+		return pos;
+	}
+	
+	@Override
+	public float getZeroLinearSpeedThreshold() {
+		return 1f;
+	}
+	
+	@Override
+	public void setZeroLinearSpeedThreshold(float value) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public boolean isTagged() {
+		return tagged;
+	}
+	
+	@Override
+	public void setTagged(boolean tagged) {
+		this.tagged = tagged;
+	}
+	
+	@Override
+	public Location<Vector2> newLocation() {
+		return new WorldLocation();
 	}
 	
 	@Override
@@ -178,5 +339,8 @@ public class Unit extends Entity {
 	@Override
 	public void onSpawn() {
 		type.onSpawn(this);
+		
+		Proximity<Vector2> proximity = new RadiusProximity<Vector2>(this, world.getUnits(), boundingRadius);
+		steering = new Separation<Vector2>(this, proximity).setDecayCoefficient(1);
 	}
 }

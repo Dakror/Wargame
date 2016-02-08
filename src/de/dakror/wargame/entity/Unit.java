@@ -16,10 +16,13 @@
 
 package de.dakror.wargame.entity;
 
+import com.badlogic.gdx.ai.steer.Proximity;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
+import com.badlogic.gdx.ai.steer.behaviors.Separation;
 import com.badlogic.gdx.ai.steer.proximities.InfiniteProximity;
+import com.badlogic.gdx.ai.steer.proximities.RadiusProximity;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -101,6 +104,7 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	}
 	
 	private static final SteeringAcceleration<Vector2> steeringOutput = new SteeringAcceleration<Vector2>(new Vector2());
+	private static final Vector2 pos2 = new Vector2();
 	
 	boolean tagged;
 	boolean independentFacing = false;
@@ -114,13 +118,19 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	Vector2 linearVelocity = new Vector2();
 	Vector2 pos = new Vector2();
 	UnitType type;
-	SteeringBehavior<Vector2> steeringBehavior;
+	SteeringBehavior<Vector2> steering;
 	float scale = 0.5f;
 	
 	public Unit(float x, float z, int face, Player owner, boolean huge, UnitType type) {
-		super(x, z, face, owner, huge, type.alias);
+		super(x + (float) Math.random() / 1000, z + (float) Math.random() / 1000, face, owner, huge, type.alias);
 		this.type = type;
-		pos.set(x, z);
+		
+		maxLinearSpeed = 2;
+		maxLinearAcceleration = 2;
+		maxAngularSpeed = 5;
+		maxAngularAcceleration = 10;
+		boundingRadius = 0.15f;
+		
 		onCreate();
 	}
 	
@@ -154,8 +164,8 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	public void update(float deltaTime) {
 		super.update(deltaTime);
 		
-		if (steeringBehavior != null) {
-			steeringBehavior.calculateSteering(steeringOutput);
+		if (steering != null) {
+			steering.calculateSteering(steeringOutput);
 			applySteering(steeringOutput, deltaTime);
 			
 			face = ((((int) Math.round(Math.toDegrees(orientation) + 360)) % 360) / 90 + 3) % 4;
@@ -167,7 +177,8 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	
 	private void applySteering(SteeringAcceleration<Vector2> steering, float deltaTime) {
 		pos.mulAdd(linearVelocity, deltaTime);
-		linearVelocity.mulAdd(steering.linear, deltaTime).limit(getMaxLinearSpeed());
+		if (steering.linear.isZero(getZeroLinearSpeedThreshold())) linearVelocity.setZero();
+		else linearVelocity.mulAdd(steering.linear, deltaTime).limit(getMaxLinearSpeed());
 		
 		if (independentFacing) {
 			orientation += angularVelocity * deltaTime;
@@ -292,14 +303,6 @@ public class Unit extends Entity implements Steerable<Vector2> {
 		throw new UnsupportedOperationException();
 	}
 	
-	public SteeringBehavior<Vector2> getSteeringBehavior() {
-		return steeringBehavior;
-	}
-	
-	public void setSteeringBehavior(SteeringBehavior<Vector2> steeringBehavior) {
-		this.steeringBehavior = steeringBehavior;
-	}
-	
 	@Override
 	public boolean isTagged() {
 		return tagged;
@@ -343,5 +346,8 @@ public class Unit extends Entity implements Steerable<Vector2> {
 	@Override
 	public void onSpawn() {
 		type.onSpawn(this);
+		
+		Proximity<Vector2> proximity = new RadiusProximity<Vector2>(this, world.getUnits(), boundingRadius);
+		steering = new Separation<Vector2>(this, proximity).setDecayCoefficient(1);
 	}
 }

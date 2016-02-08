@@ -21,15 +21,15 @@ import static android.opengl.GLES20.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 
 import android.opengl.Matrix;
 import de.dakror.wargame.entity.Entity;
+import de.dakror.wargame.entity.Unit;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.render.Renderable;
@@ -107,9 +107,10 @@ public class World implements Renderable {
 	public int rEntities;
 	float add;
 	
-	protected ArrayList<Entity> entities = new ArrayList<Entity>();
+	protected Array<Entity> entities = new Array<Entity>();
+	protected Array<Unit> units = new Array<Unit>();
 	
-	protected ArrayList<Entity> pendingSpawns = new ArrayList<Entity>();
+	protected Array<Entity> pendingSpawns = new Array<Entity>();
 	
 	int[] fbo = new int[1];
 	int[] rbo = new int[1];
@@ -296,14 +297,16 @@ public class World implements Renderable {
 			Entity e = iter.next();
 			if (e.isDead()) {
 				e.onRemoval();
+				if (e instanceof Unit) units.removeValue((Unit) e, true);
 				iter.remove();
 			} else e.update(timePassed);
 		}
 		
-		while (pendingSpawns.size() > 0) {
-			Entity e = pendingSpawns.remove(0);
+		while (pendingSpawns.size > 0) {
+			Entity e = pendingSpawns.removeIndex(0);
 			e.onSpawn();
 			entities.add(e);
+			if (e instanceof Unit) units.add((Unit) e);
 		}
 	}
 	
@@ -341,7 +344,7 @@ public class World implements Renderable {
 		r.render(pos.x, pos.y - texHeight / 2 + HEIGHT / 2 + DEPTH / 2 * add, 0, texWidth, texHeight, 0, 1, 1, -1, tex[0]);
 		
 		//TODO maybe replace with faster sorting algorithm
-		Collections.sort(entities);
+		entities.sort();
 		
 		for (Entity e : entities) {
 			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
@@ -369,6 +372,10 @@ public class World implements Renderable {
 	
 	public Vector3 getPos() {
 		return pos;
+	}
+	
+	public Array<Unit> getUnits() {
+		return units;
 	}
 	
 	public Vector3 getNewPos() {

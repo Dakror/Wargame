@@ -74,27 +74,11 @@ public class SpriteRenderer {
 		ibo = new int[1];
 		glGenBuffers(1, ibo, 0);
 		
-		//		palettes = new float[9][3 * 256];
 		palettes = new int[9];
 		uPalettes = new int[9];
-		Color c = new Color();
-		for (int i = 0; i < 9; i++) {
-			//			try {
+		for (int i = 0; i < 9; i++)
 			palettes[i] = GLUtil.loadTexture("palettes/" + (i < 8 ? ("color" + i) : "terrain") + ".png");
-			//				Bitmap bitmap = BitmapFactory.decodeStream(Wargame.instance.getAssets().open("palettes/" + (i < 9 ? ("color" + i) : "terrain") + ".png"));
-			//				for (int j = 0; j < 256; j++) {
-			//					c.set(bitmap.getPixel(j, 0));
-			//					// first part is 'a'
-			//					palettes[i][j * 3] = c.g;
-			//					palettes[i][j * 3 + 1] = c.b;
-			//					palettes[i][j * 3 + 2] = c.a;
-			//				}
-			//				bitmap.recycle();
-			//			} catch (IOException e) {
-			//				e.printStackTrace();
-			//			}
-		}
-		
+			
 		glUseProgram(program);
 		aPos = glGetAttribLocation(program, "aPos");
 		aTex = glGetAttribLocation(program, "aTex");
@@ -107,10 +91,6 @@ public class SpriteRenderer {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, kEboSize * 2, indices, GL_STREAM_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		
-		//		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-		//		glBufferData(GL_ARRAY_BUFFER, kAboSize * VERTEX_SIZE, null, GL_STREAM_DRAW);
-		//		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
 		for (int i = 0; i < 8; i++)
 			uPalettes[i] = glGetUniformLocation(program, "color" + i);
@@ -186,20 +166,12 @@ public class SpriteRenderer {
 	public void flush() {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, lastTexture);
-		//		glActiveTexture(GL_TEXTURE0);
-		//		glBindTexture(GL_TEXTURE_2D, lastTexture);
-		
-		//		for (int i = 0; i < palettes.length; i++) {
-		//			glActiveTexture(GL_TEXTURE0 + i + 1);
-		//			glBindTexture(GL_TEXTURE_2D, palettes[i]);
-		//		}
 		
 		vertices.position(0);
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 		glBufferData(GL_ARRAY_BUFFER, vertexIndex * VERTEX_SIZE, vertices, GL_STREAM_DRAW);
-		//		glBufferSubData(GL_ARRAY_BUFFER, 0, vertexIndex * VERTEX_SIZE, vertices); // slow AF
 		
 		glEnableVertexAttribArray(aPos);
 		glVertexAttribPointer(aPos, 3, GL_FLOAT, false, VERTEX_SIZE, 0);

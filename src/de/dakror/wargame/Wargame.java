@@ -36,6 +36,8 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import de.dakror.wargame.World.CanBuildResult;
+import de.dakror.wargame.entity.Unit;
+import de.dakror.wargame.entity.Unit.UnitType;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.BuildingType;
 import de.dakror.wargame.entity.building.City;
@@ -165,6 +167,12 @@ public class Wargame extends ActivityStub {
 		enemy.setMainCity(theirCity);
 		world.addEntity(theirCity);
 		
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 5; j++) {
+				world.addEntity(new Unit(3, 3f, player, UnitType.Infantry));
+			}
+		}
+		
 		//		Unit v = new Unit(0, 2, player, Units.Infantry);
 		
 		//		SteeringBehavior<Vector2> sb = new Pursue<Vector2>(u, v, 0.3f)/*.setTarget(new WorldLocation(new Vector3(2, 2, 0), 0))/*.setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f)*/;
@@ -245,7 +253,7 @@ public class Wargame extends ActivityStub {
 		
 		spriteRenderer.begin(hudMatrix);
 		textRenderer.renderText(-width / 2, height / 2 - 30, 0, 0.5f, "FPS: " + fps, spriteRenderer);
-		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "E: " + world.rEntities + " / " + world.entities.size(), spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "E: " + world.rEntities + " / " + world.entities.size, spriteRenderer);
 		
 		textRenderer.renderText(-width / 2, height / 2 - 100, 0, 0.5f, "CPU: $" + (int) Math.floor(enemy.money), spriteRenderer);
 		

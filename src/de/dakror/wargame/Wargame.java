@@ -41,6 +41,7 @@ import de.dakror.wargame.entity.Unit.UnitType;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.BuildingType;
 import de.dakror.wargame.entity.building.City;
+import de.dakror.wargame.entity.building.Estate;
 import de.dakror.wargame.render.Sprite;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
@@ -156,22 +157,17 @@ public class Wargame extends ActivityStub {
 		player = new Player("Player", true, 0);
 		enemy = new Player("CPU", false, 1);
 		
-		Building myCity = new City(2, 3, player);
-		//		player.setMainCity(myCity);
-		//		world.addEntity(myCity);
+		Building myCity = new City(4, 4, player);
+		player.setMainCity(myCity);
 		world.center(myCity);
-		//		world.addEntity(new Estate(4, 3, player));
-		//		
-		//		Building theirCity = new City(18, 19, enemy);
-		//		enemy.setMainCity(theirCity);
-		//		world.addEntity(theirCity);
-		//		
-		for (int i = 0; i < 5; i++) {
-			for (int j = 0; j < 5; j++) {
-				world.addEntity(new Unit(5f, 5f, player, UnitType.Infantry));
-			}
-		}
+		world.addEntity(myCity);
+		world.addEntity(new Estate(4, 3, player));
 		
+		Building theirCity = new City(18, 19, enemy);
+		enemy.setMainCity(theirCity);
+		world.addEntity(theirCity);
+		
+		//		
 		//		Unit v = new Unit(0, 2, player, Units.Infantry);
 		
 		//		SteeringBehavior<Vector2> sb = new Pursue<Vector2>(u, v, 0.3f)/*.setTarget(new WorldLocation(new Vector3(2, 2, 0), 0))/*.setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f)*/;
@@ -421,25 +417,10 @@ public class Wargame extends ActivityStub {
 	
 	@Override
 	public void onLongPress(MotionEvent e) {
-		//		player.money += 1000;
-		
-		world.entities.clear();
-		world.units.clear();
-		new Thread() {
-			@Override
-			public void run() {
-				for (int i = 0; i < 5; i++) {
-					for (int j = 0; j < 5; j++) {
-						world.addEntity(new Unit(5f, 5f, player, UnitType.Infantry));
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}.start();
+		player.money += 1000;
+		for (int i = 0; i < 250; i++) {
+			world.addEntity(new Unit(4, 4, player, UnitType.Infantry));
+		}
 	}
 	
 	@TargetApi(Build.VERSION_CODES.KITKAT)

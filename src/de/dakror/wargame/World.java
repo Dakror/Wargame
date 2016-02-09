@@ -29,7 +29,6 @@ import com.badlogic.gdx.utils.Array;
 
 import android.opengl.Matrix;
 import de.dakror.wargame.entity.Entity;
-import de.dakror.wargame.entity.Unit;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.render.Renderable;
@@ -108,8 +107,6 @@ public class World implements Renderable {
 	float add;
 	
 	protected Array<Entity> entities = new Array<Entity>();
-	protected Array<Unit> units = new Array<Unit>();
-	
 	protected Array<Entity> pendingSpawns = new Array<Entity>();
 	
 	int[] fbo = new int[1];
@@ -297,7 +294,6 @@ public class World implements Renderable {
 			Entity e = iter.next();
 			if (e.isDead()) {
 				e.onRemoval();
-				if (e instanceof Unit) units.removeValue((Unit) e, true);
 				iter.remove();
 			} else e.update(timePassed);
 		}
@@ -306,7 +302,6 @@ public class World implements Renderable {
 			Entity e = pendingSpawns.removeIndex(0);
 			e.onSpawn();
 			entities.add(e);
-			if (e instanceof Unit) units.add((Unit) e);
 		}
 	}
 	
@@ -374,8 +369,8 @@ public class World implements Renderable {
 		return pos;
 	}
 	
-	public Array<Unit> getUnits() {
-		return units;
+	public Array<Entity> getEntities() {
+		return entities;
 	}
 	
 	public Vector3 getNewPos() {

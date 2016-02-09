@@ -44,9 +44,9 @@ public abstract class Building extends Entity implements TouchListener {
 		//		Laboratory(450, 1000), // for science!!!!
 	}
 	
-	public static Building create(int x, int y, Player player, BuildingType type) {
+	public static Building create(int x, int z, Player player, BuildingType type) {
 		try {
-			return (Building) Class.forName(Building.class.getPackage().getName() + "." + type.name()).getConstructor(int.class, int.class, Player.class).newInstance(x, y, player);
+			return (Building) Class.forName(Building.class.getPackage().getName() + "." + type.name()).getConstructor(int.class, int.class, Player.class).newInstance(x, z, player);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -64,6 +64,8 @@ public abstract class Building extends Entity implements TouchListener {
 	private Building(int x, int z, int face, Player owner, boolean huge, BuildingType type) {
 		super(x, z, face, owner, huge, type.name());
 		this.type = type;
+		boundingRadius = 0.5f;
+		pos.set(x + boundingRadius, z + boundingRadius);
 		onCreate();
 	}
 	

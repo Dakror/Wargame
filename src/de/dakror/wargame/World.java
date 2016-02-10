@@ -37,6 +37,7 @@ import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.render.TextureAtlas.Tile;
 import de.dakror.wargame.util.ERTree;
+import gnu.trove.TIntProcedure;
 
 /**
  * @author Maximilian Stark | Dakror

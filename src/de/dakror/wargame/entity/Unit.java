@@ -186,10 +186,8 @@ public class Unit extends Entity {
 		
 		Proximity<Vector2> proximity = new ERTreeProximity(this, world.getEntities(), boundingRadius).setFilterType(Unit.class);
 		Proximity<Vector2> proximity2 = new ERTreeProximity(this, world.getEntities(), 1).setFilterType(Building.class).setNearest(1);
-		//		Proximity<Vector2> proximity = new EntityRTreeProximity(this, world.getEntities(), boundingRadius).setFilterType(Unit.class);
-		//		Proximity<Vector2> proximity2 = new EntityRTreeProximity(this, world.getEntities(), 0.145f).setFilterType(Building.class);
-		steering = new BlendedSteering<Vector2>(this)//
-		.add(new Separation<Vector2>(this, proximity).setDecayCoefficient(1), 1)//
+		steering = new BlendedSteering<Vector2>(this)
+		.add(new Separation<Vector2>(this, proximity).setDecayCoefficient(1), 1)
 		.add(new Separation<Vector2>(this, proximity2).setDecayCoefficient(1), 1);
 	}
 }

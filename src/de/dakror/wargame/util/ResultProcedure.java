@@ -24,6 +24,12 @@ import gnu.trove.TIntProcedure;
 public abstract class ResultProcedure<T> implements TIntProcedure {
 	protected T result;
 	
+	public ResultProcedure() {}
+	
+	public ResultProcedure(T init) {
+		result = init;
+	}
+	
 	public T getResult() {
 		return result;
 	}

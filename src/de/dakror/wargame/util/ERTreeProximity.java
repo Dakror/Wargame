@@ -61,11 +61,7 @@ public class ERTreeProximity implements Proximity<Vector2> {
 	
 	@Override
 	public int findNeighbors(final ProximityCallback<Vector2> callback) {
-		ResultProcedure<Integer> p = new ResultProcedure<Integer>() {
-			{
-				result = 0;
-			}
-			
+		ResultProcedure<Integer> p = new ResultProcedure<Integer>(0) {
 			@Override
 			public boolean execute(int id) {
 				Entity e = entities.get(id);

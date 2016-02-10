@@ -30,6 +30,7 @@ import com.badlogic.gdx.utils.Array;
 import android.opengl.Matrix;
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.building.Building;
+import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.render.Renderable;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
@@ -87,8 +88,11 @@ public class World implements Renderable {
 		}
 		
 		public CanBuildResult(int reason) {
-			result = false;
-			this.reason = reason;
+			if (reason == 0) result = true;
+			else {
+				result = false;
+				this.reason = reason;
+			}
 		}
 	}
 	
@@ -240,22 +244,30 @@ public class World implements Renderable {
 		return ch;
 	}
 	
-	public CanBuildResult canBuildOn(int x, int z, Player player) {
+	public CanBuildResult canBuildOn(final int x, final int z, final Player player) {
 		if (!get(x, z).solid) return new CanBuildResult(1);
 		
-		// TODO fix
-		//		boolean anyCity = false;
-		//		for (Entity e : entities.search(new float[] { x, z }, Tile)) {
-		//			if (!(e instanceof Building)) continue;
-		//			if (e.getRealX() == x && e.getRealZ() == z) return new CanBuildResult(2);
-		//			if (e instanceof City && player.equals(e.getOwner())) {
-		//				if (Vector2.dst(e.getRealX(), e.getRealZ(), x, z) < ((City) e).getRadius()) anyCity = true;
-		//			}
-		//		}
-		//		
-		//		if (!anyCity) return new CanBuildResult(3);
-		
-		return new CanBuildResult();
+		ResultProcedure<Integer> p = new ResultProcedure<Integer>(3) {
+			@Override
+			public boolean execute(int id) {
+				Entity e = entities.get(id);
+				if (!(e instanceof Building)) return true;
+				if (e.getRealX() == x && e.getRealZ() == z) {
+					result = 2;
+					return false;
+				}
+				if (e instanceof City && player.equals(e.getOwner())) {
+					if (Vector2.dst(e.getRealX(), e.getRealZ(), x, z) < ((City) e).getRadius()) {
+						result = 0;
+						return false;
+					}
+				}
+				
+				return true;
+			}
+		};
+		entities.nearestN(x, z, Integer.MAX_VALUE, p, 5);
+		return new CanBuildResult(p.getResult());
 	}
 	
 	public Building getBuildingAt(final int x, final int z, final Player optionalOwner) {

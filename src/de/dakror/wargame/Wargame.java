@@ -55,8 +55,8 @@ import de.dakror.wargame.util.Listeners.ButtonListener;
  * @author Maximilian Stark | Dakror
  */
 public class Wargame extends ActivityStub {
-	public static final Color HALFWHITE = new Color(1, 1, 1, 0.5f);
-	public static final Color HALFRED = new Color(1, 0, 0, 0.5f);
+	public static final Color HALFWHITE = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+	public static final Color HALFRED = new Color(0.5f, 0, 0, 0.5f);
 	
 	public static TextureAtlas animation, standing, terrain, ui;
 	public static int height, width;

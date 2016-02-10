@@ -16,16 +16,9 @@
 
 package de.dakror.wargame.entity;
 
-import com.badlogic.gdx.ai.steer.Proximity;
-import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
-import com.badlogic.gdx.ai.steer.behaviors.Separation;
-import com.badlogic.gdx.math.Vector2;
-
 import de.dakror.wargame.Player;
 import de.dakror.wargame.World;
-import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
-import de.dakror.wargame.util.EntityRTreeProximity;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -184,10 +177,10 @@ public class Unit extends Entity {
 	public void onSpawn() {
 		type.onSpawn(this);
 		
-		Proximity<Vector2> proximity = new EntityRTreeProximity(this, world.getEntities(), boundingRadius).setFilterType(Unit.class);
-		Proximity<Vector2> proximity2 = new EntityRTreeProximity(this, world.getEntities(), 0.145f).setFilterType(Building.class);
-		steering = new BlendedSteering<Vector2>(this)//
-		.add(new Separation<Vector2>(this, proximity).setDecayCoefficient(1), 1)//
+		//		Proximity<Vector2> proximity = new EntityRTreeProximity(this, world.getEntities(), boundingRadius).setFilterType(Unit.class);
+		//		Proximity<Vector2> proximity2 = new EntityRTreeProximity(this, world.getEntities(), 0.145f).setFilterType(Building.class);
+		//		steering = new BlendedSteering<Vector2>(this)//
+		//		.add(new Separation<Vector2>(this, proximity).setDecayCoefficient(1), 1)//
 		;//.add(new Separation<Vector2>(this, proximity2).setDecayCoefficient(1), 1);
 	}
 }

@@ -21,24 +21,20 @@ import static android.opengl.GLES20.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.infomatiq.jsi.rtree.RTree;
 
 import android.opengl.Matrix;
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.building.Building;
-import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.render.Renderable;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.render.TextureAtlas.Tile;
-import de.dakror.wargame.util.EntityRTree;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -109,7 +105,7 @@ public class World implements Renderable {
 	public int rEntities;
 	float add;
 	
-	protected EntityRTree entities = new EntityRTree();
+	protected RTree entities = new RTree();
 	protected Array<Entity> pendingSpawns = new Array<Entity>();
 	
 	int[] fbo = new int[1];
@@ -179,6 +175,7 @@ public class World implements Renderable {
 	}
 	
 	void init() {
+		entities.init(null);
 		add = (width - depth - 2) * -0.5f;
 		
 		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
@@ -247,27 +244,27 @@ public class World implements Renderable {
 	}
 	
 	public CanBuildResult canBuildOn(int x, int z, Player player) {
-		if (!get(x, z).solid) return new CanBuildResult(1);
-		
-		boolean anyCity = false;
-		for (Entity e : entities.search(new float[] { x, z }, Tile)) {
-			if (!(e instanceof Building)) continue;
-			if (e.getRealX() == x && e.getRealZ() == z) return new CanBuildResult(2);
-			if (e instanceof City && player.equals(e.getOwner())) {
-				if (Vector2.dst(e.getRealX(), e.getRealZ(), x, z) < ((City) e).getRadius()) anyCity = true;
-			}
-		}
-		
-		if (!anyCity) return new CanBuildResult(3);
-		
+		//		if (!get(x, z).solid) return new CanBuildResult(1);
+		//		
+		//		boolean anyCity = false;
+		//		for (Entity e : entities.search(new float[] { x, z }, Tile)) {
+		//			if (!(e instanceof Building)) continue;
+		//			if (e.getRealX() == x && e.getRealZ() == z) return new CanBuildResult(2);
+		//			if (e instanceof City && player.equals(e.getOwner())) {
+		//				if (Vector2.dst(e.getRealX(), e.getRealZ(), x, z) < ((City) e).getRadius()) anyCity = true;
+		//			}
+		//		}
+		//		
+		//		if (!anyCity) return new CanBuildResult(3);
+		//		
 		return new CanBuildResult();
 	}
 	
 	public Building getBuildingAt(int x, int z, Player optionalOwner) {
-		for (Entity e : entities.search(new float[] { x, z }, Tile)) {
-			if (!(e instanceof Building)) continue;
-			if (e.getRealX() == x && e.getRealZ() == z && (optionalOwner != null ? e.getOwner().equals(optionalOwner) : true)) return (Building) e;
-		}
+		//		for (Entity e : entities.search(new float[] { x, z }, Tile)) {
+		//			if (!(e instanceof Building)) continue;
+		//			if (e.getRealX() == x && e.getRealZ() == z && (optionalOwner != null ? e.getOwner().equals(optionalOwner) : true)) return (Building) e;
+		//		}
 		return null;
 	}
 	
@@ -297,21 +294,21 @@ public class World implements Renderable {
 	}
 	
 	public void update(float timePassed) {
-		for (Iterator<Entity> iter = entities.getAll(Dims).iterator(); iter.hasNext();) {
-			Entity e = iter.next();
-			if (e.isDead()) {
-				e.onRemoval();
-				iter.remove();
-				entities.delete(e);
-			} else e.update(timePassed);
-		}
-		
-		while (pendingSpawns.size > 0) {
-			Entity e = pendingSpawns.first();
-			pendingSpawns.removeValue(e, true);
-			e.onSpawn();
-			entities.insert(e);
-		}
+		//		for (Iterator<Entity> iter = entities.getAll(Dims).iterator(); iter.hasNext();) {
+		//			Entity e = iter.next();
+		//			if (e.isDead()) {
+		//				e.onRemoval();
+		//				iter.remove();
+		//				entities.delete(e);
+		//			} else e.update(timePassed);
+		//		}
+		//		
+		//		while (pendingSpawns.size > 0) {
+		//			Entity e = pendingSpawns.first();
+		//			pendingSpawns.removeValue(e, true);
+		//			e.onSpawn();
+		//			entities.insert(e);
+		//		}
 	}
 	
 	@Override
@@ -348,17 +345,17 @@ public class World implements Renderable {
 		r.render(pos.x, pos.y - texHeight / 2 + HEIGHT / 2 + DEPTH / 2 * add, 0, texWidth, texHeight, 0, 1, 1, -1, tex[0]);
 		
 		// TODO maybe use getMappedCoords() to filter and use rtree properly
-		List<Entity> list = entities.getAll(Dims);
-		
-		//TODO maybe replace with faster sorting algorithm
-		Collections.sort(list);
-		
-		for (Entity e : list) {
-			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
-				r.render(e);
-				rEntities++;
-			}
-		}
+		//		List<Entity> list = entities.getAll(Dims);
+		//		
+		//		//TODO maybe replace with faster sorting algorithm
+		//		Collections.sort(list);
+		//		
+		//		for (Entity e : list) {
+		//			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
+		//				r.render(e);
+		//				rEntities++;
+		//			}
+		//		}
 		
 		this.rEntities = rEntities;
 	}
@@ -393,7 +390,7 @@ public class World implements Renderable {
 		return depth;
 	}
 	
-	public EntityRTree getEntities() {
+	public RTree getEntities() {
 		return entities;
 	}
 }

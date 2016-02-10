@@ -61,6 +61,8 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 	protected Vector2 pos = new Vector2();
 	protected SteeringBehavior<Vector2> steering;
 	
+	public int id;
+	
 	public Entity(float x, float z, int face, Player owner, boolean huge, String name) {
 		this.x = x;
 		y = 1;

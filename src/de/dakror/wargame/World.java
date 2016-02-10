@@ -21,6 +21,7 @@ import static android.opengl.GLES20.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -35,6 +36,7 @@ import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.render.TextureAtlas.Tile;
+import de.dakror.wargame.util.ERTree;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -105,7 +107,7 @@ public class World implements Renderable {
 	public int rEntities;
 	float add;
 	
-	protected RTree entities = new RTree();
+	protected ERTree entities = new ERTree();
 	protected Array<Entity> pendingSpawns = new Array<Entity>();
 	
 	int[] fbo = new int[1];
@@ -113,14 +115,11 @@ public class World implements Renderable {
 	int[] tex = new int[1];
 	int texWidth, texHeight;
 	float[] matrix = new float[16];
-	final float[] Dims;
-	final float[] Tile = { 1, 1 };
 	
 	public World(String worldFile) {
 		super();
 		parse(worldFile);
 		init();
-		Dims = new float[] { width, depth };
 	}
 	
 	public World(int width, int depth) {
@@ -131,7 +130,6 @@ public class World implements Renderable {
 		
 		generate();
 		init();
-		Dims = new float[] { width, depth };
 	}
 	
 	void parse(String worldFile) {
@@ -175,7 +173,6 @@ public class World implements Renderable {
 	}
 	
 	void init() {
-		entities.init(null);
 		add = (width - depth - 2) * -0.5f;
 		
 		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
@@ -260,11 +257,22 @@ public class World implements Renderable {
 		return new CanBuildResult();
 	}
 	
-	public Building getBuildingAt(int x, int z, Player optionalOwner) {
-		//		for (Entity e : entities.search(new float[] { x, z }, Tile)) {
-		//			if (!(e instanceof Building)) continue;
-		//			if (e.getRealX() == x && e.getRealZ() == z && (optionalOwner != null ? e.getOwner().equals(optionalOwner) : true)) return (Building) e;
-		//		}
+	public Building getBuildingAt(final int x, final int z, final Player optionalOwner) {
+		entities.contains(x, z, 1, 1, new TIntProcedure() {
+			@Override
+			public boolean execute(int id) {
+				Entity e = entities.get(id);
+				if (e instanceof Building && e.getRealX() == x && e.getRealZ() == z && (optionalOwner != null ? e.getOwner().equals(optionalOwner) : true)) {
+					result = e;
+					return false;
+				}
+				return true;
+			}
+		});
+		for (Entity e : entities.search(new float[] { x, z }, Tile)) {
+			if (!(e instanceof Building)) continue;
+			if (e.getRealX() == x && e.getRealZ() == z && (optionalOwner != null ? e.getOwner().equals(optionalOwner) : true)) return (Building) e;
+		}
 		return null;
 	}
 	
@@ -294,21 +302,22 @@ public class World implements Renderable {
 	}
 	
 	public void update(float timePassed) {
-		//		for (Iterator<Entity> iter = entities.getAll(Dims).iterator(); iter.hasNext();) {
-		//			Entity e = iter.next();
-		//			if (e.isDead()) {
-		//				e.onRemoval();
-		//				iter.remove();
-		//				entities.delete(e);
-		//			} else e.update(timePassed);
-		//		}
-		//		
-		//		while (pendingSpawns.size > 0) {
-		//			Entity e = pendingSpawns.first();
-		//			pendingSpawns.removeValue(e, true);
-		//			e.onSpawn();
-		//			entities.insert(e);
-		//		}
+		Object[] list = entities.getAll();
+		for (int i = 0; i < list.length; i++) {
+			Entity e = (Entity) list[i];
+			if (e.isDead()) {
+				e.onRemoval();
+				//				iter.remove();
+				entities.delete(e);
+			} else e.update(timePassed);
+		}
+		
+		while (pendingSpawns.size > 0) {
+			Entity e = pendingSpawns.first();
+			pendingSpawns.removeValue(e, true);
+			e.onSpawn();
+			entities.add(e);
+		}
 	}
 	
 	@Override
@@ -347,15 +356,19 @@ public class World implements Renderable {
 		// TODO maybe use getMappedCoords() to filter and use rtree properly
 		//		List<Entity> list = entities.getAll(Dims);
 		//		
-		//		//TODO maybe replace with faster sorting algorithm
 		//		Collections.sort(list);
-		//		
-		//		for (Entity e : list) {
-		//			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
-		//				r.render(e);
-		//				rEntities++;
-		//			}
-		//		}
+		
+		// TODO maybe replace with faster sorting algorithm
+		Object[] list = entities.getAll();
+		Arrays.sort(list);
+		
+		for (int i = 0; i < list.length; i++) {
+			Entity e = (Entity) list[i];
+			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
+				r.render(e);
+				rEntities++;
+			}
+		}
 		
 		this.rEntities = rEntities;
 	}

@@ -250,6 +250,7 @@ public class World implements Renderable {
 		ResultProcedure<Integer> p = new ResultProcedure<Integer>(3) {
 			@Override
 			public boolean execute(int id) {
+				if (result != 3) return false;
 				Entity e = entities.get(id);
 				if (!(e instanceof Building)) return true;
 				if (e.getRealX() == x && e.getRealZ() == z) {

@@ -101,14 +101,14 @@ public class Estate extends Building {
 				
 			}, null, false).setPadding(30, 5).setColor(UI.BLUE));
 			
-			buttons.add(new Button(2, 1, new Sprite(Wargame.ui.getTile("iconLoop_beigeLight").regions.get(0)), new ButtonListener() {
-				@Override
-				public void onDown(Button b) {}
-				
-				@Override
-				public void onUp(Button b) {}
-				
-			}, null, true).setPadding(30, 5).setColor(UI.BLUE));
+			//			buttons.add(new Button(2, 1, new Sprite(Wargame.ui.getTile("iconLoop_beigeLight").regions.get(0)), new ButtonListener() {
+			//				@Override
+			//				public void onDown(Button b) {}
+			//				
+			//				@Override
+			//				public void onUp(Button b) {}
+			//				
+			//			}, null, true).setPadding(30, 5).setColor(UI.BLUE));
 		}
 		
 		int index = 1;

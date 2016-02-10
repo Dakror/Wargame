@@ -21,7 +21,9 @@ import static android.opengl.GLES20.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -36,6 +38,7 @@ import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.render.TextureAtlas.Tile;
+import de.dakror.wargame.util.EntityRTree;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -106,7 +109,7 @@ public class World implements Renderable {
 	public int rEntities;
 	float add;
 	
-	protected Array<Entity> entities = new Array<Entity>();
+	protected EntityRTree entities = new EntityRTree();
 	protected Array<Entity> pendingSpawns = new Array<Entity>();
 	
 	int[] fbo = new int[1];
@@ -114,11 +117,14 @@ public class World implements Renderable {
 	int[] tex = new int[1];
 	int texWidth, texHeight;
 	float[] matrix = new float[16];
+	final float[] Dims;
+	final float[] Tile = { 1, 1 };
 	
 	public World(String worldFile) {
 		super();
 		parse(worldFile);
 		init();
+		Dims = new float[] { width, depth };
 	}
 	
 	public World(int width, int depth) {
@@ -129,6 +135,7 @@ public class World implements Renderable {
 		
 		generate();
 		init();
+		Dims = new float[] { width, depth };
 	}
 	
 	void parse(String worldFile) {
@@ -243,7 +250,7 @@ public class World implements Renderable {
 		if (!get(x, z).solid) return new CanBuildResult(1);
 		
 		boolean anyCity = false;
-		for (Entity e : entities) {
+		for (Entity e : entities.search(new float[] { x, z }, Tile)) {
 			if (!(e instanceof Building)) continue;
 			if (e.getRealX() == x && e.getRealZ() == z) return new CanBuildResult(2);
 			if (e instanceof City && player.equals(e.getOwner())) {
@@ -257,7 +264,7 @@ public class World implements Renderable {
 	}
 	
 	public Building getBuildingAt(int x, int z, Player optionalOwner) {
-		for (Entity e : entities) {
+		for (Entity e : entities.search(new float[] { x, z }, Tile)) {
 			if (!(e instanceof Building)) continue;
 			if (e.getRealX() == x && e.getRealZ() == z && (optionalOwner != null ? e.getOwner().equals(optionalOwner) : true)) return (Building) e;
 		}
@@ -290,18 +297,20 @@ public class World implements Renderable {
 	}
 	
 	public void update(float timePassed) {
-		for (Iterator<Entity> iter = entities.iterator(); iter.hasNext();) {
+		for (Iterator<Entity> iter = entities.getAll(Dims).iterator(); iter.hasNext();) {
 			Entity e = iter.next();
 			if (e.isDead()) {
 				e.onRemoval();
 				iter.remove();
+				entities.delete(e);
 			} else e.update(timePassed);
 		}
 		
 		while (pendingSpawns.size > 0) {
-			Entity e = pendingSpawns.removeIndex(0);
+			Entity e = pendingSpawns.first();
+			pendingSpawns.removeValue(e, true);
 			e.onSpawn();
-			entities.add(e);
+			entities.insert(e);
 		}
 	}
 	
@@ -338,10 +347,13 @@ public class World implements Renderable {
 		
 		r.render(pos.x, pos.y - texHeight / 2 + HEIGHT / 2 + DEPTH / 2 * add, 0, texWidth, texHeight, 0, 1, 1, -1, tex[0]);
 		
-		//TODO maybe replace with faster sorting algorithm
-		entities.sort();
+		// TODO maybe use getMappedCoords() to filter and use rtree properly
+		List<Entity> list = entities.getAll(Dims);
 		
-		for (Entity e : entities) {
+		//TODO maybe replace with faster sorting algorithm
+		Collections.sort(list);
+		
+		for (Entity e : list) {
 			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
 				r.render(e);
 				rEntities++;
@@ -369,10 +381,6 @@ public class World implements Renderable {
 		return pos;
 	}
 	
-	public Array<Entity> getEntities() {
-		return entities;
-	}
-	
 	public Vector3 getNewPos() {
 		return newPos;
 	}
@@ -383,5 +391,9 @@ public class World implements Renderable {
 	
 	public int getDepth() {
 		return depth;
+	}
+	
+	public EntityRTree getEntities() {
+		return entities;
 	}
 }

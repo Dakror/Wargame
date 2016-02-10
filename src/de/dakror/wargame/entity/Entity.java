@@ -104,11 +104,19 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 			steering.calculateSteering(steeringOutput);
 			applySteering(steeringOutput, timePassed);
 			
+			float oX = x;
+			float oZ = z;
+			
 			x = pos.x - boundingRadius;
 			z = pos.y - boundingRadius;
 			
 			face = ((((int) Math.round(Math.toDegrees(orientation) + 360)) % 360) / 90 + 3) % 4;
 			updateTexture();
+			
+			if (x != oX || z != oZ) {
+				world.getEntities().delete(this);
+				world.getEntities().insert(this);
+			}
 		}
 	}
 	

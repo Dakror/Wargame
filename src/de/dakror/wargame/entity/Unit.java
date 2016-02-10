@@ -19,13 +19,13 @@ package de.dakror.wargame.entity;
 import com.badlogic.gdx.ai.steer.Proximity;
 import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
 import com.badlogic.gdx.ai.steer.behaviors.Separation;
-import com.badlogic.gdx.ai.steer.proximities.RadiusProximity;
 import com.badlogic.gdx.math.Vector2;
 
 import de.dakror.wargame.Player;
 import de.dakror.wargame.World;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
+import de.dakror.wargame.util.EntityRTreeProximity;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -96,13 +96,13 @@ public class Unit extends Entity {
 	float scale = 0.5f;
 	
 	public Unit(float x, float z, int face, Player owner, boolean huge, UnitType type) {
-		super(x + (float) (Math.random() / 100), z + (float) (Math.random() / 100), face, owner, huge, type.alias);
+		super(x + (float) (Math.random() / 10), z + (float) (Math.random() / 10), face, owner, huge, type.alias);
 		this.type = type;
 		maxLinearSpeed = 2;
 		maxLinearAcceleration = 10;
 		maxAngularSpeed = 5;
 		maxAngularAcceleration = 10;
-		boundingRadius = 0.075f;
+		boundingRadius = 0.15f;
 		pos.set(this.x + boundingRadius, this.z + boundingRadius);
 		
 		onCreate();
@@ -137,7 +137,6 @@ public class Unit extends Entity {
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-		
 		type.update(this, deltaTime);
 	}
 	
@@ -185,23 +184,10 @@ public class Unit extends Entity {
 	public void onSpawn() {
 		type.onSpawn(this);
 		
-		Proximity<Vector2> proximity = new RadiusProximity<Vector2>(this, world.getEntities(), boundingRadius);
-		Proximity<Vector2> proximity2 = new RadiusProximity<Vector2>(this, world.getEntities(), 0.145f);
+		Proximity<Vector2> proximity = new EntityRTreeProximity(this, world.getEntities(), boundingRadius).setFilterType(Unit.class);
+		Proximity<Vector2> proximity2 = new EntityRTreeProximity(this, world.getEntities(), 0.145f).setFilterType(Building.class);
 		steering = new BlendedSteering<Vector2>(this)//
-		.add(new Separation<Vector2>(this, proximity) {
-			@Override
-			public boolean reportNeighbor(com.badlogic.gdx.ai.steer.Steerable<Vector2> neighbor) {
-				if (neighbor instanceof Unit) return super.reportNeighbor(neighbor);
-				else return false;
-			}
-		}.setDecayCoefficient(1), 1)//
-		.add(new Separation<Vector2>(this, proximity2) {
-			@Override
-			public boolean reportNeighbor(com.badlogic.gdx.ai.steer.Steerable<Vector2> neighbor) {
-				if (neighbor instanceof Building) {
-					return super.reportNeighbor(neighbor);
-				} else return false;
-			}
-		}.setDecayCoefficient(1), 1);
+		.add(new Separation<Vector2>(this, proximity).setDecayCoefficient(1), 1)//
+		;//.add(new Separation<Vector2>(this, proximity2).setDecayCoefficient(1), 1);
 	}
 }

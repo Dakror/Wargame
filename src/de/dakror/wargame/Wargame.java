@@ -157,11 +157,11 @@ public class Wargame extends ActivityStub {
 		player = new Player("Player", true, 0);
 		enemy = new Player("CPU", false, 1);
 		
-		Building myCity = new City(4, 4, player);
+		Building myCity = new City(2, 3, player);
 		player.setMainCity(myCity);
 		world.center(myCity);
 		world.addEntity(myCity);
-		world.addEntity(new Estate(4, 3, player));
+		world.addEntity(new Estate(4, 4, player));
 		
 		Building theirCity = new City(18, 19, enemy);
 		enemy.setMainCity(theirCity);
@@ -248,7 +248,7 @@ public class Wargame extends ActivityStub {
 		
 		spriteRenderer.begin(hudMatrix);
 		textRenderer.renderText(-width / 2, height / 2 - 30, 0, 0.5f, "FPS: " + fps, spriteRenderer);
-		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "E: " + world.rEntities + " / " + world.entities.size, spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "E: " + world.rEntities + " / " + world.entities.size(), spriteRenderer);
 		
 		textRenderer.renderText(-width / 2, height / 2 - 100, 0, 0.5f, "CPU: $" + (int) Math.floor(enemy.money), spriteRenderer);
 		
@@ -417,10 +417,21 @@ public class Wargame extends ActivityStub {
 	
 	@Override
 	public void onLongPress(MotionEvent e) {
-		player.money += 1000;
-		for (int i = 0; i < 250; i++) {
-			world.addEntity(new Unit(4, 4, player, UnitType.Infantry));
-		}
+		//		player.money += 1000;
+		
+		new Thread() {
+			@Override
+			public void run() {
+				for (int i = 0; i < 250; i++) {
+					world.addEntity(new Unit(15, 5, player, UnitType.Infantry));
+					try {
+						Thread.sleep(50);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}.start();
 	}
 	
 	@TargetApi(Build.VERSION_CODES.KITKAT)

@@ -36,8 +36,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import de.dakror.wargame.World.CanBuildResult;
-import de.dakror.wargame.entity.Unit;
-import de.dakror.wargame.entity.Unit.UnitType;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.BuildingType;
 import de.dakror.wargame.entity.building.City;
@@ -417,21 +415,7 @@ public class Wargame extends ActivityStub {
 	
 	@Override
 	public void onLongPress(MotionEvent e) {
-		//		player.money += 1000;
-		
-		new Thread() {
-			@Override
-			public void run() {
-				for (int i = 0; i < 250; i++) {
-					world.addEntity(new Unit(15, 5, player, UnitType.Infantry));
-					try {
-						Thread.sleep(50);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}.start();
+		player.money += 1000;
 	}
 	
 	@TargetApi(Build.VERSION_CODES.KITKAT)

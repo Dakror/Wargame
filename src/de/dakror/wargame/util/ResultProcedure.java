@@ -16,27 +16,15 @@
 
 package de.dakror.wargame.util;
 
-import java.util.List;
-
-import com.newbrightidea.util.RTree;
-
-import de.dakror.wargame.entity.Entity;
+import gnu.trove.TIntProcedure;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class EntityRTree1 extends RTree<Entity> {
-	final float[] Zero = { 0, 0 };
+public abstract class ResultProcedure<T> implements TIntProcedure {
+	protected T result;
 	
-	public void insert(Entity entity) {
-		super.insert(new float[] { entity.getRealX(), entity.getRealZ() }, new float[] { entity.getBoundingRadius() * 2, entity.getBoundingRadius() * 2 }, entity);
-	}
-	
-	public boolean delete(Entity entity) {
-		return super.delete(new float[] { entity.getRealX(), entity.getRealZ() }, new float[] { entity.getBoundingRadius(), entity.getBoundingRadius() }, entity);
-	}
-	
-	public List<Entity> getAll(float[] worldDims) {
-		return search(Zero, worldDims);
+	public T getResult() {
+		return result;
 	}
 }

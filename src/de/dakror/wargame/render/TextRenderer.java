@@ -124,6 +124,7 @@ public class TextRenderer {
 		Font font = fonts.get(this.font);
 		for (int i = 0; i < text.length(); i++) {
 			Glyph g = font.glyphs.get(text.charAt(i));
+			if (g == null) System.err.println("No gylph found for '" + text.charAt(i) + "'");
 			r.render(x + w + (g.advanceX - g.width) / 2 * size, y + (font.base - g.height - g.offsetY) * size, z, g.width * size, g.height * size, g.x / font.textureWidth, g.y / font.textureHeight, g.width / font.textureWidth, g.height / font.textureHeight, color, font.textureId);
 			w += g.advanceX * size;
 		}

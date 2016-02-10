@@ -26,7 +26,6 @@ import java.util.Arrays;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.infomatiq.jsi.rtree.RTree;
 
 import android.opengl.Matrix;
 import de.dakror.wargame.entity.Entity;
@@ -37,7 +36,7 @@ import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.render.TextureAtlas.Tile;
 import de.dakror.wargame.util.ERTree;
-import gnu.trove.TIntProcedure;
+import de.dakror.wargame.util.ResultProcedure;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -242,8 +241,9 @@ public class World implements Renderable {
 	}
 	
 	public CanBuildResult canBuildOn(int x, int z, Player player) {
-		//		if (!get(x, z).solid) return new CanBuildResult(1);
-		//		
+		if (!get(x, z).solid) return new CanBuildResult(1);
+		
+		// TODO fix
 		//		boolean anyCity = false;
 		//		for (Entity e : entities.search(new float[] { x, z }, Tile)) {
 		//			if (!(e instanceof Building)) continue;
@@ -254,12 +254,12 @@ public class World implements Renderable {
 		//		}
 		//		
 		//		if (!anyCity) return new CanBuildResult(3);
-		//		
+		
 		return new CanBuildResult();
 	}
 	
 	public Building getBuildingAt(final int x, final int z, final Player optionalOwner) {
-		entities.contains(x, z, 1, 1, new TIntProcedure() {
+		final ResultProcedure<Entity> p = new ResultProcedure<Entity>() {
 			@Override
 			public boolean execute(int id) {
 				Entity e = entities.get(id);
@@ -269,12 +269,10 @@ public class World implements Renderable {
 				}
 				return true;
 			}
-		});
-		for (Entity e : entities.search(new float[] { x, z }, Tile)) {
-			if (!(e instanceof Building)) continue;
-			if (e.getRealX() == x && e.getRealZ() == z && (optionalOwner != null ? e.getOwner().equals(optionalOwner) : true)) return (Building) e;
-		}
-		return null;
+		};
+		entities.contains(x, z, 1, 1, p);
+		
+		return (Building) p.getResult();
 	}
 	
 	public Vector2 getMappedCoords(float screenX, float screenY) {
@@ -313,7 +311,12 @@ public class World implements Renderable {
 			} else e.update(timePassed);
 		}
 		
-		while (pendingSpawns.size > 0) {
+		list = entities.getAll();
+		for (int i = 0; i < list.length; i++) {
+			((Entity) list[i]).updatePosition();
+		}
+		
+		if (pendingSpawns.size > 0) {
 			Entity e = pendingSpawns.first();
 			pendingSpawns.removeValue(e, true);
 			e.onSpawn();
@@ -404,7 +407,7 @@ public class World implements Renderable {
 		return depth;
 	}
 	
-	public RTree getEntities() {
+	public ERTree getEntities() {
 		return entities;
 	}
 }

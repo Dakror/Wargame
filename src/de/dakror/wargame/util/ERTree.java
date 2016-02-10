@@ -16,6 +16,7 @@
 
 package de.dakror.wargame.util;
 
+import com.infomatiq.jsi.Point;
 import com.infomatiq.jsi.Rectangle;
 import com.infomatiq.jsi.rtree.RTree;
 
@@ -28,7 +29,7 @@ import gnu.trove.TIntProcedure;
  */
 public class ERTree extends RTree {
 	final Rectangle r_cache = new Rectangle();
-	final Rectangle p_cache = new Rectangle();
+	final Point p_cache = new Point(0, 0);
 	final TIntObjectHashMap<Entity> map = new TIntObjectHashMap<Entity>(1024);
 	int idCount = 0;
 	
@@ -43,7 +44,7 @@ public class ERTree extends RTree {
 	}
 	
 	Rectangle setCache(float x, float y, float width, float height) {
-		r_cache.set(x, y, width, height);
+		r_cache.set(x, y, x + width, y + height);
 		return r_cache;
 	}
 	
@@ -55,12 +56,36 @@ public class ERTree extends RTree {
 		return map.get(id);
 	}
 	
+	public boolean delete(Entity e, boolean update) {
+		if (delete(setCache(e), e.id)) {
+			if (!update) map.remove(e.id);
+			return true;
+		}
+		return false;
+	}
+	
 	public boolean delete(Entity e) {
-		return delete(setCache(e), e.id);
+		return delete(e, false);
+	}
+	
+	public void update(float newX, float newZ, Entity e) {
+		if (delete(e, true)) add(setCache(newX, newZ, e.getBoundingRadius() * 2, e.getBoundingRadius() * 2), e.id);
 	}
 	
 	public void contains(float x, float z, float width, float depth, TIntProcedure callback) {
 		contains(setCache(x, z, width, depth), callback);
+	}
+	
+	public void nearestN(float x, float z, int n, TIntProcedure callback, float furthest) {
+		p_cache.x = x;
+		p_cache.y = z;
+		nearestN(p_cache, callback, n, furthest);
+	}
+	
+	public void nearest(float x, float z, TIntProcedure callback, float furthest) {
+		p_cache.x = x;
+		p_cache.y = z;
+		nearest(p_cache, callback, furthest);
 	}
 	
 	public Object[] getAll() {

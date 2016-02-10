@@ -60,13 +60,15 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 	protected Vector2 linearVelocity = new Vector2();
 	protected Vector2 pos = new Vector2();
 	protected SteeringBehavior<Vector2> steering;
-	
+	protected float newX, newZ;
 	public int id;
 	
 	public Entity(float x, float z, int face, Player owner, boolean huge, String name) {
 		this.x = x;
 		y = 1;
 		this.z = z;
+		newX = x;
+		newZ = z;
 		this.huge = huge;
 		this.face = face;
 		paletteIndex = owner.getColor();
@@ -106,19 +108,19 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 			steering.calculateSteering(steeringOutput);
 			applySteering(steeringOutput, timePassed);
 			
-			float oX = x;
-			float oZ = z;
-			
-			x = pos.x - boundingRadius;
-			z = pos.y - boundingRadius;
+			newX = pos.x - boundingRadius;
+			newZ = pos.y - boundingRadius;
 			
 			face = ((((int) Math.round(Math.toDegrees(orientation) + 360)) % 360) / 90 + 3) % 4;
 			updateTexture();
-			
-			//			if (x != oX || z != oZ) {
-			//				world.getEntities().delete(this);
-			//				world.getEntities().insert(this);
-			//			}
+		}
+	}
+	
+	public void updatePosition() {
+		if (newX != x || newZ != z) {
+			world.getEntities().update(newX, newZ, this);
+			x = newX;
+			z = newZ;
 		}
 	}
 	

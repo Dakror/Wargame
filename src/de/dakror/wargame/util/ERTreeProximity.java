@@ -16,8 +16,6 @@
 
 package de.dakror.wargame.util;
 
-import java.util.List;
-
 import com.badlogic.gdx.ai.steer.Proximity;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.math.Vector2;
@@ -26,23 +24,22 @@ import de.dakror.wargame.entity.Entity;
 
 /**
  * @author Maximilian Stark | Dakror
+ *
  */
-public class EntityRTreeProximity1 implements Proximity<Vector2> {
+public class ERTreeProximity implements Proximity<Vector2> {
+	int nearest = 10;
 	Entity owner;
 	float radius;
-	final float[] size;
 	Class<?> filterType;
-	EntityRTree1 entities;
+	ERTree entities;
 	
-	public EntityRTreeProximity1(Entity owner, EntityRTree1 entities, float radius) {
+	public ERTreeProximity(Entity owner, ERTree entities, float radius) {
 		this.owner = owner;
 		this.entities = entities;
 		this.radius = radius;
-		size = new float[2];
-		//		size = new float[] { radius * 5, radius * 5 };
 	}
 	
-	public EntityRTreeProximity1 setFilterType(Class<?> c) {
+	public ERTreeProximity setFilterType(Class<?> c) {
 		filterType = c;
 		return this;
 	}
@@ -57,20 +54,32 @@ public class EntityRTreeProximity1 implements Proximity<Vector2> {
 		this.owner = (Entity) owner;
 	}
 	
-	@Override
-	public int findNeighbors(ProximityCallback<Vector2> callback) {
-		List<Entity> list = entities.search(new float[] { owner.getRealX(), owner.getRealZ() }, size); // TODO generalize this for many calls and a wider subarea
-		int num = 0;
-		for (Entity e : list) {
-			if (e == owner) continue;
-			if (filterType != null && !filterType.isInstance(e)) continue;
-			if (Vector2.dst(owner.getRealX(), owner.getRealZ(), e.getRealX(), e.getRealZ()) > radius) continue;
-			
-			callback.reportNeighbor(e);
-			num++;
-		}
-		
-		return num;
+	public ERTreeProximity setNearest(int nearest) {
+		this.nearest = nearest;
+		return this;
 	}
 	
+	@Override
+	public int findNeighbors(final ProximityCallback<Vector2> callback) {
+		ResultProcedure<Integer> p = new ResultProcedure<Integer>() {
+			{
+				result = 0;
+			}
+			
+			@Override
+			public boolean execute(int id) {
+				Entity e = entities.get(id);
+				if (e == owner) return true;
+				if (filterType != null && !filterType.isInstance(e)) return true;
+				if (Vector2.dst(owner.getRealX(), owner.getRealZ(), e.getRealX(), e.getRealZ()) > radius) return true;
+				
+				result++;
+				callback.reportNeighbor(e);
+				return true;
+			}
+		};
+		
+		entities.nearestN(owner.getRealX(), owner.getRealZ(), nearest, p, radius);
+		return p.getResult();
+	}
 }

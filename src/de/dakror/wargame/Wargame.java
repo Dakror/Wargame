@@ -22,6 +22,8 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.badlogic.gdx.ai.GdxAI;
+import com.badlogic.gdx.ai.fma.Formation;
+import com.badlogic.gdx.ai.fma.patterns.DefensiveCircleFormationPattern;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
@@ -50,6 +52,7 @@ import de.dakror.wargame.ui.UI;
 import de.dakror.wargame.util.ActivityStub;
 import de.dakror.wargame.util.AndroidLogger;
 import de.dakror.wargame.util.Listeners.ButtonListener;
+import de.dakror.wargame.util.WorldLocation;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -88,6 +91,8 @@ public class Wargame extends ActivityStub {
 	boolean hudEvents = false;
 	
 	MotionEvent lastTouchEvent, lastSingleTap, lastDoubleTap;
+	
+	public static Formation<Vector2> testFormation;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -157,14 +162,16 @@ public class Wargame extends ActivityStub {
 		
 		Building myCity = new City(2, 3, player);
 		player.setMainCity(myCity);
-		world.center(myCity);
 		world.addEntity(myCity);
+		world.center(myCity);
+		
 		world.addEntity(new Estate(4, 4, player));
 		
 		Building theirCity = new City(18, 19, enemy);
 		enemy.setMainCity(theirCity);
 		world.addEntity(theirCity);
 		
+		testFormation = new Formation<Vector2>(new WorldLocation(new Vector2(6, 6), 0), new DefensiveCircleFormationPattern<Vector2>(0.2f));
 		//		
 		//		Unit v = new Unit(0, 2, player, Units.Infantry);
 		
@@ -213,9 +220,11 @@ public class Wargame extends ActivityStub {
 			vY = Math.abs(vY) < stop ? 0 : vY;
 		}
 		
-		player.money += timeStep;
-		enemy.money += timeStep;
+		// main city cost refunded
+		player.money += 6 / 60f * timeStep;
+		enemy.money += 6 / 60f * timeStep;
 		
+		testFormation.updateSlots();
 		world.update(timeStep);
 		
 		glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
@@ -415,7 +424,11 @@ public class Wargame extends ActivityStub {
 	
 	@Override
 	public void onLongPress(MotionEvent e) {
-		player.money += 1000;
+		//		player.money += 1000;
+		Vector2 v = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
+		if (v.x >= 0 && v.y >= 0) {
+			testFormation.getAnchorPoint().getPosition().set(v);
+		}
 	}
 	
 	@TargetApi(Build.VERSION_CODES.KITKAT)

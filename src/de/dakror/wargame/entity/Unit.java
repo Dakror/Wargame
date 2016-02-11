@@ -16,22 +16,25 @@
 
 package de.dakror.wargame.entity;
 
-import com.badlogic.gdx.ai.steer.Proximity;
-import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
-import com.badlogic.gdx.ai.steer.behaviors.Separation;
+import com.badlogic.gdx.ai.fma.FormationMember;
+import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
+import com.badlogic.gdx.ai.fsm.StateMachine;
+import com.badlogic.gdx.ai.steer.SteeringAcceleration;
+import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 
 import de.dakror.wargame.Player;
 import de.dakror.wargame.World;
-import de.dakror.wargame.entity.building.Building;
+import de.dakror.wargame.entity.ai.UnitState;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
-import de.dakror.wargame.util.ERTreeProximity;
+import de.dakror.wargame.util.UnitSteering;
+import de.dakror.wargame.util.WorldLocation;
 
 /**
  * @author Maximilian Stark | Dakror
  *
  */
-public class Unit extends Entity {
+public class Unit extends Entity implements FormationMember<Vector2> {
 	public static enum AttackKind {
 		Arc_Missile,
 		Bomb,
@@ -50,7 +53,7 @@ public class Unit extends Entity {
 	}
 	
 	public static enum UnitType {
-		Infantry(20, 6, 2, 35, 5.0f, false, AttackKind.Machine_Gun, AttackKind.N$A, 1, 0, "Infantry"),
+		Infantry(20, 6, 2, 35, .50f, false, AttackKind.Machine_Gun, AttackKind.N$A, 1, 0, "Infantry"),
 		Bazooka(10, 15, 0, 65, 11.0f, false, AttackKind.Handgun, AttackKind.Rocket, 1, 3, "Infantry_P"),
 		Medic(28, 0, 2, 110, 15.0f, false, AttackKind.Medkit, AttackKind.N$A, 0, 0, "Volunteer_T"),
 		
@@ -93,18 +96,23 @@ public class Unit extends Entity {
 	}
 	
 	UnitType type;
+	WorldLocation target;
 	float scale = 0.5f;
+	
+	StateMachine<Unit, UnitState> stateMachine;
 	
 	public Unit(float x, float z, int face, Player owner, boolean huge, UnitType type) {
 		super(x + (float) (Math.random() / 10), z + (float) (Math.random() / 10), face, owner, huge, type.alias);
 		this.type = type;
-		maxLinearSpeed = 2;
-		maxLinearAcceleration = 10;
+		maxLinearSpeed = 1.5f;
+		maxLinearAcceleration = 2;
 		maxAngularSpeed = 5;
 		maxAngularAcceleration = 10;
 		boundingRadius = 0.15f;
 		pos.set(this.x + boundingRadius, this.z + boundingRadius);
-		
+		target = new WorldLocation();
+		stateMachine = new DefaultStateMachine<Unit, UnitState>(this, UnitState.BUILD_FORMATION, UnitState.GLOBAL_STATE);
+		steering = new UnitSteering(this);
 		onCreate();
 	}
 	
@@ -137,7 +145,26 @@ public class Unit extends Entity {
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
+		stateMachine.update();
+		
 		type.update(this, deltaTime);
+	}
+	
+	@Override
+	protected void applySteering(SteeringAcceleration<Vector2> steering, float timePassed) {
+		pos.mulAdd(linearVelocity, timePassed);
+		if (stateMachine.getCurrentState() != UnitState.BUILD_FORMATION && steering.linear.isZero(0.1f)) linearVelocity.setZero();
+		else if (stateMachine.getCurrentState() == UnitState.BUILD_FORMATION && steering.linear.isZero()) linearVelocity.setZero();
+		else linearVelocity.mulAdd(steering.linear, timePassed).limit(getMaxLinearSpeed());
+		
+		if (independentFacing) {
+			orientation += angularVelocity * timePassed;
+			angularVelocity += steering.angular * timePassed;
+		} else if (!linearVelocity.isZero(getZeroLinearSpeedThreshold())) {
+			float newOrientation = vectorToAngle(linearVelocity);
+			angularVelocity = (newOrientation - getOrientation()) * timePassed; // this is superfluous if independentFacing is always true
+			orientation = newOrientation;
+		}
 	}
 	
 	@Override
@@ -183,11 +210,12 @@ public class Unit extends Entity {
 	@Override
 	public void onSpawn() {
 		type.onSpawn(this);
-		
-		Proximity<Vector2> proximity = new ERTreeProximity(this, world.getEntities(), boundingRadius).setFilterType(Unit.class);
-		Proximity<Vector2> proximity2 = new ERTreeProximity(this, world.getEntities(), 1).setFilterType(Building.class).setNearest(1);
-		steering = new BlendedSteering<Vector2>(this)
-		.add(new Separation<Vector2>(this, proximity).setDecayCoefficient(1), 1)
-		.add(new Separation<Vector2>(this, proximity2).setDecayCoefficient(1), 1);
+		stateMachine.getGlobalState().enter(this);
+		stateMachine.getCurrentState().enter(this);
+	}
+	
+	@Override
+	public Location<Vector2> getTargetLocation() {
+		return target;
 	}
 }

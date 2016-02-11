@@ -126,7 +126,7 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 	
 	protected void applySteering(SteeringAcceleration<Vector2> steering, float timePassed) {
 		pos.mulAdd(linearVelocity, timePassed);
-		if (steering.linear.isZero(0.5f)) linearVelocity.setZero();
+		if (steering.linear.isZero(0.1f)) linearVelocity.setZero();
 		else linearVelocity.mulAdd(steering.linear, timePassed).limit(getMaxLinearSpeed());
 		
 		if (independentFacing) {
@@ -157,6 +157,14 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 	@Override
 	public Vector2 angleToVector(Vector2 outVector, float angle) {
 		return WorldLocation.AngleToVector(outVector, angle);
+	}
+	
+	public SteeringBehavior<Vector2> getSteeringBehavior() {
+		return steering;
+	}
+	
+	public void setSteeringBehavior(SteeringBehavior<Vector2> steering) {
+		this.steering = steering;
 	}
 	
 	@Override
@@ -244,7 +252,7 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 	
 	@Override
 	public float getZeroLinearSpeedThreshold() {
-		return 1f;
+		return 0.001f;
 	}
 	
 	@Override

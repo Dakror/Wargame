@@ -17,7 +17,7 @@
 package de.dakror.wargame.entity.building;
 
 import de.dakror.wargame.Player;
-import de.dakror.wargame.World.Terrain;
+import de.dakror.wargame.World.TileType;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -42,7 +42,7 @@ public class City extends Building {
 		if (owner.isHuman()) {
 			for (int i = -radius; i <= radius; i++)
 				for (int j = -radius; j <= radius; j++)
-					if (Math.sqrt(i * i + j * j) < radius) world.replace((int) x + i, (int) z + j, Terrain.Forest, Terrain.Mountains);
+					if (Math.sqrt(i * i + j * j) < radius) world.replace((int) x + i, (int) z + j, TileType.Forest, TileType.Mountains);
 		}
 	}
 	

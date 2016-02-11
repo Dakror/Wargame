@@ -23,11 +23,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
+import com.badlogic.gdx.ai.pfa.Connection;
+import com.badlogic.gdx.ai.pfa.DefaultConnection;
+import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
+import com.badlogic.gdx.ai.pfa.indexed.IndexedNode;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
 import android.opengl.Matrix;
+import de.dakror.wargame.World.TiledNode;
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.City;
@@ -42,8 +47,8 @@ import de.dakror.wargame.util.ResultProcedure;
 /**
  * @author Maximilian Stark | Dakror
  */
-public class World implements Renderable {
-	public static enum Terrain {
+public class World implements Renderable, IndexedGraph<TiledNode> {
+	public static enum TileType {
 		Air(false),
 		Basement(),
 		Custom0,
@@ -64,11 +69,11 @@ public class World implements Renderable {
 		
 		boolean solid;
 		
-		private Terrain() {
+		private TileType() {
 			this(true);
 		}
 		
-		private Terrain(boolean solid) {
+		private TileType(boolean solid) {
 			this.solid = solid;
 		}
 	}
@@ -96,9 +101,42 @@ public class World implements Renderable {
 		}
 	}
 	
-	// lol super dumb method, but idc 
-	// (X|Z)
-	protected byte[][] map;
+	public class TiledNode implements IndexedNode<TiledNode> {
+		int x, z;
+		TileType type;
+		Array<Connection<TiledNode>> connections;
+		
+		public TiledNode(int x, int z, TileType type) {
+			this.x = x;
+			this.z = z;
+			this.type = type;
+			connections = new Array<Connection<TiledNode>>(8);
+		}
+		
+		@Override
+		public int getIndex() {
+			return z * width + x;
+		}
+		
+		@Override
+		public Array<Connection<TiledNode>> getConnections() {
+			return connections;
+		}
+	}
+	
+	public class TiledConnection extends DefaultConnection<TiledNode> {
+		public TiledConnection(TiledNode fromNode, TiledNode toNode) {
+			super(fromNode, toNode);
+		}
+		
+		@Override
+		public float getCost() {
+			return 1;
+		}
+	}
+	
+	// z * width + x
+	protected TiledNode[] map;
 	
 	protected Vector3 pos, newPos;
 	
@@ -130,7 +168,7 @@ public class World implements Renderable {
 		super();
 		this.width = width;
 		this.depth = depth;
-		map = new byte[width][depth];
+		map = new TiledNode[width * depth];
 		
 		generate();
 		init();
@@ -148,7 +186,7 @@ public class World implements Renderable {
 					width = Integer.valueOf(s[0]);
 					depth = Integer.valueOf(s[1]);
 					z = depth - 1;
-					map = new byte[width][depth];
+					map = new TiledNode[width * depth];
 				} else if (map != null) {
 					if (line.startsWith("-")) {
 						z = depth - 1;
@@ -156,7 +194,7 @@ public class World implements Renderable {
 						for (int i = 0; i < width; i++) {
 							String s = line.substring(i, i + 1);
 							if (s.equals(" ")) s = "0";
-							set(i, z, Terrain.values()[Integer.valueOf(s, 16)]);
+							set(i, z, TileType.values()[Integer.valueOf(s, 16)]);
 						}
 						z--;
 					}
@@ -170,7 +208,7 @@ public class World implements Renderable {
 	}
 	
 	void generate() {
-		Terrain[] t = { Terrain.Desert, Terrain.Forest, Terrain.Mountains, Terrain.River, Terrain.Tundra };
+		TileType[] t = { TileType.Desert, TileType.Forest, TileType.Mountains, TileType.River, TileType.Tundra };
 		for (int i = 0; i < width; i++)
 			for (int j = 0; j < depth; j++)
 				set(i, j, t[(int) (Math.random() * t.length)]);
@@ -226,26 +264,26 @@ public class World implements Renderable {
 		return x >= 0 && x < width && z >= 0 && z < depth;
 	}
 	
-	public boolean set(int x, int z, Terrain type) {
+	public boolean set(int x, int z, TileType type) {
 		if (!isInBounds(x, z)) return false;
-		byte oldVal = map[x][z];
-		map[x][z] = (byte) type.ordinal();
-		boolean ch = oldVal != map[x][z];
+		TiledNode tn = get(x, z);
+		boolean ch = type != tn.type;
 		if (ch) dirty = true;
+		tn.type = type;
 		return ch;
 	}
 	
-	public boolean replace(int x, int z, Terrain from, Terrain to) {
-		if (!isInBounds(x, z) || get(x, z) != from) return false;
-		byte oldVal = map[x][z];
-		map[x][z] = (byte) to.ordinal();
-		boolean ch = oldVal != map[x][z];
+	public boolean replace(int x, int z, TileType from, TileType to) {
+		if (!isInBounds(x, z) || getType(x, z) != from) return false;
+		TiledNode tn = get(x, z);
+		boolean ch = tn.type != to;
 		if (ch) dirty = true;
+		tn.type = to;
 		return ch;
 	}
 	
 	public CanBuildResult canBuildOn(final int x, final int z, final Player player) {
-		if (!get(x, z).solid) return new CanBuildResult(1);
+		if (!getType(x, z).solid) return new CanBuildResult(1);
 		
 		ResultProcedure<Integer> p = new ResultProcedure<Integer>(3) {
 			@Override
@@ -301,14 +339,23 @@ public class World implements Renderable {
 		return new Vector2(x / 2, z / 2);
 	}
 	
-	public Terrain get(int x, int z) {
-		if (!isInBounds(x, z)) return Terrain.Air;
-		return Terrain.values()[map[x][z]];
+	public TiledNode get(int x, int z) {
+		TiledNode tn = map[z * width + x];
+		if (tn == null) {
+			tn = new TiledNode(x, z, TileType.Air);
+			map[tn.getIndex()] = tn;
+		}
+		return tn;
+	}
+	
+	public TileType getType(int x, int z) {
+		if (!isInBounds(x, z)) return TileType.Air;
+		return get(x, z).type;
 	}
 	
 	public String getFile(int x, int z) {
 		if (!isInBounds(x, z)) return null;
-		String t = get(x, z).name();
+		String t = getType(x, z).name();
 		
 		return t;
 	}
@@ -319,7 +366,6 @@ public class World implements Renderable {
 			Entity e = (Entity) list[i];
 			if (e.isDead()) {
 				e.onRemoval();
-				//				iter.remove();
 				entities.delete(e);
 			} else e.update(timePassed);
 		}
@@ -371,12 +417,8 @@ public class World implements Renderable {
 		r.render(pos.x, pos.y - texHeight / 2 + HEIGHT / 2 + DEPTH / 2 * add, 0, texWidth, texHeight, 0, 1, 1, -1, tex[0]);
 		
 		// TODO maybe use getMappedCoords() to filter and use rtree properly
-		//		List<Entity> list = entities.getAll(Dims);
-		//		
-		//		Collections.sort(list);
-		
-		// TODO maybe replace with faster sorting algorithm
 		Object[] list = entities.getAll();
+		// TODO maybe replace with faster sorting algorithm
 		Arrays.sort(list);
 		
 		for (int i = 0; i < list.length; i++) {
@@ -422,5 +464,23 @@ public class World implements Renderable {
 	
 	public ERTree getEntities() {
 		return entities;
+	}
+	
+	@Override
+	public Array<Connection<TiledNode>> getConnections(TiledNode fromNode) {
+		if (fromNode.getConnections().size == 0) {
+			for (int i = -1; i < 2; i++) {
+				for (int j = -1; j < 2; j++) {
+					if (i == 0 && j == 0) continue;
+					if (isInBounds(fromNode.x + i, fromNode.z + j)) fromNode.getConnections().add(new TiledConnection(fromNode, get(fromNode.x + i, fromNode.z + j)));
+				}
+			}
+		}
+		return fromNode.getConnections();
+	}
+	
+	@Override
+	public int getNodeCount() {
+		return width * depth;
 	}
 }

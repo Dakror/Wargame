@@ -170,7 +170,7 @@ public class Estate extends Building {
 		hp = 550;
 		def = 25;
 		buildCosts = 1575;
-		runCosts = 12;
+		runCosts = 45;
 		function = "Trains Infantry";
 		detail1 = "These soldiers do the";
 		detail2 = "dirty work for you.";
@@ -191,7 +191,9 @@ public class Estate extends Building {
 			if (queue.first().paid) {
 				queue.first().timeLeft -= timePassed;
 				if (queue.first().timeLeft <= 0) {
-					world.addEntity(new Unit(x + 1 + (float) Math.random(), z + (float) Math.random(), owner, queue.removeFirst().unitType));
+					Unit u = new Unit(x + 1 + (float) Math.random(), z + (float) Math.random(), owner, queue.removeFirst().unitType);
+					world.addEntity(u);
+					Wargame.testFormation.addMember(u);
 				}
 			} else if (owner.money >= queue.first().unitType.costs) { // TODO: show when funds insufficient
 				owner.money -= queue.first().unitType.costs;

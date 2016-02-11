@@ -37,7 +37,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import de.dakror.wargame.World.CanBuildResult;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.BuildingType;
 import de.dakror.wargame.entity.building.City;
@@ -53,6 +52,8 @@ import de.dakror.wargame.util.ActivityStub;
 import de.dakror.wargame.util.AndroidLogger;
 import de.dakror.wargame.util.Listeners.ButtonListener;
 import de.dakror.wargame.util.WorldLocation;
+import de.dakror.wargame.world.CanBuildResult;
+import de.dakror.wargame.world.World;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -255,7 +256,7 @@ public class Wargame extends ActivityStub {
 		
 		spriteRenderer.begin(hudMatrix);
 		textRenderer.renderText(-width / 2, height / 2 - 30, 0, 0.5f, "FPS: " + fps, spriteRenderer);
-		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "E: " + world.rEntities + " / " + world.entities.size(), spriteRenderer);
+		textRenderer.renderText(-width / 2, height / 2 - 60, 0, 0.5f, "E: " + world.rEntities + " / " + world.getEntities().size(), spriteRenderer);
 		
 		textRenderer.renderText(-width / 2, height / 2 - 100, 0, 0.5f, "CPU: $" + (int) Math.floor(enemy.money), spriteRenderer);
 		

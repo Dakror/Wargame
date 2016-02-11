@@ -24,11 +24,11 @@ import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 
 import de.dakror.wargame.Player;
-import de.dakror.wargame.World;
 import de.dakror.wargame.entity.ai.UnitState;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.util.UnitSteering;
 import de.dakror.wargame.util.WorldLocation;
+import de.dakror.wargame.world.World;
 
 /**
  * @author Maximilian Stark | Dakror

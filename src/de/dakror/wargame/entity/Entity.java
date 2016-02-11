@@ -24,10 +24,10 @@ import com.badlogic.gdx.math.Vector2;
 
 import de.dakror.wargame.Player;
 import de.dakror.wargame.Wargame;
-import de.dakror.wargame.World;
 import de.dakror.wargame.render.AnimatedSprite;
 import de.dakror.wargame.render.TextureAtlas.Tile;
 import de.dakror.wargame.util.WorldLocation;
+import de.dakror.wargame.world.World;
 
 /**
  * @author Maximilian Stark | Dakror

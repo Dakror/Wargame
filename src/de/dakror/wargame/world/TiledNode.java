@@ -14,44 +14,37 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame.entity.building;
+package de.dakror.wargame.world;
 
-import de.dakror.wargame.Player;
-import de.dakror.wargame.world.TileType;
+import com.badlogic.gdx.ai.pfa.Connection;
+import com.badlogic.gdx.ai.pfa.indexed.IndexedNode;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class City extends Building {
-	int radius;
+public class TiledNode implements IndexedNode<TiledNode> {
+	int x, z;
+	World world;
+	TileType type;
+	boolean buildingOnTop;
+	Array<Connection<TiledNode>> connections;
 	
-	public City(int x, int z, Player owner) {
-		super(x, z, owner, BuildingType.City);
-		hp = 1000;
-		def = 5;
-		buildCosts = 850;
-		runCosts = 6;
-		function = "Function: Claim land";
-		detail1 = "Enables you to place";
-		detail2 = "buildings around.";
-		radius = 4;
+	public TiledNode(int x, int z, World world, TileType type) {
+		this.x = x;
+		this.z = z;
+		this.type = type;
+		this.world = world;
+		connections = new Array<Connection<TiledNode>>(8);
 	}
 	
 	@Override
-	public void onSpawn() {
-		if (owner.isHuman()) {
-			for (int i = -radius; i <= radius; i++)
-				for (int j = -radius; j <= radius; j++)
-					if (Math.sqrt(i * i + j * j) < radius) world.replace((int) x + i, (int) z + j, TileType.Forest, TileType.Mountains);
-		}
-	}
-	
-	public int getRadius() {
-		return radius;
+	public int getIndex() {
+		return z * world.getWidth() + x;
 	}
 	
 	@Override
-	public void onDeath() {
-		if (equals(owner.getMainCity())) System.out.println(owner.getName() + " lost.");
+	public Array<Connection<TiledNode>> getConnections() {
+		return connections;
 	}
 }

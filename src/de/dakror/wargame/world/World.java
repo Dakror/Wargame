@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame;
+package de.dakror.wargame.world;
 
 import static android.opengl.GLES20.*;
 
@@ -24,15 +24,14 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 
 import com.badlogic.gdx.ai.pfa.Connection;
-import com.badlogic.gdx.ai.pfa.DefaultConnection;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
-import com.badlogic.gdx.ai.pfa.indexed.IndexedNode;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
 import android.opengl.Matrix;
-import de.dakror.wargame.World.TiledNode;
+import de.dakror.wargame.Player;
+import de.dakror.wargame.Wargame;
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.City;
@@ -48,93 +47,6 @@ import de.dakror.wargame.util.ResultProcedure;
  * @author Maximilian Stark | Dakror
  */
 public class World implements Renderable, IndexedGraph<TiledNode> {
-	public static enum TileType {
-		Air(false),
-		Basement(),
-		Custom0,
-		Custom1,
-		Custom2,
-		Desert,
-		Forest,
-		Hills,
-		Jungle,
-		Mountains,
-		Plains,
-		River(false),
-		Road,
-		Ruins,
-		Sea(false),
-		Tundra, // 16
-		;
-		
-		boolean solid;
-		
-		private TileType() {
-			this(true);
-		}
-		
-		private TileType(boolean solid) {
-			this.solid = solid;
-		}
-	}
-	
-	public static class CanBuildResult {
-		public boolean result;
-		/**
-		 * 0 nothing
-		 * 1 no space
-		 * 2 building there
-		 * 3 too far from city
-		 */
-		public int reason;
-		
-		public CanBuildResult() {
-			result = true;
-		}
-		
-		public CanBuildResult(int reason) {
-			if (reason == 0) result = true;
-			else {
-				result = false;
-				this.reason = reason;
-			}
-		}
-	}
-	
-	public class TiledNode implements IndexedNode<TiledNode> {
-		int x, z;
-		TileType type;
-		Array<Connection<TiledNode>> connections;
-		
-		public TiledNode(int x, int z, TileType type) {
-			this.x = x;
-			this.z = z;
-			this.type = type;
-			connections = new Array<Connection<TiledNode>>(8);
-		}
-		
-		@Override
-		public int getIndex() {
-			return z * width + x;
-		}
-		
-		@Override
-		public Array<Connection<TiledNode>> getConnections() {
-			return connections;
-		}
-	}
-	
-	public class TiledConnection extends DefaultConnection<TiledNode> {
-		public TiledConnection(TiledNode fromNode, TiledNode toNode) {
-			super(fromNode, toNode);
-		}
-		
-		@Override
-		public float getCost() {
-			return 1;
-		}
-	}
-	
 	// z * width + x
 	protected TiledNode[] map;
 	
@@ -342,7 +254,7 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 	public TiledNode get(int x, int z) {
 		TiledNode tn = map[z * width + x];
 		if (tn == null) {
-			tn = new TiledNode(x, z, TileType.Air);
+			tn = new TiledNode(x, z, this, TileType.Air);
 			map[tn.getIndex()] = tn;
 		}
 		return tn;
@@ -366,6 +278,7 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 			Entity e = (Entity) list[i];
 			if (e.isDead()) {
 				e.onRemoval();
+				if (e instanceof Building) get((int) e.getRealX(), (int) e.getRealZ()).buildingOnTop = false;
 				entities.delete(e);
 			} else e.update(timePassed);
 		}
@@ -379,6 +292,7 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 			Entity e = pendingSpawns.first();
 			pendingSpawns.removeValue(e, true);
 			e.onSpawn();
+			if (e instanceof Building) get((int) e.getRealX(), (int) e.getRealZ()).buildingOnTop = true;
 			entities.add(e);
 		}
 	}

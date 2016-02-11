@@ -19,19 +19,19 @@ package de.dakror.wargame.entity.ai;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.steer.Proximity;
-import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
-import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
-import com.badlogic.gdx.ai.steer.behaviors.LookWhereYouAreGoing;
-import com.badlogic.gdx.ai.steer.behaviors.ReachOrientation;
+import com.badlogic.gdx.ai.steer.behaviors.FollowPath;
 import com.badlogic.gdx.ai.steer.behaviors.Separation;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
+import com.badlogic.gdx.ai.steer.utils.paths.LinePath.LinePathParam;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import de.dakror.wargame.entity.Unit;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.util.ERTreeProximity;
 import de.dakror.wargame.util.UnitSteering;
+import de.dakror.wargame.world.TiledSmoothableGraphPath;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -44,29 +44,39 @@ public enum UnitState implements State<Unit> {
 			Proximity<Vector2> proximity2 = new ERTreeProximity(entity, entity.getWorld().getEntities(), 1).setFilterType(Building.class).setNearest(1);
 			((UnitSteering) entity.getSteeringBehavior()).setGlobal(new BlendedSteering<Vector2>(entity)//
 			.add(new Separation<Vector2>(entity, proximity).setDecayCoefficient(1), 1)//
-			.add(new Separation<Vector2>(entity, proximity2).setDecayCoefficient(1), 100), 1);
+			.add(new Separation<Vector2>(entity, proximity2).setDecayCoefficient(1), 1), 1);
 		}
 	},
 	BUILD_FORMATION {
 		@Override
-		public void enter(Unit entity) {
-			Proximity<Vector2> proximity2 = new ERTreeProximity(entity, entity.getWorld().getEntities(), 2).setFilterType(Building.class).setNearest(1);
-			
-			((UnitSteering) entity.getSteeringBehavior()).add(new BlendedSteering<Vector2>(entity) //
-			.add(new Arrive<Vector2>(entity, entity.getTargetLocation()) //
-			.setTimeToTarget(0.1f) //
-			.setArrivalTolerance(0.01f) //
-			.setDecelerationRadius(1f), 1f) //
-			.add(new ReachOrientation<Vector2>(entity, entity.getTargetLocation()) //
-			.setTimeToTarget(0.1f) //
-			.setAlignTolerance(0.01f) //
-			.setDecelerationRadius(MathUtils.PI), 1f) //
-			.add(new LookWhereYouAreGoing<Vector2>(entity) //
-			.setTimeToTarget(0.1f) //
-			.setAlignTolerance(0.01f) //
-			.setDecelerationRadius(MathUtils.PI), 1f)//
-			.add(new CollisionAvoidance<Vector2>(entity, proximity2), 2500), 1)//
-			;
+		public boolean onMessage(Unit entity, Telegram telegram) {
+			if (telegram.message == Messages.FORMATION_UPDATED) {
+				TiledSmoothableGraphPath p = new TiledSmoothableGraphPath();
+				entity.getWorld().pathFinder.searchNodePath(entity.getWorld().get(entity.getPosition()), entity.getWorld().get(entity.getTargetLocation().getPosition()), entity.getWorld().heuristic, p);
+				//entity.getWorld().pathSmoother.smoothPath(p);
+				
+				Array<Vector2> nodes = new Array<Vector2>(p.getCount());
+				nodes.add(entity.getPosition());
+				
+				float dx = entity.getPosition().x % 1;
+				float dz = entity.getPosition().y % 1;
+				
+				for (int i = 1; i < p.getCount(); i++) {
+					nodes.add(p.getNodePosition(i).cpy().add(dx, dz));
+				}
+				
+				LinePath<Vector2> path = new LinePath<Vector2>(nodes, true);
+				((UnitSteering) entity.getSteeringBehavior()).flushState();
+				((UnitSteering) entity.getSteeringBehavior()).add(//
+				new FollowPath<Vector2, LinePathParam>(entity, path, 0.01f)//
+				.setTimeToTarget(0.01f)//
+				.setPredictionTime(0.1f)//
+				.setArrivalTolerance(0.05f)//
+				.setDecelerationRadius(0.2f), 1);
+				
+				return true;
+			}
+			return false;
 		}
 	};
 	

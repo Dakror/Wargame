@@ -24,6 +24,7 @@ import javax.microedition.khronos.opengles.GL10;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.fma.Formation;
 import com.badlogic.gdx.ai.fma.patterns.DefensiveCircleFormationPattern;
+import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
@@ -37,6 +38,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import de.dakror.wargame.entity.ai.Messages;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.BuildingType;
 import de.dakror.wargame.entity.building.City;
@@ -90,6 +92,8 @@ public class Wargame extends ActivityStub {
 	public static Player player, enemy;
 	
 	boolean hudEvents = false;
+	
+	boolean requestSlotUpdate;
 	
 	MotionEvent lastTouchEvent, lastSingleTap, lastDoubleTap;
 	
@@ -225,7 +229,13 @@ public class Wargame extends ActivityStub {
 		player.money += 6 / 60f * timeStep;
 		enemy.money += 6 / 60f * timeStep;
 		
-		testFormation.updateSlots();
+		if (requestSlotUpdate) {
+			testFormation.updateSlots();
+			MessageManager.getInstance().dispatchMessage(Messages.FORMATION_UPDATED);
+			requestSlotUpdate = false;
+		}
+		
+		MessageManager.getInstance().update();
 		world.update(timeStep);
 		
 		glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
@@ -429,6 +439,7 @@ public class Wargame extends ActivityStub {
 		Vector2 v = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
 		if (v.x >= 0 && v.y >= 0) {
 			testFormation.getAnchorPoint().getPosition().set(v);
+			requestSlotUpdate = true;
 		}
 	}
 	

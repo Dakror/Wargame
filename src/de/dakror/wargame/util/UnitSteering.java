@@ -48,6 +48,10 @@ public class UnitSteering extends BlendedSteering<Vector2> {
 		return super.add(behavior, weight);
 	}
 	
+	public int getStateSize() {
+		return list.size - 1;
+	}
+	
 	public void flushState() {
 		list.truncate(1);
 	}

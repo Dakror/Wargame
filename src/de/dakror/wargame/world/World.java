@@ -24,6 +24,8 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 
 import com.badlogic.gdx.ai.pfa.Connection;
+import com.badlogic.gdx.ai.pfa.PathSmoother;
+import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -69,6 +71,10 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 	int[] tex = new int[1];
 	int texWidth, texHeight;
 	float[] matrix = new float[16];
+	
+	public IndexedAStarPathFinder<TiledNode> pathFinder;
+	public TiledManhattanDistance heuristic;
+	public PathSmoother<TiledNode, Vector2> pathSmoother;
 	
 	public World(String worldFile) {
 		super();
@@ -127,6 +133,10 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 	}
 	
 	void init() {
+		pathFinder = new IndexedAStarPathFinder<TiledNode>(this);
+		heuristic = new TiledManhattanDistance();
+		pathSmoother = new PathSmoother<TiledNode, Vector2>(new TiledRaycastCollisionDetector(this));
+		
 		add = (width - depth - 2) * -0.5f;
 		
 		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
@@ -251,6 +261,14 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 		return new Vector2(x / 2, z / 2);
 	}
 	
+	public TiledNode get(Vector2 v) {
+		return get(v.x, v.y);
+	}
+	
+	public TiledNode get(float x, float z) {
+		return get((int) Math.floor(x), (int) Math.floor(z));
+	}
+	
 	public TiledNode get(int x, int z) {
 		TiledNode tn = map[z * width + x];
 		if (tn == null) {
@@ -283,10 +301,10 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 			} else e.update(timePassed);
 		}
 		
-		list = entities.getAll();
-		for (int i = 0; i < list.length; i++) {
-			((Entity) list[i]).updatePosition();
-		}
+		//		list = entities.getAll();
+		//		for (int i = 0; i < list.length; i++) {
+		//			((Entity) list[i]).updatePosition();
+		//		}
 		
 		if (pendingSpawns.size > 0) {
 			Entity e = pendingSpawns.first();
@@ -382,14 +400,6 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 	
 	@Override
 	public Array<Connection<TiledNode>> getConnections(TiledNode fromNode) {
-		if (fromNode.getConnections().size == 0) {
-			for (int i = -1; i < 2; i++) {
-				for (int j = -1; j < 2; j++) {
-					if (i == 0 && j == 0) continue;
-					if (isInBounds(fromNode.x + i, fromNode.z + j)) fromNode.getConnections().add(new TiledConnection(fromNode, get(fromNode.x + i, fromNode.z + j)));
-				}
-			}
-		}
 		return fromNode.getConnections();
 	}
 	

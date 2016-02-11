@@ -113,6 +113,8 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 			
 			face = ((((int) Math.round(Math.toDegrees(orientation) + 360)) % 360) / 90 + 3) % 4;
 			updateTexture();
+			
+			updatePosition();
 		}
 	}
 	

@@ -24,7 +24,7 @@ import com.badlogic.gdx.utils.Array;
  * @author Maximilian Stark | Dakror
  */
 public class TiledNode implements IndexedNode<TiledNode> {
-	int x, z;
+	public int x, z;
 	World world;
 	TileType type;
 	boolean buildingOnTop;
@@ -35,7 +35,7 @@ public class TiledNode implements IndexedNode<TiledNode> {
 		this.z = z;
 		this.type = type;
 		this.world = world;
-		connections = new Array<Connection<TiledNode>>(8);
+		connections = new Array<Connection<TiledNode>>(4);
 	}
 	
 	@Override
@@ -45,6 +45,15 @@ public class TiledNode implements IndexedNode<TiledNode> {
 	
 	@Override
 	public Array<Connection<TiledNode>> getConnections() {
+		if (connections.size == 0) {
+			for (int i = -1; i < 2; i++) {
+				for (int j = -1; j < 2; j++) {
+					if (i == 0 && j == 0) continue;
+					if (Math.sqrt(i * i + j * j) > 1) continue; // disable diagonal
+					if (world.isInBounds(x + i, z + j)) connections.add(new TiledConnection(this, world.get(x + i, z + j)));
+				}
+			}
+		}
 		return connections;
 	}
 }

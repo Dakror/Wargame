@@ -270,6 +270,8 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 	}
 	
 	public TiledNode get(int x, int z) {
+		if (!isInBounds(x, z)) return null;
+		
 		TiledNode tn = map[z * width + x];
 		if (tn == null) {
 			tn = new TiledNode(x, z, this, TileType.Air);

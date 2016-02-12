@@ -23,7 +23,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.fma.Formation;
-import com.badlogic.gdx.ai.fma.patterns.DefensiveCircleFormationPattern;
 import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -45,19 +44,19 @@ import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.BuildingType;
 import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.entity.building.Estate;
+import de.dakror.wargame.entity.motion.ArmyFormation;
+import de.dakror.wargame.entity.motion.WorldLocation;
 import de.dakror.wargame.render.Sprite;
 import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas;
 import de.dakror.wargame.ui.Button;
-import de.dakror.wargame.ui.Colors;
 import de.dakror.wargame.ui.Panel;
 import de.dakror.wargame.ui.UI;
 import de.dakror.wargame.util.ActivityStub;
 import de.dakror.wargame.util.AndroidLogger;
 import de.dakror.wargame.util.Listeners.ButtonListener;
 import de.dakror.wargame.util.MiscUtil;
-import de.dakror.wargame.util.WorldLocation;
 import de.dakror.wargame.world.CanBuildResult;
 import de.dakror.wargame.world.World;
 
@@ -180,7 +179,7 @@ public class Wargame extends ActivityStub {
 		enemy.setMainCity(theirCity);
 		world.addEntity(theirCity);
 		
-		testFormation = new Formation<Vector2>(new WorldLocation(new Vector2(6, 6), 0), new DefensiveCircleFormationPattern<Vector2>(0.2f));
+		testFormation = new Formation<Vector2>(new WorldLocation(new Vector2(6, 6), 0), new ArmyFormation(0.3f));
 		//		
 		//		Unit v = new Unit(0, 2, player, Units.Infantry);
 		
@@ -281,10 +280,10 @@ public class Wargame extends ActivityStub {
 		int in = 0;
 		for (Object e : world.getEntities().getAll()) {
 			if (e instanceof Unit) {
-				textRenderer.renderText(-width / 2, height / 2 - 130 - in * 30, 0, 0.5f, "#" + MiscUtil.lengthenFloat(e.hashCode(), 9) + ": " + ((Entity) e).getPosition().x, spriteRenderer);
-				textRenderer.renderText(-width / 2 + 510, height / 2 - 130 - in * 30, 0, 0.5f, "" + ((Entity) e).getPosition().y, spriteRenderer);
-				textRenderer.renderText(-width / 2 + 760, height / 2 - 130 - in * 30, 0, 0.5f, "" + (float) Math.toDegrees(((Entity) e).getOrientation()), spriteRenderer);
-				textRenderer.renderText(-width / 2 + 1050, height / 2 - 130 - in * 30, 0, 0.5f, Colors.MEDIUM_BLUE, "" + (float) Math.toDegrees(((Unit) e).getTargetLocation().getOrientation()), spriteRenderer);
+				textRenderer.renderText(-width / 2, height / 2 - 130 - in * 30, 0, 0.5f, HALFWHITE, "#" + MiscUtil.lengthenFloat(e.hashCode(), 9) + ": " + ((Entity) e).getPosition().x, spriteRenderer);
+				textRenderer.renderText(-width / 2 + 510, height / 2 - 130 - in * 30, 0, 0.5f, HALFWHITE, "" + ((Entity) e).getPosition().y, spriteRenderer);
+				textRenderer.renderText(-width / 2 + 760, height / 2 - 130 - in * 30, 0, 0.5f, HALFWHITE, "" + (float) Math.toDegrees(((Entity) e).getOrientation()), spriteRenderer);
+				textRenderer.renderText(-width / 2 + 1050, height / 2 - 130 - in * 30, 0, 0.5f, HALFWHITE, "" + (float) Math.toDegrees(((Unit) e).getTargetLocation().getOrientation()), spriteRenderer);
 				in++;
 			}
 		}

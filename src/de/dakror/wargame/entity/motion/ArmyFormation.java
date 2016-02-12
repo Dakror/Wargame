@@ -14,45 +14,47 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame.util;
+package de.dakror.wargame.entity.motion;
 
-import com.badlogic.gdx.ai.steer.Steerable;
-import com.badlogic.gdx.ai.steer.SteeringBehavior;
-import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
+import com.badlogic.gdx.ai.fma.FormationPattern;
+import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 
 /**
  * @author Maximilian Stark | Dakror
  *
  */
-public class UnitSteering extends PrioritySteering<Vector2> {
-	public UnitSteering(Steerable<Vector2> owner) {
-		super(owner);
-	}
+public class ArmyFormation implements FormationPattern<Vector2> {
+	int numberOfSlots;
+	float memberSize;
 	
-	public UnitSteering setGlobal(SteeringBehavior<Vector2> global) {
-		global.setOwner(owner);
-		if (behaviors.size == 0) behaviors.add(global);
-		else behaviors.insert(0, global);
-		
-		return this;
+	public ArmyFormation(float memberSize) {
+		this.memberSize = memberSize;
 	}
 	
 	@Override
-	public UnitSteering add(SteeringBehavior<Vector2> behavior) {
-		if (behaviors.size == 0) {
-			System.err.println("no global state in UnitSteering!");
-			return this;
+	public void setNumberOfSlots(int numberOfSlots) {
+		this.numberOfSlots = numberOfSlots;
+	}
+	
+	@Override
+	public Location<Vector2> calculateSlotLocation(Location<Vector2> outLocation, int slotNumber) {
+		if (numberOfSlots > 1) {
+			int width = (numberOfSlots / 5) + 5;
+			
+			outLocation.getPosition().set((slotNumber % width) * memberSize, -slotNumber / width * memberSize); // not yet there
+		} else {
+			outLocation.getPosition().setZero();
 		}
-		super.add(behavior);
-		return this;
+		
+		outLocation.setOrientation(0);
+		
+		return outLocation;
 	}
 	
-	public int getStateSize() {
-		return behaviors.size - 1;
+	@Override
+	public boolean supportsSlots(int slotCount) {
+		return true;
 	}
 	
-	public void flushState() {
-		behaviors.truncate(1);
-	}
 }

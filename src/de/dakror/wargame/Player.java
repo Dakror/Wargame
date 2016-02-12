@@ -34,7 +34,7 @@ public class Player {
 		this.name = name;
 		this.human = human;
 		this.color = color;
-		money = 1500;
+		money = Float.POSITIVE_INFINITY;
 	}
 	
 	public boolean isHuman() {

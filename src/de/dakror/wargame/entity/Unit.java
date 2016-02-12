@@ -27,9 +27,9 @@ import de.dakror.wargame.Player;
 import de.dakror.wargame.Wargame;
 import de.dakror.wargame.entity.ai.Messages;
 import de.dakror.wargame.entity.ai.UnitState;
+import de.dakror.wargame.entity.motion.UnitSteering;
+import de.dakror.wargame.entity.motion.WorldLocation;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
-import de.dakror.wargame.util.UnitSteering;
-import de.dakror.wargame.util.WorldLocation;
 import de.dakror.wargame.world.World;
 
 /**

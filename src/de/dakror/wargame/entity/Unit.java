@@ -19,13 +19,10 @@ package de.dakror.wargame.entity;
 import com.badlogic.gdx.ai.fma.FormationMember;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
-import com.badlogic.gdx.ai.msg.MessageManager;
-import com.badlogic.gdx.ai.steer.SteeringAcceleration;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 
 import de.dakror.wargame.Player;
-import de.dakror.wargame.entity.ai.Messages;
 import de.dakror.wargame.entity.ai.UnitState;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.util.UnitSteering;
@@ -108,13 +105,13 @@ public class Unit extends Entity implements FormationMember<Vector2> {
 		this.type = type;
 		maxLinearSpeed = 1;
 		maxLinearAcceleration = 20;
-		maxAngularSpeed = 5;
-		maxAngularAcceleration = 10;
+		maxAngularSpeed = 25;
+		maxAngularAcceleration = 50;
 		boundingRadius = 0.15f;
 		pos.set(this.x + boundingRadius, this.z + boundingRadius);
 		target = new WorldLocation();
 		stateMachine = new DefaultStateMachine<Unit, UnitState>(this, UnitState.BUILD_FORMATION, UnitState.GLOBAL_STATE);
-		MessageManager.getInstance().addListener(stateMachine, Messages.FORMATION_UPDATED);
+		//		MessageManager.getInstance().addListener(stateMachine, Messages.FORMATION_UPDATED);
 		steering = new UnitSteering(this);
 		onCreate();
 	}
@@ -151,23 +148,6 @@ public class Unit extends Entity implements FormationMember<Vector2> {
 		stateMachine.update();
 		
 		type.update(this, deltaTime);
-	}
-	
-	@Override
-	protected void applySteering(SteeringAcceleration<Vector2> steering, float timePassed) {
-		linearVelocity.mulAdd(steering.linear, timePassed).limit(getMaxLinearSpeed());
-		if (stateMachine.getCurrentState() != UnitState.BUILD_FORMATION && steering.linear.isZero(0.1f)) linearVelocity.setZero();
-		else if (stateMachine.getCurrentState() == UnitState.BUILD_FORMATION && steering.linear.isZero()) linearVelocity.setZero();
-		else pos.mulAdd(linearVelocity, timePassed);
-		
-		if (independentFacing) {
-			orientation += angularVelocity * timePassed;
-			angularVelocity += steering.angular * timePassed;
-		} else if (!linearVelocity.isZero(getZeroLinearSpeedThreshold())) {
-			float newOrientation = vectorToAngle(linearVelocity);
-			angularVelocity = (newOrientation - getOrientation()) * timePassed; // this is superfluous if independentFacing is always true
-			orientation = newOrientation;
-		}
 	}
 	
 	@Override

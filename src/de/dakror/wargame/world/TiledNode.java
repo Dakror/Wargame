@@ -16,6 +16,8 @@
 
 package de.dakror.wargame.world;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedNode;
 import com.badlogic.gdx.utils.Array;
@@ -27,7 +29,7 @@ public class TiledNode implements IndexedNode<TiledNode> {
 	public int x, z;
 	World world;
 	TileType type;
-	boolean buildingOnTop;
+	boolean blocked;
 	Array<Connection<TiledNode>> connections;
 	
 	public TiledNode(int x, int z, World world, TileType type) {
@@ -43,15 +45,29 @@ public class TiledNode implements IndexedNode<TiledNode> {
 		return z * world.getWidth() + x;
 	}
 	
+	public void setBlocked(boolean blocked) {
+		if (blocked == this.blocked) return;
+		for (int i = 0; i < 4; i++) {
+			int x1 = (i - 1) % 2, z1 = (i - 2) % 2;
+			TiledNode tn = world.get(x + x1, z + z1);
+			if (blocked) {
+				for (Iterator<Connection<TiledNode>> iter = tn.getConnections().iterator(); iter.hasNext();)
+					if (iter.next().getToNode().equals(this)) iter.remove();
+			} else tn.getConnections().add(new TiledConnection(tn, this));
+		}
+		this.blocked = blocked;
+	}
+	
+	public boolean isBlocked() {
+		return blocked;
+	}
+	
 	@Override
 	public Array<Connection<TiledNode>> getConnections() {
 		if (connections.size == 0) {
-			for (int i = -1; i < 2; i++) {
-				for (int j = -1; j < 2; j++) {
-					if (i == 0 && j == 0) continue;
-					if (Math.sqrt(i * i + j * j) > 1) continue; // disable diagonal
-					if (world.isInBounds(x + i, z + j)) connections.add(new TiledConnection(this, world.get(x + i, z + j)));
-				}
+			for (int i = 0; i < 4; i++) {
+				int x1 = (i - 1) % 2, z1 = (i - 2) % 2;
+				if (world.isInBounds(x + x1, z + z1)) connections.add(new TiledConnection(this, world.get(x + x1, z + z1)));
 			}
 		}
 		return connections;

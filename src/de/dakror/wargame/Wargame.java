@@ -38,7 +38,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import de.dakror.wargame.entity.ai.Messages;
+import de.dakror.wargame.entity.Entity;
+import de.dakror.wargame.entity.Unit;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.BuildingType;
 import de.dakror.wargame.entity.building.City;
@@ -48,11 +49,13 @@ import de.dakror.wargame.render.SpriteRenderer;
 import de.dakror.wargame.render.TextRenderer;
 import de.dakror.wargame.render.TextureAtlas;
 import de.dakror.wargame.ui.Button;
+import de.dakror.wargame.ui.Colors;
 import de.dakror.wargame.ui.Panel;
 import de.dakror.wargame.ui.UI;
 import de.dakror.wargame.util.ActivityStub;
 import de.dakror.wargame.util.AndroidLogger;
 import de.dakror.wargame.util.Listeners.ButtonListener;
+import de.dakror.wargame.util.MiscUtil;
 import de.dakror.wargame.util.WorldLocation;
 import de.dakror.wargame.world.CanBuildResult;
 import de.dakror.wargame.world.World;
@@ -229,11 +232,11 @@ public class Wargame extends ActivityStub {
 		player.money += 6 / 60f * timeStep;
 		enemy.money += 6 / 60f * timeStep;
 		
-		if (requestSlotUpdate) {
-			testFormation.updateSlots();
-			MessageManager.getInstance().dispatchMessage(Messages.FORMATION_UPDATED);
-			requestSlotUpdate = false;
-		}
+		//		if (requestSlotUpdate) {
+		testFormation.updateSlots();
+		//			MessageManager.getInstance().dispatchMessage(Messages.FORMATION_UPDATED);
+		//			requestSlotUpdate = false;
+		//		}
 		
 		MessageManager.getInstance().update();
 		world.update(timeStep);
@@ -273,6 +276,17 @@ public class Wargame extends ActivityStub {
 		textRenderer.setFont(1);
 		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + (int) Math.floor(player.money), spriteRenderer);
 		textRenderer.setFont(0);
+		
+		int in = 0;
+		for (Object e : world.getEntities().getAll()) {
+			if (e instanceof Unit) {
+				textRenderer.renderText(-width / 2, height / 2 - 130 - in * 30, 0, 0.5f, "#" + MiscUtil.lengthenFloat(e.hashCode(), 9) + ": " + ((Entity) e).getPosition().x, spriteRenderer);
+				textRenderer.renderText(-width / 2 + 510, height / 2 - 130 - in * 30, 0, 0.5f, "" + ((Entity) e).getPosition().y, spriteRenderer);
+				textRenderer.renderText(-width / 2 + 760, height / 2 - 130 - in * 30, 0, 0.5f, "" + (float) Math.toDegrees(((Entity) e).getOrientation()), spriteRenderer);
+				textRenderer.renderText(-width / 2 + 1050, height / 2 - 130 - in * 30, 0, 0.5f, Colors.MEDIUM_BLUE, "" + (float) Math.toDegrees(((Unit) e).getTargetLocation().getOrientation()), spriteRenderer);
+				in++;
+			}
+		}
 		
 		if (placeBuilding != null) {
 			detailsPanel.render(spriteRenderer, null);

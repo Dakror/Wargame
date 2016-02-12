@@ -106,14 +106,23 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 		
 		if (steering != null) {
 			steering.calculateSteering(steeringOutput);
+			
 			applySteering(steeringOutput, timePassed);
+			pos.x = Math.max(boundingRadius, Math.min(world.getWidth() - boundingRadius, pos.x));
+			pos.y = Math.max(boundingRadius, Math.min(world.getDepth() - boundingRadius, pos.y));
 			
 			newX = pos.x - boundingRadius;
 			newZ = pos.y - boundingRadius;
 			
-			face = ((((int) Math.round(Math.toDegrees(orientation) + 360)) % 360) / 90 + 3) % 4;
-			updateTexture();
+			orientation %= 2 * Math.PI;
 			
+			int d = (int) Math.round(Math.toDegrees(orientation));
+			if (d > -45 && d < 45) face = 3;
+			if (d > 45 && d < 135) face = 2;
+			if (d > 135 || d < -135) face = 1;
+			if (d > -135 && d < -45) face = 0;
+			
+			updateTexture();
 			updatePosition();
 		}
 	}
@@ -128,8 +137,7 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 	
 	protected void applySteering(SteeringAcceleration<Vector2> steering, float timePassed) {
 		pos.mulAdd(linearVelocity, timePassed);
-		if (steering.linear.isZero(0.1f)) linearVelocity.setZero();
-		else linearVelocity.mulAdd(steering.linear, timePassed).limit(getMaxLinearSpeed());
+		linearVelocity.mulAdd(steering.linear, timePassed).limit(getMaxLinearSpeed());
 		
 		if (independentFacing) {
 			orientation += angularVelocity * timePassed;

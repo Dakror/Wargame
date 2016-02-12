@@ -53,7 +53,7 @@ public class TiledRaycastCollisionDetector implements RaycastCollisionDetector<V
 		int ystep = (y0 < y1 ? 1 : -1);
 		for (int x = x0; x <= x1; x++) {
 			TiledNode tile = steep ? world.get(y, x) : world.get(x, y);
-			if (tile.buildingOnTop || !tile.type.solid) return true; // We've hit a building or water
+			if (tile.isBlocked() || !tile.type.solid) return true; // We've hit a building or water
 			error += deltay;
 			if (error + error >= deltax) {
 				y += ystep;

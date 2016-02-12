@@ -296,7 +296,7 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 			Entity e = (Entity) list[i];
 			if (e.isDead()) {
 				e.onRemoval();
-				if (e instanceof Building) get((int) e.getRealX(), (int) e.getRealZ()).buildingOnTop = false;
+				if (e instanceof Building) get((int) e.getRealX(), (int) e.getRealZ()).setBlocked(false);
 				entities.delete(e);
 			} else e.update(timePassed);
 		}
@@ -310,7 +310,9 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 			Entity e = pendingSpawns.first();
 			pendingSpawns.removeValue(e, true);
 			e.onSpawn();
-			if (e instanceof Building) get((int) e.getRealX(), (int) e.getRealZ()).buildingOnTop = true;
+			if (e instanceof Building) {
+				get((int) e.getRealX(), (int) e.getRealZ()).setBlocked(true);
+			}
 			entities.add(e);
 		}
 	}

@@ -45,11 +45,11 @@ public class MiscUtil {
 		}
 	}
 	
-	public static String lengthenFloat(float f, int len) {
+	public static String lengthenFloat(Number f, int len) {
 		String s = "" + f;
 		while (s.length() < len)
-			s = f % 1 == 0 ? " " + s : s + "0";
-		return s;
+			s = f.floatValue() % 1 == 0 ? "0" + s : s + "0";
+		return s.substring(0, len);
 	}
 	
 	static long time = 0;

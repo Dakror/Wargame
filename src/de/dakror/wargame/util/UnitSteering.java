@@ -18,41 +18,41 @@ package de.dakror.wargame.util;
 
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
-import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
+import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
 import com.badlogic.gdx.math.Vector2;
 
 /**
  * @author Maximilian Stark | Dakror
  *
  */
-public class UnitSteering extends BlendedSteering<Vector2> {
+public class UnitSteering extends PrioritySteering<Vector2> {
 	public UnitSteering(Steerable<Vector2> owner) {
 		super(owner);
 	}
 	
-	public BlendedSteering<Vector2> setGlobal(SteeringBehavior<Vector2> global, float weight) {
+	public UnitSteering setGlobal(SteeringBehavior<Vector2> global) {
 		global.setOwner(owner);
-		if (list.size == 0) list.add(new BehaviorAndWeight<Vector2>(global, weight));
-		else list.insert(0, new BehaviorAndWeight<Vector2>(global, weight));
+		if (behaviors.size == 0) behaviors.add(global);
+		else behaviors.insert(0, global);
 		
 		return this;
 	}
 	
 	@Override
-	public BlendedSteering<Vector2> add(SteeringBehavior<Vector2> behavior, float weight) {
-		if (list.size == 0) {
+	public UnitSteering add(SteeringBehavior<Vector2> behavior) {
+		if (behaviors.size == 0) {
 			System.err.println("no global state in UnitSteering!");
 			return this;
 		}
-		
-		return super.add(behavior, weight);
+		super.add(behavior);
+		return this;
 	}
 	
 	public int getStateSize() {
-		return list.size - 1;
+		return behaviors.size - 1;
 	}
 	
 	public void flushState() {
-		list.truncate(1);
+		behaviors.truncate(1);
 	}
 }

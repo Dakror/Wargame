@@ -54,6 +54,6 @@ public class WorldLocation implements Location<Vector2> {
 	}
 	
 	public static float VectorToAngle(Vector2 vector) {
-		return (float) Math.atan2(vector.x, vector.y);
+		return (float) Math.atan2(-vector.x, vector.y);
 	}
 }

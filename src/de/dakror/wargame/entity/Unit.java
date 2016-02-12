@@ -19,10 +19,13 @@ package de.dakror.wargame.entity;
 import com.badlogic.gdx.ai.fma.FormationMember;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
+import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 
 import de.dakror.wargame.Player;
+import de.dakror.wargame.Wargame;
+import de.dakror.wargame.entity.ai.Messages;
 import de.dakror.wargame.entity.ai.UnitState;
 import de.dakror.wargame.render.TextureAtlas.TextureRegion;
 import de.dakror.wargame.util.UnitSteering;
@@ -111,7 +114,7 @@ public class Unit extends Entity implements FormationMember<Vector2> {
 		pos.set(this.x + boundingRadius, this.z + boundingRadius);
 		target = new WorldLocation();
 		stateMachine = new DefaultStateMachine<Unit, UnitState>(this, UnitState.BUILD_FORMATION, UnitState.GLOBAL_STATE);
-		//		MessageManager.getInstance().addListener(stateMachine, Messages.FORMATION_UPDATED);
+		MessageManager.getInstance().addListener(stateMachine, Messages.FORMATION_UPDATED);
 		steering = new UnitSteering(this);
 		onCreate();
 	}
@@ -193,6 +196,7 @@ public class Unit extends Entity implements FormationMember<Vector2> {
 	@Override
 	public void onSpawn() {
 		type.onSpawn(this);
+		Wargame.requestSlotUpdate = true;
 		stateMachine.getGlobalState().enter(this);
 		stateMachine.getCurrentState().enter(this);
 	}

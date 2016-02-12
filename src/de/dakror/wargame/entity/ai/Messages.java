@@ -21,5 +21,5 @@ package de.dakror.wargame.entity.ai;
  *
  */
 public final class Messages {
-	//	public static final int FORMATION_UPDATED = 0;
+	public static final int FORMATION_UPDATED = 0;
 }

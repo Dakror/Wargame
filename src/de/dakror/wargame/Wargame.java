@@ -40,6 +40,7 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.Unit;
+import de.dakror.wargame.entity.ai.Messages;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.BuildingType;
 import de.dakror.wargame.entity.building.City;
@@ -96,7 +97,7 @@ public class Wargame extends ActivityStub {
 	
 	boolean hudEvents = false;
 	
-	boolean requestSlotUpdate;
+	public static boolean requestSlotUpdate = true;
 	
 	MotionEvent lastTouchEvent, lastSingleTap, lastDoubleTap;
 	
@@ -232,11 +233,11 @@ public class Wargame extends ActivityStub {
 		player.money += 6 / 60f * timeStep;
 		enemy.money += 6 / 60f * timeStep;
 		
-		//		if (requestSlotUpdate) {
-		testFormation.updateSlots();
-		//			MessageManager.getInstance().dispatchMessage(Messages.FORMATION_UPDATED);
-		//			requestSlotUpdate = false;
-		//		}
+		if (requestSlotUpdate) {
+			testFormation.updateSlots();
+			MessageManager.getInstance().dispatchMessage(Messages.FORMATION_UPDATED);
+			requestSlotUpdate = false;
+		}
 		
 		MessageManager.getInstance().update();
 		world.update(timeStep);

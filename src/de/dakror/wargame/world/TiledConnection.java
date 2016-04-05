@@ -16,8 +16,6 @@
 
 package de.dakror.wargame.world;
 
-import com.badlogic.gdx.ai.pfa.DefaultConnection;
-
 /**
  * @author Maximilian Stark | Dakror
  */

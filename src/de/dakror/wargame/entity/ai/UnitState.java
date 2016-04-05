@@ -16,18 +16,6 @@
 
 package de.dakror.wargame.entity.ai;
 
-import com.badlogic.gdx.ai.fsm.State;
-import com.badlogic.gdx.ai.msg.Telegram;
-import com.badlogic.gdx.ai.steer.Proximity;
-import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
-import com.badlogic.gdx.ai.steer.behaviors.CollisionAvoidance;
-import com.badlogic.gdx.ai.steer.behaviors.LookWhereYouAreGoing;
-import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
-import com.badlogic.gdx.ai.steer.behaviors.ReachOrientation;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-
 import de.dakror.wargame.entity.Unit;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.motion.FollowPathBoid;

@@ -14,12 +14,13 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame.util;
+package de.dakror.wargameV2.util;
 
 import com.infomatiq.jsi.Point;
 import com.infomatiq.jsi.Rectangle;
 import com.infomatiq.jsi.rtree.RTree;
 
+import de.dakror.wargameV2.entity.Entity;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntProcedure;
 

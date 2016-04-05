@@ -1,10 +1,5 @@
 package de.dakror.wargame.world;
 
-import com.badlogic.gdx.ai.utils.Collision;
-import com.badlogic.gdx.ai.utils.Ray;
-import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
-import com.badlogic.gdx.math.Vector2;
-
 /**
  * @author Maximilian Stark | Dakror
  */

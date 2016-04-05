@@ -1,7 +1,5 @@
 package de.dakror.wargame.world;
 
-import com.badlogic.gdx.ai.pfa.Heuristic;
-
 /**
  * @author Maximilian Stark | Dakror
  */

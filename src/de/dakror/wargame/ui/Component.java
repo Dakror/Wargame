@@ -16,7 +16,7 @@
 
 package de.dakror.wargame.ui;
 
-import de.dakror.wargame.render.Renderable;
+import de.dakror.wargame.graphics.Renderable;
 
 /**
  * @author Maximilian Stark | Dakror

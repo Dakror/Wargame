@@ -16,12 +16,6 @@
 
 package de.dakror.wargame.util;
 
-import com.badlogic.gdx.ai.steer.Proximity;
-import com.badlogic.gdx.ai.steer.Steerable;
-import com.badlogic.gdx.math.Vector2;
-
-import de.dakror.wargame.entity.Entity;
-
 /**
  * @author Maximilian Stark | Dakror
  *

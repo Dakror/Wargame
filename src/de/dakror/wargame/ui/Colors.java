@@ -16,8 +16,6 @@
 
 package de.dakror.wargame.ui;
 
-import com.badlogic.gdx.graphics.Color;
-
 /**
  * @author Maximilian Stark | Dakror
  */

@@ -16,11 +16,7 @@
 
 package de.dakror.wargame.entity.motion;
 
-import com.badlogic.gdx.ai.steer.Steerable;
-import com.badlogic.gdx.ai.steer.SteeringAcceleration;
-import com.badlogic.gdx.ai.steer.behaviors.Arrive;
-import com.badlogic.gdx.math.Vector;
-import com.badlogic.gdx.utils.Array;
+import java.util.Vector;
 
 /**
  * @author Maximilian Stark | Dakror

@@ -1,8 +1,5 @@
 package de.dakror.wargame.entity.motion;
 
-import com.badlogic.gdx.ai.utils.Location;
-import com.badlogic.gdx.math.Vector2;
-
 public class WorldLocation implements Location<Vector2> {
 	Vector2 position;
 	float orientation;

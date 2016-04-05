@@ -16,20 +16,14 @@
 
 package de.dakror.wargame.entity;
 
-import com.badlogic.gdx.ai.fma.FormationMember;
-import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
-import com.badlogic.gdx.ai.fsm.StateMachine;
-import com.badlogic.gdx.ai.msg.MessageManager;
-import com.badlogic.gdx.ai.utils.Location;
-import com.badlogic.gdx.math.Vector2;
-
+import android.location.Location;
 import de.dakror.wargame.Player;
 import de.dakror.wargame.Wargame;
 import de.dakror.wargame.entity.ai.Messages;
 import de.dakror.wargame.entity.ai.UnitState;
 import de.dakror.wargame.entity.motion.UnitSteering;
 import de.dakror.wargame.entity.motion.WorldLocation;
-import de.dakror.wargame.render.TextureAtlas.TextureRegion;
+import de.dakror.wargame.graphics.TextureAtlas.TextureRegion;
 import de.dakror.wargame.world.World;
 
 /**

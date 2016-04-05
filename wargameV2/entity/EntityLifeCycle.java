@@ -14,23 +14,23 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame.util;
-
-import android.view.MotionEvent;
+package de.dakror.wargameV2.entity;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Listeners {
-	public static interface ButtonListener {
-		public void onDown(Button b);
-		
-		public void onUp(Button b);
-	}
+public interface EntityLifeCycle {
+	public void onCreate();
 	
-	public static interface TouchListener {
-		public boolean onDown(MotionEvent e);
-		
-		public boolean onUp(MotionEvent e);
-	}
+	public void onSpawn();
+	
+	public void update(float timePassed);
+	
+	public void onDeath();
+	
+	public void onRemoval();
+	
+	public void onSelect();
+	
+	public void onDeselect();
 }

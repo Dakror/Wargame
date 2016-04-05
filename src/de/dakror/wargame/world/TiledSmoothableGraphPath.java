@@ -1,9 +1,5 @@
 package de.dakror.wargame.world;
 
-import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
-import com.badlogic.gdx.ai.pfa.SmoothableGraphPath;
-import com.badlogic.gdx.math.Vector2;
-
 /**
  * @author Maximilian Stark | Dakror
  */

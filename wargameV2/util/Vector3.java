@@ -14,23 +14,57 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame.util;
-
-import android.view.MotionEvent;
+package de.dakror.wargameV2.util;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Listeners {
-	public static interface ButtonListener {
-		public void onDown(Button b);
-		
-		public void onUp(Button b);
+public class Vector3 {
+	public float x, y, z;
+	
+	public Vector3() {}
+	
+	public Vector3(Vector3 v) {
+		x = v.x;
+		y = v.y;
+		z = v.z;
 	}
 	
-	public static interface TouchListener {
-		public boolean onDown(MotionEvent e);
+	public Vector3(float x, float y, float z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+	
+	public float length() {
+		return (float) Math.sqrt(x * x + y * y + z * z);
+	}
+	
+	public Vector3 add(Vector3 v) {
+		x += v.x;
+		y += v.y;
+		z += v.z;
 		
-		public boolean onUp(MotionEvent e);
+		return this;
+	}
+	
+	public Vector3 scl(float scl) {
+		x *= scl;
+		y *= scl;
+		z *= scl;
+		
+		return this;
+	}
+	
+	public Vector3 mul(Vector3 v) {
+		x *= v.x;
+		y *= v.y;
+		z *= v.z;
+		
+		return this;
+	}
+	
+	public Vector3 neg() {
+		return scl(-1);
 	}
 }

@@ -16,9 +16,7 @@
 
 package de.dakror.wargame.entity.motion;
 
-import com.badlogic.gdx.ai.fma.FormationPattern;
-import com.badlogic.gdx.ai.utils.Location;
-import com.badlogic.gdx.math.Vector2;
+import android.location.Location;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -40,9 +38,11 @@ public class ArmyFormation implements FormationPattern<Vector2> {
 	@Override
 	public Location<Vector2> calculateSlotLocation(Location<Vector2> outLocation, int slotNumber) {
 		if (numberOfSlots > 1) {
-			int width = (numberOfSlots / 5) + 5;
-			
-			outLocation.getPosition().set((slotNumber % width) * memberSize, -slotNumber / width * memberSize); // not yet there
+			int width = Math.min(numberOfSlots, (numberOfSlots / 3) + 3);
+			int numOfThisRow = Math.min(width, numberOfSlots - ((int) Math.floor(slotNumber / (float) width) * width));
+			System.out.println(slotNumber + ", " + width + ", " + numberOfSlots + ", " + numOfThisRow);
+			outLocation.getPosition().set((slotNumber % numOfThisRow) * memberSize - ((numOfThisRow - 1) * memberSize * 0.5f), -slotNumber / width * memberSize);
+			System.out.println(outLocation.getPosition().x + ", " + ((numOfThisRow - 1) * memberSize));
 		} else {
 			outLocation.getPosition().setZero();
 		}
@@ -56,5 +56,4 @@ public class ArmyFormation implements FormationPattern<Vector2> {
 	public boolean supportsSlots(int slotCount) {
 		return true;
 	}
-	
 }

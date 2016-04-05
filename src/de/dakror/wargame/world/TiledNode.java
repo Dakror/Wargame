@@ -16,11 +16,8 @@
 
 package de.dakror.wargame.world;
 
+import java.sql.Connection;
 import java.util.Iterator;
-
-import com.badlogic.gdx.ai.pfa.Connection;
-import com.badlogic.gdx.ai.pfa.indexed.IndexedNode;
-import com.badlogic.gdx.utils.Array;
 
 /**
  * @author Maximilian Stark | Dakror
@@ -67,7 +64,7 @@ public class TiledNode implements IndexedNode<TiledNode> {
 		if (connections.size == 0) {
 			for (int i = 0; i < 4; i++) {
 				int x1 = (i - 1) % 2, z1 = (i - 2) % 2;
-				if (world.isInBounds(x + x1, z + z1)) connections.add(new TiledConnection(this, world.get(x + x1, z + z1)));
+				if (world.isInBounds(x + x1, z + z1) && world.get(x + x1, z + z1).type.solid) connections.add(new TiledConnection(this, world.get(x + x1, z + z1)));
 			}
 		}
 		return connections;

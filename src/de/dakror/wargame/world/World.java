@@ -21,27 +21,19 @@ import static android.opengl.GLES20.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
 import java.util.Arrays;
-
-import com.badlogic.gdx.ai.pfa.Connection;
-import com.badlogic.gdx.ai.pfa.PathSmoother;
-import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
-import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 
 import android.opengl.Matrix;
 import de.dakror.wargame.Player;
 import de.dakror.wargame.Wargame;
-import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.City;
-import de.dakror.wargame.render.Renderable;
-import de.dakror.wargame.render.SpriteRenderer;
-import de.dakror.wargame.render.TextRenderer;
-import de.dakror.wargame.render.TextureAtlas.TextureRegion;
-import de.dakror.wargame.render.TextureAtlas.Tile;
+import de.dakror.wargame.graphics.Renderable;
+import de.dakror.wargame.graphics.SpriteRenderer;
+import de.dakror.wargame.graphics.TextRenderer;
+import de.dakror.wargame.graphics.TextureAtlas.TextureRegion;
+import de.dakror.wargame.graphics.TextureAtlas.Tile;
 import de.dakror.wargame.util.ERTree;
 import de.dakror.wargame.util.ResultProcedure;
 

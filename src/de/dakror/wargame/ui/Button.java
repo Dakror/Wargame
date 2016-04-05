@@ -20,10 +20,10 @@ import java.util.ArrayList;
 
 import android.view.MotionEvent;
 import de.dakror.wargame.Wargame;
-import de.dakror.wargame.render.Sprite;
-import de.dakror.wargame.render.SpriteRenderer;
-import de.dakror.wargame.render.TextRenderer;
-import de.dakror.wargame.render.TextureAtlas.TextureRegion;
+import de.dakror.wargame.graphics.Sprite;
+import de.dakror.wargame.graphics.SpriteRenderer;
+import de.dakror.wargame.graphics.TextRenderer;
+import de.dakror.wargame.graphics.TextureAtlas.TextureRegion;
 import de.dakror.wargame.util.Listeners.ButtonListener;
 import de.dakror.wargame.util.Listeners.TouchListener;
 

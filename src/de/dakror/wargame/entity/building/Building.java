@@ -16,17 +16,11 @@
 
 package de.dakror.wargame.entity.building;
 
-import com.badlogic.gdx.graphics.Color;
-
 import android.view.MotionEvent;
 import de.dakror.wargame.Player;
-import de.dakror.wargame.entity.Entity;
-import de.dakror.wargame.render.SpriteRenderer;
-import de.dakror.wargame.render.TextRenderer;
-import de.dakror.wargame.ui.Colors;
-import de.dakror.wargame.ui.ContextMenu;
+import de.dakror.wargame.graphics.SpriteRenderer;
+import de.dakror.wargame.graphics.TextRenderer;
 import de.dakror.wargame.ui.Panel;
-import de.dakror.wargame.ui.UI;
 import de.dakror.wargame.util.Listeners.TouchListener;
 import de.dakror.wargame.world.World;
 

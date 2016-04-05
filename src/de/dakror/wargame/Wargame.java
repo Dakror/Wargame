@@ -21,12 +21,6 @@ import static android.opengl.GLES20.*;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import com.badlogic.gdx.ai.GdxAI;
-import com.badlogic.gdx.ai.fma.Formation;
-import com.badlogic.gdx.ai.msg.MessageManager;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.opengl.GLSurfaceView;
@@ -46,15 +40,15 @@ import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.entity.building.Estate;
 import de.dakror.wargame.entity.motion.ArmyFormation;
 import de.dakror.wargame.entity.motion.WorldLocation;
-import de.dakror.wargame.render.Sprite;
-import de.dakror.wargame.render.SpriteRenderer;
-import de.dakror.wargame.render.TextRenderer;
-import de.dakror.wargame.render.TextureAtlas;
+import de.dakror.wargame.graphics.Color;
+import de.dakror.wargame.graphics.Sprite;
+import de.dakror.wargame.graphics.SpriteRenderer;
+import de.dakror.wargame.graphics.TextRenderer;
+import de.dakror.wargame.graphics.TextureAtlas;
 import de.dakror.wargame.ui.Button;
 import de.dakror.wargame.ui.Panel;
 import de.dakror.wargame.ui.UI;
 import de.dakror.wargame.util.ActivityStub;
-import de.dakror.wargame.util.AndroidLogger;
 import de.dakror.wargame.util.Listeners.ButtonListener;
 import de.dakror.wargame.util.MiscUtil;
 import de.dakror.wargame.world.CanBuildResult;
@@ -100,12 +94,9 @@ public class Wargame extends ActivityStub {
 	
 	MotionEvent lastTouchEvent, lastSingleTap, lastDoubleTap;
 	
-	public static Formation<Vector2> testFormation;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		GdxAI.setLogger(new AndroidLogger());
 		instance = this;
 		glView = new GLSurfaceView(this);
 		glView.setEGLContextClientVersion(2);

@@ -14,23 +14,37 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame.util;
-
-import android.view.MotionEvent;
+package de.dakror.wargameV2.world;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Listeners {
-	public static interface ButtonListener {
-		public void onDown(Button b);
-		
-		public void onUp(Button b);
+public enum TileType {
+	Air(false),
+	Basement(),
+	Custom0,
+	Custom1,
+	Custom2,
+	Desert,
+	Forest,
+	Hills,
+	Jungle,
+	Mountains,
+	Plains,
+	River(false),
+	Road,
+	Ruins,
+	Sea(false),
+	Tundra, // 16
+	;
+	
+	boolean solid;
+	
+	private TileType() {
+		this(true);
 	}
 	
-	public static interface TouchListener {
-		public boolean onDown(MotionEvent e);
-		
-		public boolean onUp(MotionEvent e);
+	private TileType(boolean solid) {
+		this.solid = solid;
 	}
 }

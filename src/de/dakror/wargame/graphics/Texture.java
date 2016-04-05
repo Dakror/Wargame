@@ -14,23 +14,26 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargame.util;
+package de.dakror.wargame.graphics;
 
-import android.view.MotionEvent;
+import android.opengl.GLES20;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class Listeners {
-	public static interface ButtonListener {
-		public void onDown(Button b);
+public class Texture {
+	public static enum TextureFilter {
+		Nearest(GLES20.GL_NEAREST),
+		Linear(GLES20.GL_LINEAR);
+		public final int glEnum;
 		
-		public void onUp(Button b);
+		TextureFilter(int glEnum) {
+			this.glEnum = glEnum;
+		}
 	}
 	
-	public static interface TouchListener {
-		public boolean onDown(MotionEvent e);
-		
-		public boolean onUp(MotionEvent e);
-	}
+	public String name;
+	public int minFilter, magFilter, width, height;
+	
+	public int textureId;
 }

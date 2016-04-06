@@ -16,13 +16,7 @@
 
 package de.dakror.wargame.entity;
 
-import android.location.Location;
 import de.dakror.wargame.Player;
-import de.dakror.wargame.Wargame;
-import de.dakror.wargame.entity.ai.Messages;
-import de.dakror.wargame.entity.ai.UnitState;
-import de.dakror.wargame.entity.motion.UnitSteering;
-import de.dakror.wargame.entity.motion.WorldLocation;
 import de.dakror.wargame.graphics.TextureAtlas.TextureRegion;
 import de.dakror.wargame.world.World;
 
@@ -30,7 +24,7 @@ import de.dakror.wargame.world.World;
  * @author Maximilian Stark | Dakror
  *
  */
-public class Unit extends Entity implements FormationMember<Vector2> {
+public class Unit extends Entity {
 	public static enum AttackKind {
 		Arc_Missile,
 		Bomb,
@@ -92,24 +86,13 @@ public class Unit extends Entity implements FormationMember<Vector2> {
 	}
 	
 	UnitType type;
-	WorldLocation target;
 	float scale = 0.5f;
-	
-	StateMachine<Unit, UnitState> stateMachine;
 	
 	public Unit(float x, float z, int face, Player owner, boolean huge, UnitType type) {
 		super(x + (float) (Math.random() / 10), z + (float) (Math.random() / 10), face, owner, huge, type.alias);
 		this.type = type;
-		maxLinearSpeed = 1;
-		maxLinearAcceleration = 20;
-		maxAngularSpeed = 25;
-		maxAngularAcceleration = 50;
-		boundingRadius = 0.15f;
-		pos.set(this.x + boundingRadius, this.z + boundingRadius);
-		target = new WorldLocation();
-		stateMachine = new DefaultStateMachine<Unit, UnitState>(this, UnitState.BUILD_FORMATION, UnitState.GLOBAL_STATE);
-		MessageManager.getInstance().addListener(stateMachine, Messages.FORMATION_UPDATED);
-		steering = new UnitSteering(this);
+		boundWidth = 0.25f;
+		boundDepth = 0.25f;
 		onCreate();
 	}
 	
@@ -142,7 +125,6 @@ public class Unit extends Entity implements FormationMember<Vector2> {
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-		stateMachine.update();
 		
 		type.update(this, deltaTime);
 	}
@@ -190,13 +172,5 @@ public class Unit extends Entity implements FormationMember<Vector2> {
 	@Override
 	public void onSpawn() {
 		type.onSpawn(this);
-		Wargame.requestSlotUpdate = true;
-		stateMachine.getGlobalState().enter(this);
-		stateMachine.getCurrentState().enter(this);
-	}
-	
-	@Override
-	public Location<Vector2> getTargetLocation() {
-		return target;
 	}
 }

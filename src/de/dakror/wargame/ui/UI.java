@@ -17,6 +17,7 @@
 package de.dakror.wargame.ui;
 
 import de.dakror.wargame.Wargame;
+import de.dakror.wargame.graphics.Color.Colors;
 import de.dakror.wargame.graphics.SpriteRenderer;
 import de.dakror.wargame.graphics.TextRenderer;
 import de.dakror.wargame.graphics.TextureAtlas.TextureRegion;
@@ -55,16 +56,16 @@ public class UI {
 		TextureRegion heartIcon = Wargame.ui.getTile("hud_heartFull").regions.get(0);
 		float hW = heartIcon.origWidth * (icoHeight / heartIcon.origHeight);
 		r.render(x, y - 8, 0, hW, icoHeight, heartIcon.x, heartIcon.y, heartIcon.width, heartIcon.height, heartIcon.texture.textureId);
-		t.renderText(x + hW, y - 1, 0, 0.5f, Color.SLATE, hp + "", r);
+		t.renderText(x + hW, y - 1, 0, 0.5f, Colors.SLATE, hp + "", r);
 		
 		TextureRegion swordIcon = Wargame.ui.getTile("cursorSword_gold").regions.get(0);
 		float sW = swordIcon.origWidth * (icoHeight / swordIcon.origHeight);
 		r.render(x + width / 3 - 20, y - 8, 0, sW, icoHeight, swordIcon.x, swordIcon.y, swordIcon.width, swordIcon.height, swordIcon.texture.textureId);
-		t.renderText(x + width / 3 - 15 + sW, y - 1, 0, 0.5f, Color.SLATE, atk + "", r);
+		t.renderText(x + width / 3 - 15 + sW, y - 1, 0, 0.5f, Colors.SLATE, atk + "", r);
 		
 		TextureRegion shieldIcon = Wargame.ui.getTile("shieldSilver2").regions.get(0);
 		float dW = shieldIcon.origWidth * (icoHeight / shieldIcon.origHeight);
 		r.render(x + width / 3 * 2 - 20, y - 8, 0, dW, icoHeight, shieldIcon.x, shieldIcon.y, shieldIcon.width, shieldIcon.height, shieldIcon.texture.textureId);
-		t.renderText(x + width / 3 * 2 - 15 + dW, y - 1, 0, 0.5f, Color.SLATE, def + "", r);
+		t.renderText(x + width / 3 * 2 - 15 + dW, y - 1, 0, 0.5f, Colors.SLATE, def + "", r);
 	}
 }

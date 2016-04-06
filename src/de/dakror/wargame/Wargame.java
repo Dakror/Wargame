@@ -31,16 +31,12 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import de.dakror.wargame.entity.Entity;
-import de.dakror.wargame.entity.Unit;
-import de.dakror.wargame.entity.ai.Messages;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.Building.BuildingType;
 import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.entity.building.Estate;
-import de.dakror.wargame.entity.motion.ArmyFormation;
-import de.dakror.wargame.entity.motion.WorldLocation;
 import de.dakror.wargame.graphics.Color;
+import de.dakror.wargame.graphics.Color.Colors;
 import de.dakror.wargame.graphics.Sprite;
 import de.dakror.wargame.graphics.SpriteRenderer;
 import de.dakror.wargame.graphics.TextRenderer;
@@ -50,7 +46,7 @@ import de.dakror.wargame.ui.Panel;
 import de.dakror.wargame.ui.UI;
 import de.dakror.wargame.util.ActivityStub;
 import de.dakror.wargame.util.Listeners.ButtonListener;
-import de.dakror.wargame.util.MiscUtil;
+import de.dakror.wargame.util.Vector;
 import de.dakror.wargame.world.CanBuildResult;
 import de.dakror.wargame.world.World;
 
@@ -89,8 +85,6 @@ public class Wargame extends ActivityStub {
 	public static Player player, enemy;
 	
 	boolean hudEvents = false;
-	
-	public static boolean requestSlotUpdate = true;
 	
 	MotionEvent lastTouchEvent, lastSingleTap, lastDoubleTap;
 	
@@ -170,13 +164,12 @@ public class Wargame extends ActivityStub {
 		enemy.setMainCity(theirCity);
 		world.addEntity(theirCity);
 		
-		testFormation = new Formation<Vector2>(new WorldLocation(new Vector2(6, 6), 0), new ArmyFormation(0.3f));
 		//		
 		//		Unit v = new Unit(0, 2, player, Units.Infantry);
 		
-		//		SteeringBehavior<Vector2> sb = new Pursue<Vector2>(u, v, 0.3f)/*.setTarget(new WorldLocation(new Vector3(2, 2, 0), 0))/*.setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f)*/;
+		//		SteeringBehavior<Vector> sb = new Pursue<Vector>(u, v, 0.3f)/*.setTarget(new WorldLocation(new Vector(2, 2, 0), 0))/*.setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f)*/;
 		//		u.setSteeringBehavior(sb);
-		//		v.setSteeringBehavior(new Arrive<Vector2>(v).setTarget(new WorldLocation(new Vector2(6, 6), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f));
+		//		v.setSteeringBehavior(new Arrive<Vector>(v).setTarget(new WorldLocation(new Vector(6, 6), 0)).setArrivalTolerance(u.getZeroLinearSpeedThreshold()).setDecelerationRadius(1f));
 		//		world.addEntity(v);
 		//		map.addEntity(u);
 	}
@@ -207,7 +200,6 @@ public class Wargame extends ActivityStub {
 		handleInput();
 		
 		float timeStep = Math.min(1.0f / fps, 1 / 60f);
-		GdxAI.getTimepiece().update(timeStep);
 		
 		if (vX != 0 && vY != 0) {
 			final float stop = 0.00001f;
@@ -223,13 +215,6 @@ public class Wargame extends ActivityStub {
 		player.money += 6 / 60f * timeStep;
 		enemy.money += 6 / 60f * timeStep;
 		
-		if (requestSlotUpdate) {
-			testFormation.updateSlots();
-			MessageManager.getInstance().dispatchMessage(Messages.FORMATION_UPDATED);
-			requestSlotUpdate = false;
-		}
-		
-		MessageManager.getInstance().update();
 		world.update(timeStep);
 		
 		glClearColor(130 / 255f, 236 / 255f, 255 / 255f, 1);
@@ -268,17 +253,6 @@ public class Wargame extends ActivityStub {
 		textRenderer.renderText(-200, height / 2 - 80, 0, 1f, "$ " + (int) Math.floor(player.money), spriteRenderer);
 		textRenderer.setFont(0);
 		
-		int in = 0;
-		for (Object e : world.getEntities().getAll()) {
-			if (e instanceof Unit) {
-				textRenderer.renderText(-width / 2, height / 2 - 130 - in * 30, 0, 0.5f, HALFWHITE, "#" + MiscUtil.lengthenFloat(e.hashCode(), 9) + ": " + ((Entity) e).getPosition().x, spriteRenderer);
-				textRenderer.renderText(-width / 2 + 510, height / 2 - 130 - in * 30, 0, 0.5f, HALFWHITE, "" + ((Entity) e).getPosition().y, spriteRenderer);
-				textRenderer.renderText(-width / 2 + 760, height / 2 - 130 - in * 30, 0, 0.5f, HALFWHITE, "" + (float) Math.toDegrees(((Entity) e).getOrientation()), spriteRenderer);
-				textRenderer.renderText(-width / 2 + 1050, height / 2 - 130 - in * 30, 0, 0.5f, HALFWHITE, "" + (float) Math.toDegrees(((Unit) e).getTargetLocation().getOrientation()), spriteRenderer);
-				in++;
-			}
-		}
-		
 		if (placeBuilding != null) {
 			detailsPanel.render(spriteRenderer, null);
 			placeBuilding.renderDetails(detailsPanel, spriteRenderer, textRenderer);
@@ -295,7 +269,7 @@ public class Wargame extends ActivityStub {
 				//@on
 				for (int i = 0; i < reason.length; i++)
 					// (x1 + x2) / 2
-					textRenderer.renderTextCentered((-width / 2 + detailsPanel.getWidth() + width / 2 - buyButtons.length * UI.BTN_SQUARE_WIDTH + 10) / 2, -height / 2 + 80 - i * 30, 0, 0.6f, Color.RED, reason[i], spriteRenderer);
+					textRenderer.renderTextCentered((-width / 2 + detailsPanel.getWidth() + width / 2 - buyButtons.length * UI.BTN_SQUARE_WIDTH + 10) / 2, -height / 2 + 80 - i * 30, 0, 0.6f, Colors.RED, reason[i], spriteRenderer);
 			}
 		} else if (selectedBuilding != null) {
 			selectedBuilding.renderContextMenu(spriteRenderer, textRenderer);
@@ -319,7 +293,7 @@ public class Wargame extends ActivityStub {
 		if (lastSingleTap != null) {
 			if (!tryToPlaceBuilding(lastSingleTap, true) && placeBuilding == null) {
 				if (!hudEvents) {
-					Vector2 pos = world.getMappedCoords(lastSingleTap.getX() - width / 2, height - lastSingleTap.getY() - height / 2);
+					Vector pos = world.getMappedCoords(lastSingleTap.getX() - width / 2, height - lastSingleTap.getY() - height / 2);
 					Building b = world.getBuildingAt((int) pos.x, (int) pos.y, null);
 					
 					if (selectedBuilding != null) selectedBuilding.onDeselect();
@@ -379,7 +353,7 @@ public class Wargame extends ActivityStub {
 	public boolean tryToPlaceBuilding(MotionEvent e, boolean single) {
 		if (!hudEvents) {
 			if (placeBuilding != null) {
-				Vector2 pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
+				Vector pos = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
 				if (pos.x >= 0 && pos.y >= 0 && pos.x < world.getWidth() && pos.y < world.getDepth()) {
 					if (!single || (placeBuilding.getRealX() == (int) pos.x && placeBuilding.getRealZ() == (int) pos.y)) {
 						if (world.canBuildOn((int) placeBuilding.getRealX(), (int) placeBuilding.getRealZ(), player).result && player.money >= placeBuilding.getBuildCosts()) {
@@ -441,11 +415,6 @@ public class Wargame extends ActivityStub {
 	@Override
 	public void onLongPress(MotionEvent e) {
 		//		player.money += 1000;
-		Vector2 v = world.getMappedCoords(e.getX() - width / 2, height - e.getY() - height / 2);
-		if (v.x >= 0 && v.y >= 0) {
-			testFormation.getAnchorPoint().getPosition().set(v);
-			requestSlotUpdate = true;
-		}
 	}
 	
 	@TargetApi(Build.VERSION_CODES.KITKAT)

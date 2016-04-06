@@ -16,6 +16,7 @@
 
 package de.dakror.wargame.graphics;
 
+import de.dakror.wargame.graphics.Color.Colors;
 import de.dakror.wargame.graphics.TextureAtlas.TextureRegion;
 
 /**
@@ -27,7 +28,7 @@ public class Sprite {
 	protected float textureX, textureY, textureWidth, textureHeight;
 	protected float xOffset, yOffset, innerWidth, innerHeight;
 	protected float srcWidth, srcHeight;
-	protected Color color = new Color(Color.WHITE), additive = new Color(Color.BLACK);
+	protected Color color = new Color(Colors.WHITE), additive = new Color(Colors.BLACK);
 	protected int textureId;
 	protected int paletteIndex;
 	

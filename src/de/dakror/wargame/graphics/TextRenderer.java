@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import de.dakror.wargame.Wargame;
+import de.dakror.wargame.graphics.Color.Colors;
 
 /**
  * Only supports one page long fonts for simplicity and lazyness :P
@@ -114,7 +115,7 @@ public class TextRenderer {
 	}
 	
 	public float renderText(float x, float y, float z, float size, String text, SpriteRenderer r) {
-		return renderText(x, y, z, size, Color.WHITE, text, r);
+		return renderText(x, y, z, size, Colors.WHITE, text, r);
 	}
 	
 	public float renderText(float x, float y, float z, float size, Color color, String text, SpriteRenderer r) {
@@ -131,7 +132,7 @@ public class TextRenderer {
 	}
 	
 	public void renderTextCentered(float x, float y, float z, float size, String text, SpriteRenderer r) {
-		renderTextCentered(x, y, z, size, Color.WHITE, text, r);
+		renderTextCentered(x, y, z, size, Colors.WHITE, text, r);
 	}
 	
 	public void renderTextCentered(float x, float y, float z, float size, Color color, String text, SpriteRenderer r) {

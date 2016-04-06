@@ -21,12 +21,13 @@ import static android.opengl.GLES20.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 import android.opengl.Matrix;
 import de.dakror.wargame.Player;
 import de.dakror.wargame.Wargame;
+import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.building.Building;
 import de.dakror.wargame.entity.building.City;
 import de.dakror.wargame.graphics.Renderable;
@@ -36,15 +37,17 @@ import de.dakror.wargame.graphics.TextureAtlas.TextureRegion;
 import de.dakror.wargame.graphics.TextureAtlas.Tile;
 import de.dakror.wargame.util.ERTree;
 import de.dakror.wargame.util.ResultProcedure;
+import de.dakror.wargame.util.Vector;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public class World implements Renderable, IndexedGraph<TiledNode> {
+public class World implements Renderable {
 	// z * width + x
-	protected TiledNode[] map;
+	protected int[] map;
+	protected boolean[] blocked;
 	
-	protected Vector3 pos, newPos;
+	protected Vector pos, newPos;
 	
 	public static float WIDTH = 129f;
 	public static float HEIGHT = 18f;
@@ -56,17 +59,13 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 	float add;
 	
 	protected ERTree entities = new ERTree();
-	protected Array<Entity> pendingSpawns = new Array<Entity>();
+	protected LinkedList<Entity> pendingSpawns = new LinkedList<Entity>();
 	
 	int[] fbo = new int[1];
 	int[] rbo = new int[1];
 	int[] tex = new int[1];
 	int texWidth, texHeight;
 	float[] matrix = new float[16];
-	
-	public IndexedAStarPathFinder<TiledNode> pathFinder;
-	public TiledManhattanDistance heuristic;
-	public PathSmoother<TiledNode, Vector2> pathSmoother;
 	
 	public World(String worldFile) {
 		super();
@@ -78,7 +77,8 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 		super();
 		this.width = width;
 		this.depth = depth;
-		map = new TiledNode[width * depth];
+		map = new int[width * depth];
+		blocked = new boolean[width * depth];
 		
 		generate();
 		init();
@@ -96,7 +96,8 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 					width = Integer.valueOf(s[0]);
 					depth = Integer.valueOf(s[1]);
 					z = depth - 1;
-					map = new TiledNode[width * depth];
+					map = new int[width * depth];
+					blocked = new boolean[width * depth];
 				} else if (map != null) {
 					if (line.startsWith("-")) {
 						z = depth - 1;
@@ -125,14 +126,10 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 	}
 	
 	void init() {
-		pathFinder = new IndexedAStarPathFinder<TiledNode>(this);
-		heuristic = new TiledManhattanDistance();
-		pathSmoother = new PathSmoother<TiledNode, Vector2>(new TiledRaycastCollisionDetector(this));
-		
 		add = (width - depth - 2) * -0.5f;
 		
-		pos = new Vector3(-width / 2 * WIDTH, 0, 0);
-		newPos = new Vector3(pos);
+		pos = new Vector(-width / 2 * WIDTH, 0, 0);
+		newPos = new Vector(pos);
 		
 		glGenFramebuffers(1, fbo, 0);
 		glGenRenderbuffers(1, rbo, 0);
@@ -180,24 +177,24 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 	
 	public boolean set(int x, int z, TileType type) {
 		if (!isInBounds(x, z)) return false;
-		TiledNode tn = get(x, z);
-		boolean ch = type != tn.type;
+		TileType t = get(x, z);
+		boolean ch = type != t;
 		if (ch) dirty = true;
-		tn.type = type;
+		map[z * width + x] = type.ordinal();
 		return ch;
 	}
 	
 	public boolean replace(int x, int z, TileType from, TileType to) {
-		if (!isInBounds(x, z) || getType(x, z) != from) return false;
-		TiledNode tn = get(x, z);
-		boolean ch = tn.type != to;
+		if (!isInBounds(x, z) || get(x, z) != from) return false;
+		TileType t = get(x, z);
+		boolean ch = t != to;
 		if (ch) dirty = true;
-		tn.type = to;
+		map[z * width + x] = to.ordinal();
 		return ch;
 	}
 	
 	public CanBuildResult canBuildOn(final int x, final int z, final Player player) {
-		if (!getType(x, z).solid) return new CanBuildResult(1);
+		if (!get(x, z).solid) return new CanBuildResult(1);
 		
 		ResultProcedure<Integer> p = new ResultProcedure<Integer>(3) {
 			@Override
@@ -210,7 +207,7 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 					return false;
 				}
 				if (e instanceof City && player.equals(e.getOwner())) {
-					if (Vector2.dst(e.getRealX(), e.getRealZ(), x, z) < ((City) e).getRadius()) {
+					if (Vector.dst(e.getRealX(), e.getRealZ(), x, z) < ((City) e).getRadius()) {
 						result = 0;
 						return false;
 					}
@@ -240,7 +237,7 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 		return (Building) p.getResult();
 	}
 	
-	public Vector2 getMappedCoords(float screenX, float screenY) {
+	public Vector getMappedCoords(float screenX, float screenY) {
 		screenX = screenX / Wargame.scale - pos.x;
 		screenY = screenY / Wargame.scale - (pos.y - texHeight / 2 + HEIGHT / 2 + DEPTH / 2 * add);
 		
@@ -250,36 +247,38 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 		int x = (int) Math.floor(screenX / WIDTH * 2 - screenY / DEPTH * 2 + width);
 		int z = (int) Math.floor(screenY / DEPTH * 2 + screenX / WIDTH * 2 + depth);
 		
-		return new Vector2(x / 2, z / 2);
+		return new Vector(x / 2, z / 2);
 	}
 	
-	public TiledNode get(Vector2 v) {
+	public TileType get(Vector v) {
 		return get(v.x, v.y);
 	}
 	
-	public TiledNode get(float x, float z) {
+	public TileType get(float x, float z) {
 		return get((int) Math.floor(x), (int) Math.floor(z));
 	}
 	
-	public TiledNode get(int x, int z) {
-		if (!isInBounds(x, z)) return null;
+	public TileType get(int x, int z) {
+		if (!isInBounds(x, z)) return TileType.Air;
 		
-		TiledNode tn = map[z * width + x];
-		if (tn == null) {
-			tn = new TiledNode(x, z, this, TileType.Air);
-			map[tn.getIndex()] = tn;
-		}
-		return tn;
+		int ord = map[z * width + x];
+		return TileType.values()[ord];
 	}
 	
-	public TileType getType(int x, int z) {
-		if (!isInBounds(x, z)) return TileType.Air;
-		return get(x, z).type;
+	public boolean isBlocked(int x, int z) {
+		if (!isInBounds(x, z)) return true;
+		return blocked[z * width + x];
+	}
+	
+	public void setBlocked(int x, int z, boolean blocked) {
+		if (!isInBounds(x, z)) return;
+		
+		this.blocked[z * width + x] = blocked;
 	}
 	
 	public String getFile(int x, int z) {
 		if (!isInBounds(x, z)) return null;
-		String t = getType(x, z).name();
+		String t = get(x, z).name();
 		
 		return t;
 	}
@@ -290,7 +289,7 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 			Entity e = (Entity) list[i];
 			if (e.isDead()) {
 				e.onRemoval();
-				if (e instanceof Building) get((int) e.getRealX(), (int) e.getRealZ()).setBlocked(false);
+				if (e instanceof Building) setBlocked((int) e.getRealX(), (int) e.getRealZ(), false);
 				entities.delete(e);
 			} else e.update(timePassed);
 		}
@@ -300,13 +299,10 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 		//			((Entity) list[i]).updatePosition();
 		//		}
 		
-		if (pendingSpawns.size > 0) {
-			Entity e = pendingSpawns.first();
-			pendingSpawns.removeValue(e, true);
+		if (pendingSpawns.size() > 0) {
+			Entity e = pendingSpawns.removeFirst();
 			e.onSpawn();
-			if (e instanceof Building) {
-				get((int) e.getRealX(), (int) e.getRealZ()).setBlocked(true);
-			}
+			if (e instanceof Building) setBlocked((int) e.getRealX(), (int) e.getRealZ(), true);
 			entities.add(e);
 		}
 	}
@@ -374,11 +370,11 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 		clampNewPosition();
 	}
 	
-	public Vector3 getPos() {
+	public Vector getPos() {
 		return pos;
 	}
 	
-	public Vector3 getNewPos() {
+	public Vector getNewPos() {
 		return newPos;
 	}
 	
@@ -392,15 +388,5 @@ public class World implements Renderable, IndexedGraph<TiledNode> {
 	
 	public ERTree getEntities() {
 		return entities;
-	}
-	
-	@Override
-	public Array<Connection<TiledNode>> getConnections(TiledNode fromNode) {
-		return fromNode.getConnections();
-	}
-	
-	@Override
-	public int getNodeCount() {
-		return width * depth;
 	}
 }

@@ -17,6 +17,7 @@
 package de.dakror.wargame.util;
 
 import android.view.MotionEvent;
+import de.dakror.wargame.ui.Button;
 
 /**
  * @author Maximilian Stark | Dakror

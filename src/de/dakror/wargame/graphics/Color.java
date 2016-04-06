@@ -21,10 +21,29 @@ package de.dakror.wargame.graphics;
  *
  */
 public class Color {
-	public static final Color WHITE = new Color(1, 1, 1, 1);
-	public static final Color BLACK = new Color(0, 0, 0, 1);
+	public static class Colors {
+		// Palette URL: http://paletton.com/#uid=33D0u0khxjJ9btcdTnVlJgaqGby
+		public static final Color MEDIUM_BLUE = new Color(51 / 255f, 74 / 255f, 103 / 255f, 1);
+		public static final Color KHAKI = new Color(157 / 255f, 139 / 255f, 71 / 255f, 1);
+		public static final Color MINT = new Color(36 / 255f, 109 / 255f, 95 / 255f, 1);
+		public static final Color DARK_RED = new Color(92 / 255f, 30 / 255f, 15 / 255f, 1);
+		
+		public static final Color WHITE = new Color(1, 1, 1, 1);
+		public static final Color RED = new Color(1, 0, 0, 1);
+		public static final Color BLACK = new Color(0, 0, 0, 1);
+		
+		public static final Color ROYAL = new Color(0x4169e1ff);
+		public static final Color SLATE = new Color(0x708090ff);
+	}
 	
 	public float r, g, b, a;
+	
+	public Color(int rgba) {
+		r = ((rgba & 0xff000000) >>> 24) / 255f;
+		g = ((rgba & 0x00ff0000) >>> 16) / 255f;
+		b = ((rgba & 0x0000ff00) >>> 8) / 255f;
+		a = ((rgba & 0x000000ff)) / 255f;
+	}
 	
 	public Color(float r, float g, float b) {
 		this(r, g, b, 1);
@@ -42,5 +61,14 @@ public class Color {
 		g = c.g;
 		b = c.b;
 		a = c.a;
+	}
+	
+	public Color set(Color c) {
+		r = c.r;
+		g = c.g;
+		b = c.b;
+		a = c.a;
+		
+		return this;
 	}
 }

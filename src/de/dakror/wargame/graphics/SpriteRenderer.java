@@ -23,6 +23,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+import de.dakror.wargame.graphics.Color.Colors;
+
 /**
  * @author Maximilian Stark | Dakror
  *
@@ -97,15 +99,15 @@ public class SpriteRenderer {
 	}
 	
 	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, int texture) {
-		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, Color.WHITE, Color.BLACK, -1, texture);
+		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, Colors.WHITE, Colors.BLACK, -1, texture);
 	}
 	
 	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, Color color, int texture) {
-		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, color, Color.BLACK, -1, texture);
+		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, color, Colors.BLACK, -1, texture);
 	}
 	
 	public void render(float x, float y, float z, float w, float h, float tx, float ty, float tw, float th, float p, int texture) {
-		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, Color.WHITE, Color.BLACK, p, texture);
+		render(x, y, z, w, h, tx, ty, tw, th, 0, 0, w, h, Colors.WHITE, Colors.BLACK, p, texture);
 	}
 	
 	public void render(Sprite sprite) {

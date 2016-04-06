@@ -20,6 +20,7 @@ import com.infomatiq.jsi.Point;
 import com.infomatiq.jsi.Rectangle;
 import com.infomatiq.jsi.rtree.RTree;
 
+import de.dakror.wargame.entity.Entity;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntProcedure;
 
@@ -48,7 +49,7 @@ public class ERTree extends RTree {
 	}
 	
 	Rectangle setCache(Entity e) {
-		return setCache(e.getRealX(), e.getRealZ(), e.getBoundingRadius() * 2, e.getBoundingRadius() * 2);
+		return setCache(e.getRealX(), e.getRealZ(), e.getBoundingWidth(), e.getBoundingDepth());
 	}
 	
 	public Entity get(int id) {
@@ -68,7 +69,7 @@ public class ERTree extends RTree {
 	}
 	
 	public void update(float newX, float newZ, Entity e) {
-		if (delete(e, true)) add(setCache(newX, newZ, e.getBoundingRadius() * 2, e.getBoundingRadius() * 2), e.id);
+		if (delete(e, true)) add(setCache(newX, newZ, e.getBoundingWidth(), e.getBoundingDepth()), e.id);
 	}
 	
 	public void contains(float x, float z, float width, float depth, TIntProcedure callback) {

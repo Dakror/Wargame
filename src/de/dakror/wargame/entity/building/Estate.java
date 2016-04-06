@@ -16,17 +16,22 @@
 
 package de.dakror.wargame.entity.building;
 
-import java.util.Queue;
+import java.util.LinkedList;
 
 import de.dakror.wargame.Player;
 import de.dakror.wargame.Wargame;
+import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.entity.Unit;
 import de.dakror.wargame.entity.Unit.UnitType;
+import de.dakror.wargame.graphics.Color.Colors;
 import de.dakror.wargame.graphics.Sprite;
 import de.dakror.wargame.graphics.SpriteRenderer;
 import de.dakror.wargame.graphics.TextRenderer;
+import de.dakror.wargame.ui.Button;
 import de.dakror.wargame.ui.ContextMenu;
 import de.dakror.wargame.ui.Panel;
+import de.dakror.wargame.ui.ProgressBar;
+import de.dakror.wargame.ui.UI;
 import de.dakror.wargame.util.Listeners.ButtonListener;
 
 /**
@@ -83,7 +88,7 @@ public class Estate extends Building {
 				
 				@Override
 				public void onUp(Button b) {
-					if (queue.size >= 9) return; // TODO show error
+					if (queue.size() >= 9) return; // TODO show error
 					
 					for (Button bt : buttons) {
 						if (bt.isToggled()) {
@@ -122,13 +127,13 @@ public class Estate extends Building {
 				t.renderText(secondary.getX() + 20, secondary.getY() + secondary.getHeight() - 60, 0, 0.8f, Colors.MEDIUM_BLUE, type.name(), r);
 				t.renderText(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 100, 0, 0.5f, Colors.DARK_RED, "Costs: $" + type.costs, r);
 				t.renderText(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 135, 0, 0.5f, Colors.KHAKI, "Train time: " + type.produceDuration + "s", r);
-				float w = t.renderText(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 170, 0, 0.5f, Color.ROYAL, type.weapon0.getName(), r);
+				float w = t.renderText(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 170, 0, 0.5f, Colors.ROYAL, type.weapon0.getName(), r);
 				t.renderText(secondary.getX() + 40 + w, secondary.getY() + secondary.getHeight() - 170, 0, 0.5f, Colors.MINT, "(" + type.weapon1.getName() + ")", r);
 				UI.renderStats(secondary.getX() + 30, secondary.getY() + secondary.getHeight() - 205, secondary.getWidth(), type.hp, type.atk, type.def, r, t);
 			}
 			
-			if (queue.size > 0) {
-				ProductionTask first = queue.first();
+			if (queue.size() > 0) {
+				ProductionTask first = queue.getFirst();
 				pb.setValue(1 - (first.timeLeft / first.allTime));
 				Sprite s = first.src.getForeground();
 				s.resizeSoft(150, 150);
@@ -151,13 +156,13 @@ public class Estate extends Building {
 				}
 			} else pb.setValue(0);
 			pb.render(r, t);
-			if (queue.size > 0) {
-				t.renderText(pb.getX() + pb.getWidth() / 2 - 30, pb.getY() + 10, 0, 0.7f, Color.BLACK, (int) Math.ceil(queue.first().timeLeft) + "s", r);
+			if (queue.size() > 0) {
+				t.renderText(pb.getX() + pb.getWidth() / 2 - 30, pb.getY() + 10, 0, 0.7f, Colors.BLACK, (int) Math.ceil(queue.getFirst().timeLeft) + "s", r);
 			}
 		}
 	}
 	
-	Queue<ProductionTask> queue;
+	LinkedList<ProductionTask> queue;
 	
 	public Estate(int x, int z, Player owner) {
 		super(x, z, owner, BuildingType.Estate);
@@ -168,7 +173,7 @@ public class Estate extends Building {
 		function = "Trains Infantry";
 		detail1 = "These soldiers do the";
 		detail2 = "dirty work for you.";
-		queue = new Queue<ProductionTask>();
+		queue = new LinkedList<ProductionTask>();
 	}
 	
 	@Override
@@ -181,17 +186,16 @@ public class Estate extends Building {
 	public void update(float timePassed) {
 		super.update(timePassed);
 		
-		if (queue.size > 0) {
-			if (queue.first().paid) {
-				queue.first().timeLeft -= timePassed;
-				if (queue.first().timeLeft <= 0) {
+		if (queue.size() > 0) {
+			if (queue.getFirst().paid) {
+				queue.getFirst().timeLeft -= timePassed;
+				if (queue.getFirst().timeLeft <= 0) {
 					Unit u = new Unit(x + 1 + (float) Math.random(), z + (float) Math.random(), owner, queue.removeFirst().unitType);
 					world.addEntity(u);
-					Wargame.testFormation.addMember(u);
 				}
-			} else if (owner.money >= queue.first().unitType.costs) { // TODO: show when funds insufficient
-				owner.money -= queue.first().unitType.costs;
-				queue.first().paid = true;
+			} else if (owner.money >= queue.getFirst().unitType.costs) { // TODO: show when funds insufficient
+				owner.money -= queue.getFirst().unitType.costs;
+				queue.getFirst().paid = true;
 			}
 		}
 	}

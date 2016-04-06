@@ -20,6 +20,7 @@ package de.dakror.wargame.world;
  * @author Maximilian Stark | Dakror
  */
 public enum TileType {
+	// Don't modify order!
 	Air(false),
 	Basement(),
 	Custom0,

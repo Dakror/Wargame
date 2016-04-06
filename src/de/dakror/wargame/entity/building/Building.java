@@ -18,9 +18,13 @@ package de.dakror.wargame.entity.building;
 
 import android.view.MotionEvent;
 import de.dakror.wargame.Player;
+import de.dakror.wargame.entity.Entity;
+import de.dakror.wargame.graphics.Color.Colors;
 import de.dakror.wargame.graphics.SpriteRenderer;
 import de.dakror.wargame.graphics.TextRenderer;
+import de.dakror.wargame.ui.ContextMenu;
 import de.dakror.wargame.ui.Panel;
+import de.dakror.wargame.ui.UI;
 import de.dakror.wargame.util.Listeners.TouchListener;
 import de.dakror.wargame.world.World;
 
@@ -58,8 +62,8 @@ public abstract class Building extends Entity implements TouchListener {
 	private Building(int x, int z, int face, Player owner, boolean huge, BuildingType type) {
 		super(x, z, face, owner, huge, type.name());
 		this.type = type;
-		boundingRadius = 0.5f;
-		pos.set(x + boundingRadius, z + boundingRadius);
+		boundWidth = 1;
+		boundDepth = 1;
 		onCreate();
 	}
 	
@@ -97,12 +101,12 @@ public abstract class Building extends Entity implements TouchListener {
 		t.renderText(p.getX() + 20, p.getY() + p.getHeight() - 60, 0, 0.8f, Colors.MEDIUM_BLUE, type.name(), r);
 		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 100, 0, 0.5f, Colors.DARK_RED, "Costs: $" + buildCosts, r);
 		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 135, 0, 0.5f, runCosts > 0 ? Colors.KHAKI : Colors.MINT, (runCosts > 0 ? "Run costs: " : "Profits: ") + Math.abs(runCosts) + "$/min", r);
-		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 170, 0, 0.5f, Color.ROYAL, function, r);
+		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 170, 0, 0.5f, Colors.ROYAL, function, r);
 		
 		UI.renderStats(p.getX() + 30, p.getY() + p.getHeight() - 205, p.getWidth(), hp, atk, def, r, t);
 		
-		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 245, 0, 0.5f, Color.SLATE, detail1, r);
-		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 275, 0, 0.5f, Color.SLATE, detail2, r);
+		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 245, 0, 0.5f, Colors.SLATE, detail1, r);
+		t.renderText(p.getX() + 30, p.getY() + p.getHeight() - 275, 0, 0.5f, Colors.SLATE, detail2, r);
 	}
 	
 	@Override
@@ -168,6 +172,6 @@ public abstract class Building extends Entity implements TouchListener {
 	@Override
 	public void onDeselect() {
 		selected = false;
-		additive.set(Color.BLACK);
+		additive.set(Colors.BLACK);
 	}
 }

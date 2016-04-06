@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import android.view.MotionEvent;
 import de.dakror.wargame.Wargame;
+import de.dakror.wargame.entity.Entity;
 import de.dakror.wargame.graphics.Renderable;
 import de.dakror.wargame.graphics.SpriteRenderer;
 import de.dakror.wargame.graphics.TextRenderer;

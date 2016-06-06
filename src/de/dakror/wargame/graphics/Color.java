@@ -34,6 +34,9 @@ public class Color {
 		
 		public static final Color ROYAL = new Color(0x4169e1ff);
 		public static final Color SLATE = new Color(0x708090ff);
+		
+		public static final Color YELLOW = new Color(0xffff00ff);
+		public static final Color GOLD = new Color(0xffd700ff);
 	}
 	
 	public float r, g, b, a;

@@ -19,13 +19,16 @@ package de.dakror.wargame.entity;
 import de.dakror.wargame.Player;
 import de.dakror.wargame.Wargame;
 import de.dakror.wargame.graphics.AnimatedSprite;
+import de.dakror.wargame.graphics.Renderable;
+import de.dakror.wargame.graphics.SpriteRenderer;
+import de.dakror.wargame.graphics.TextRenderer;
 import de.dakror.wargame.graphics.TextureAtlas.Tile;
 import de.dakror.wargame.world.World;
 
 /**
  * @author Maximilian Stark | Dakror
  */
-public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, Comparable<Entity> {
+public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, Comparable<Entity>, Renderable {
 	protected boolean dead;
 	/**
 	 * 0 = X+<br>
@@ -89,6 +92,11 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 	}
 	
 	@Override
+	public void render(SpriteRenderer r, TextRenderer t) {
+		r.render(this);
+	}
+	
+	@Override
 	public float getX() {
 		return (x + (huge ? 1 : 0)) * (World.WIDTH) / 2 + z * (World.WIDTH) / 2 + world.getPos().x + ((World.WIDTH) - width) / 4;
 	}
@@ -144,7 +152,7 @@ public abstract class Entity extends AnimatedSprite implements EntityLifeCycle, 
 	protected void updateTexture() {
 		tile = faces[face];
 		super.updateTexture();
-		width = textureWidth * tile.regions.get(index).texture.width;
-		height = textureHeight * tile.regions.get(index).texture.height;
+		width = textureWidth * tile.regions.get(index).texture.width * (huge ? 2 : 1);
+		height = textureHeight * tile.regions.get(index).texture.height * (huge ? 2 : 1);
 	}
 }

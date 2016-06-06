@@ -348,7 +348,7 @@ public class World implements Renderable {
 		for (int i = 0; i < list.length; i++) {
 			Entity e = (Entity) list[i];
 			if ((e.getX() + e.getWidth()) * Wargame.scale >= -Wargame.width / 2 && e.getX() * Wargame.scale <= Wargame.width / 2 && e.getY() * Wargame.scale <= Wargame.height / 2 && (e.getY() + e.getHeight()) * Wargame.scale >= -Wargame.height / 2) {
-				r.render(e);
+				e.render(r, t);
 				rEntities++;
 			}
 		}

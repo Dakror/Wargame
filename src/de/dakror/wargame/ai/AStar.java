@@ -14,33 +14,11 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.dakror.wargameV2.graphics;
+package de.dakror.wargame.ai;
 
 /**
  * @author Maximilian Stark | Dakror
- *
  */
-public class Color {
-	public static final Color WHITE = new Color(1, 1, 1, 1);
-	public static final Color BLACK = new Color(0, 0, 0, 1);
-	
-	public float r, g, b, a;
-	
-	public Color(float r, float g, float b) {
-		this(r, g, b, 1);
-	}
-	
-	public Color(float r, float g, float b, float a) {
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.a = a;
-	}
-	
-	public Color(Color c) {
-		r = c.r;
-		g = c.g;
-		b = c.b;
-		a = c.a;
-	}
+public class AStar {
+
 }

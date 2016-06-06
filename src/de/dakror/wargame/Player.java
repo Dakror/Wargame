@@ -16,6 +16,9 @@
 
 package de.dakror.wargame;
 
+import java.util.ArrayList;
+
+import de.dakror.wargame.entity.Unit;
 import de.dakror.wargame.entity.building.Building;
 
 /**
@@ -29,12 +32,14 @@ public class Player {
 	String name;
 	
 	Building mainCity;
+	final ArrayList<Unit> generals;
 	
 	public Player(String name, boolean human, int color) {
 		this.name = name;
 		this.human = human;
 		this.color = color;
 		money = Float.POSITIVE_INFINITY;
+		generals = new ArrayList<Unit>();
 	}
 	
 	public boolean isHuman() {
@@ -47,6 +52,10 @@ public class Player {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public ArrayList<Unit> getGenerals() {
+		return generals;
 	}
 	
 	public void setMainCity(Building mainCity) {

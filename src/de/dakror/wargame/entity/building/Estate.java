@@ -190,7 +190,7 @@ public class Estate extends Building {
 			if (queue.getFirst().paid) {
 				queue.getFirst().timeLeft -= timePassed;
 				if (queue.getFirst().timeLeft <= 0) {
-					Unit u = new Unit(x + 1 + (float) Math.random(), z + (float) Math.random(), owner, queue.removeFirst().unitType);
+					Unit u = new Unit(x + 1 + (float) Math.random() * 0.5f - 0.25f, z + (float) Math.random() * 0.5f - 0.25f, owner, queue.removeFirst().unitType);
 					world.addEntity(u);
 				}
 			} else if (owner.money >= queue.getFirst().unitType.costs) { // TODO: show when funds insufficient

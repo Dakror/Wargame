@@ -72,6 +72,10 @@ public class ERTree extends RTree {
 		if (delete(e, true)) add(setCache(newX, newZ, e.getBoundingWidth(), e.getBoundingDepth()), e.id);
 	}
 	
+	public void intersects(float x, float z, float width, float depth, TIntProcedure callback) {
+		intersects(setCache(x, z, width, depth), callback);
+	}
+	
 	public void contains(float x, float z, float width, float depth, TIntProcedure callback) {
 		contains(setCache(x, z, width, depth), callback);
 	}
